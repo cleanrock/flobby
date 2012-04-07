@@ -23,7 +23,7 @@ int PopupMenu::show()
 
     if (m)
     {
-        return reinterpret_cast<int>(m->user_data());
+        return (int)(m->user_data());
     }
     else
     {

@@ -63,7 +63,7 @@ UserInterface::UserInterface(Model & model) :
             { "&Login...", FL_COMMAND +'l', (Fl_Callback *)&menuLogin, this },
             { "&Disconnect", 0, (Fl_Callback *)&menuDisconnect, this, FL_MENU_INACTIVE },
             { "&Channels...", FL_COMMAND +'h', (Fl_Callback *)&menuChannels, this, FL_MENU_INACTIVE },
-            { "&Test", FL_COMMAND +'t', (Fl_Callback *)&onTest, this }, // TODO remove
+//            { "&Test", FL_COMMAND +'t', (Fl_Callback *)&onTest, this }, // TODO remove
             { "E&xit", FL_COMMAND +'q', (Fl_Callback *)&onQuit, this },
             { 0 },
         { "Se&ttings",              0, 0, 0, FL_SUBMENU },
