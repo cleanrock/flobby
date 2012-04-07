@@ -1,5 +1,6 @@
 #include "PopupMenu.h"
 #include <cassert>
+#include <cstdint>
 
 PopupMenu::PopupMenu():
     menu_(0,0,0,0)
@@ -14,7 +15,7 @@ PopupMenu::~PopupMenu()
 void PopupMenu::add(std::string const & text, int id)
 {
     assert(id > 0);
-    menu_.add(text.c_str(), 0, 0, (void*)id);
+    menu_.add(text.c_str(), 0, 0, reinterpret_cast<void*>(static_cast<intptr_t>(id)) );
 }
 
 int PopupMenu::show()
@@ -23,7 +24,7 @@ int PopupMenu::show()
 
     if (m)
     {
-        return (int)(m->user_data());
+        return reinterpret_cast<intptr_t>(m->user_data());
     }
     else
     {
