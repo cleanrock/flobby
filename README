@@ -1,0 +1,10 @@
+flobby is a spring (http://springrts.com) lobby written in C++11.
+
+Dependencies worth of note:
+FLTK 1.3
+google-glog
+boost
+C++11
+
+TODO
+
