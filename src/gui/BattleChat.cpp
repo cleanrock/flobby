@@ -15,7 +15,6 @@
 BattleChat::BattleChat(int x, int y, int w, int h, Model & model):
     Fl_Group(x, y, w, h),
     model_(model)
-    // TODO remove deleteLine_(0)
 {
     int const ih = 24; // input height
 
@@ -43,7 +42,6 @@ BattleChat::~BattleChat()
 
 void BattleChat::battleChatMsg(std::string const & userName, std::string const & msg)
 {
-    //std::string line(userName + ": " + msg);
     std::ostringstream oss;
 
     // handle messages from host
@@ -57,9 +55,13 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
 
 }
 
-void BattleChat::clear()
+void BattleChat::close()
 {
-    // TODO
+    voteLine_->label(0);
+    voteLine_->deactivate();
+
+    // add empty line
+    addInfo("");
 }
 
 void BattleChat::onText(Fl_Widget * w, void * data)
@@ -72,9 +74,6 @@ void BattleChat::onText(Fl_Widget * w, void * data)
     if (!msg.empty())
     {
         bc->model_.sayBattle(msg);
-
-        // always scroll on input
-        // TODO bc->textDisplay_->show_insert_position();
     }
     bc->input_->value("");
 }
@@ -87,12 +86,4 @@ void BattleChat::addInfo(std::string const & msg)
 void BattleChat::battleJoined(Battle const & battle)
 {
     battleHost_ = battle.founder();
-
-    // TODO remove if line limit in TextDisplay is ok
-//    while (deleteLine_ > 0)
-//    {
-//        textDisplay_->remove(deleteLine_);
-//        --deleteLine_;
-//    }
-//    deleteLine_ = textDisplay_->size();
 }

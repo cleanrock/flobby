@@ -309,8 +309,7 @@ void BattleRoom::userChanged(User const & user)
 
 void BattleRoom::close()
 {
-    // add empty line
-    battleChat_->addInfo("");
+    battleChat_->close();
 
     battleId_ = -1;
 

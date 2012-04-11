@@ -19,7 +19,7 @@ public:
 
     void battleJoined(Battle const & battle); // call when joining a battle
     void addInfo(std::string const & msg);
-    void clear();
+    void close(); // call when "me" left battle
 
 private:
     Model & model_;
