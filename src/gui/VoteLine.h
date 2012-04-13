@@ -21,6 +21,13 @@ private:
     Fl_Button * yes_;
     Fl_Button * no_;
 
+    std::string question_;
+    int votesYes_;
+    int votesNo_;
+    int votesTotal_;
+    std::string votes_;
+
+    void makeVotesString();
     static void onYes(Fl_Widget * w, void * data);
     static void onNo(Fl_Widget * w, void * data);
 };
