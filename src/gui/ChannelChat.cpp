@@ -67,6 +67,7 @@ int ChannelChat::handle(int event)
     switch (event)
     {
     case FL_SHOW:
+        labelcolor(FL_BLACK);
         Fl::focus(input_);
         break;
     }
@@ -134,7 +135,10 @@ void ChannelChat::userJoined(std::string const & channelName, std::string const 
     if (channelName == channelName_)
     {
         userList_->addRow(makeRow(userName));
-        text_->append(userName + " joined");
+        std::ostringstream oss;
+        oss << "@C" << FL_DARK2 << "@." << userName << " joined";
+
+        text_->append(oss.str());
     }
 }
 
@@ -142,15 +146,17 @@ void ChannelChat::userLeft(std::string const & channelName, std::string const & 
 {
     if (channelName == channelName_)
     {
+
         userList_->removeRow(userName);
-        if (reason.empty())
+
+        std::ostringstream oss;
+        oss << "@C" << FL_DARK2 << "@." << userName << " left";
+
+        if (!reason.empty())
         {
-            text_->append(userName + " left ");
+            oss << " (" << reason << ")";
         }
-        else
-        {
-            text_->append(userName + " left (" + reason + ")");
-        }
+        text_->append(oss.str());
     }
 }
 
@@ -162,3 +168,9 @@ void ChannelChat::said(std::string const & channelName, std::string const & user
     }
 }
 
+void ChannelChat::leave()
+{
+    model_.leaveChannel(channelName_);
+    text_->clear();
+    userList_->clear();
+}

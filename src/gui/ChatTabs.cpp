@@ -5,6 +5,7 @@
 #include "ServerMessages.h"
 #include "ChannelChat.h"
 #include "PrivateChat.h"
+#include "PopupMenu.h"
 
 #include "model/Model.h"
 
@@ -14,11 +15,12 @@
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Input.H>
+#include <FL/fl_ask.H>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <sstream>
-#include <iostream>
+#include <iostream> // TODO remove
 
 
 ChatTabs::ChatTabs(int x, int y, int w, int h, Model & model):
@@ -36,8 +38,9 @@ ChatTabs::ChatTabs(int x, int y, int w, int h, Model & model):
     resizable(server_);
 
     // model signals
-    model_.connectSaidPrivate( boost::bind(&ChatTabs::said, this, _1, _2) );
+    model_.connectSaidPrivate( boost::bind(&ChatTabs::saidPrivate, this, _1, _2) );
     model_.connectChannelJoined( boost::bind(&ChatTabs::channelJoined, this, _1) );
+    model_.connectSaidChannel( boost::bind(&ChatTabs::saidChannel, this, _1, _2, _3) );
 }
 
 ChatTabs::~ChatTabs()
@@ -79,6 +82,13 @@ void ChatTabs::openPrivateChat(std::string const & userName)
     {
         assert(it->second);
         PrivateChat * pc = it->second;
+
+        // re-add it if it was closed
+        if (find(pc) == children())
+        {
+            add(pc);
+        }
+
         value(pc);
         pc->show();
     }
@@ -95,23 +105,136 @@ void ChatTabs::openChannelChat(std::string const & channelName)
     else
     {
         assert(it->second);
-        ChannelChat * pc = it->second;
-        value(pc);
-        pc->show();
+        ChannelChat * cc = it->second;
+
+        // re-add it if it was closed
+        if (find(cc) == children())
+        {
+            add(cc);
+        }
+
+        value(cc);
+        cc->show();
     }
 
 }
 
-void ChatTabs::said(std::string const & userName, std::string const & msg)
+void ChatTabs::saidPrivate(std::string const & userName, std::string const & msg)
 {
     auto it = privateChats_.find(userName);
     if (it == privateChats_.end())
     {
         createChat(userName, privateChats_);
     }
+    else
+    {
+        PrivateChat * pc = it->second;
+        // re-add it if it was closed
+        if (find(pc) == children())
+        {
+            add(pc);
+        }
+        // color tab red if its not visible
+        if (value() != pc)
+        {
+            pc->labelcolor(FL_RED);
+            redraw_tabs();
+        }
+    }
+}
+
+void ChatTabs::saidChannel(std::string const & channelName, std::string const & userName, std::string const & message)
+{
+    auto it = channelChats_.find(channelName);
+    if (it != channelChats_.end())
+    {
+        // color tab red if its not visible
+        ChannelChat * cc = it->second;
+        if (value() != cc)
+        {
+            cc->labelcolor(FL_RED);
+            redraw_tabs();
+        }
+    }
 }
 
 void ChatTabs::channelJoined(std::string const & channelName)
 {
     openChannelChat(channelName);
+}
+
+int ChatTabs::handle(int event)
+{
+    // close chats and channels (left double clicking or context menu)
+    // channels are left when closed
+    // chats are not destroyed, they will be just be re-added when needed
+    if (event == FL_PUSH)
+    {
+        Fl_Widget* chat =  which(Fl::event_x(), Fl::event_y());
+
+        if (chat != 0 && chat != server_)
+        {
+            if (Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks())
+            {
+                if (closeChat(chat))
+                {
+                    return 1;
+                }
+            }
+            else if (Fl::event_button() == FL_RIGHT_MOUSE && Fl::event_clicks() == 0)
+            {
+                PopupMenu menu;
+                menu.add("Close (Leave)", 1);
+                int const id = menu.show();
+                switch (id)
+                {
+                case 1:
+                    if (closeChat(chat))
+                    {
+                        return 1;
+                    }
+                    break;
+                }
+
+            }
+        }
+    }
+
+    return Fl_Tabs::handle(event);
+}
+
+void ChatTabs::draw()
+{
+    // workaround for bugged drawing in Fl_Tabs, needed when closing tabs
+    fl_color(FL_BACKGROUND_COLOR);
+    fl_rectf(x(), y(), w(), server_->y() - y());
+
+    Fl_Tabs::draw();
+}
+
+bool ChatTabs::closeChat(Fl_Widget* w)
+{
+    for (auto & pair : privateChats_)
+    {
+        if (pair.second == w)
+        {
+            remove(w);
+            redraw();
+            return true;
+        }
+    }
+
+    for (auto & pair : channelChats_)
+    {
+        if (pair.second == w)
+        {
+            remove(w);
+            ChannelChat * cc = static_cast<ChannelChat*>(w);
+            cc->leave();
+            redraw();
+            return true;
+        }
+    }
+
+    return false;
 }

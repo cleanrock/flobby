@@ -16,6 +16,7 @@ class ChannelChat: public Fl_Tile
 public:
     ChannelChat(int x, int y, int w, int h, std::string const & channelName, Model & model);
     virtual ~ChannelChat();
+    void leave();
 
 //    void initTiles();
 

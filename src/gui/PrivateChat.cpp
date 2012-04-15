@@ -5,6 +5,7 @@
 
 #include <FL/Fl_Input.H>
 #include <FL/Fl.H>
+#include <FL/fl_ask.H>
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -17,7 +18,7 @@ PrivateChat::PrivateChat(int x, int y, int w, int h, std::string const & userNam
     std::string const tabName(" "+userName_);
     copy_label(tabName.c_str());
 
-    int const m = 1; // margin
+    int const m = 0; // margin
     int const ih = 24; // input height
     text_ = new TextDisplay(x+m, y+m, w-2*m, h-ih-2*m);
 
@@ -31,6 +32,8 @@ PrivateChat::PrivateChat(int x, int y, int w, int h, std::string const & userNam
     // model signals
     model_.connectSayPrivate( boost::bind(&PrivateChat::say, this, _1, _2) );
     model_.connectSaidPrivate( boost::bind(&PrivateChat::said, this, _1, _2) );
+    model_.connectUserJoined( boost::bind(&PrivateChat::userJoined, this, _1) );
+    model_.connectUserLeft( boost::bind(&PrivateChat::userLeft, this, _1) );
 
     Fl::focus(input_);
 }
@@ -44,6 +47,7 @@ int PrivateChat::handle(int event)
     switch (event)
     {
     case FL_SHOW:
+        labelcolor(FL_BLACK);
         Fl::focus(input_);
         break;
     }
@@ -60,9 +64,6 @@ void PrivateChat::onInput(Fl_Widget * w, void * data)
     if (!msg.empty())
     {
         pc->model_.sayPrivate(pc->userName_, msg);
-
-        // always scroll on input
-        // TODO pc->text_->show_insert_position();
     }
     pc->input_->value("");
 }
@@ -71,7 +72,9 @@ void PrivateChat::say(std::string const & userName, std::string const & msg)
 {
     if (userName == userName_)
     {
-        text_->append(msg);
+        std::ostringstream oss;
+        oss << "@C" << FL_DARK2 << "@." << msg;
+        text_->append(oss.str());
     }
 }
 
@@ -80,5 +83,26 @@ void PrivateChat::said(std::string const & userName, std::string const & msg)
     if (userName == userName_)
     {
         text_->append(userName + ": " + msg);
+        fl_beep();
+    }
+}
+
+void PrivateChat::userJoined(User const & user)
+{
+    if (user.name() == userName_)
+    {
+        std::ostringstream oss;
+        oss << "@C" << FL_DARK2 << "@." << "user joined server";
+        text_->append(oss.str());
+    }
+}
+
+void PrivateChat::userLeft(User const & user)
+{
+    if (user.name() == userName_)
+    {
+        std::ostringstream oss;
+        oss << "@C" << FL_DARK2 << "@." << "user left server";
+        text_->append(oss.str());
     }
 }

@@ -1068,6 +1068,16 @@ void Model::sayChannel(std::string const & channelName, std::string const & mess
     }
 }
 
+void Model::leaveChannel(std::string const & channelName)
+{
+    if (!channelName.empty())
+    {
+        std::ostringstream oss;
+        oss << "LEAVE " << channelName;
+        controller_.send(oss.str());
+    }
+}
+
 void Model::initMapIndex()
 {
     mapIndex_.clear();

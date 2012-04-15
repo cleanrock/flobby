@@ -171,7 +171,7 @@ void StringTable::addRow(const StringTableRow & row)
     {
         if (row.id_ == r.id_)
         {
-            throw std::runtime_error("row already exist");
+            throw std::runtime_error("row already exist: " + row.id_);
         }
     }
 

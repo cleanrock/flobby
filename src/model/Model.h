@@ -63,6 +63,7 @@ public:
     void getChannels();
     void joinChannel(std::string const & channelName);
     void sayChannel(std::string const & channelName, std::string const & message);
+    void leaveChannel(std::string const & channelName);
 
     User & me();
     void meSpec(bool spec);

@@ -4,6 +4,7 @@
 #include <string>
 
 class Model;
+class User;
 class TextDisplay;
 class Fl_Input;
 
@@ -21,8 +22,11 @@ private:
 
     int handle(int event);
 
+    // model signal handlers
     void say(std::string const & userName, std::string const & msg); // your confirm msg
     void said(std::string const & userName, std::string const & msg); // msg from other
+    void userJoined(User const & user);
+    void userLeft(User const & user);
 
     static void onInput(Fl_Widget * w, void * data);
 

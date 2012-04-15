@@ -33,12 +33,17 @@ private:
 
     template <typename M>
     void createChat(std::string const & name, M & map); // used to create both private and channel tabs
+    bool closeChat(Fl_Widget* w); // returns true of chat closed
 
     // model signal handlers
-    void said(std::string const & userName, std::string const & msg); // msg from other, needed here to create new private chat tabs
+    void saidPrivate(std::string const & userName, std::string const & msg); // msg from other, needed here to create new private chat tabs
     void channelJoined(std::string const & channelName);
+    void saidChannel(std::string const & channelName, std::string const & userName, std::string const & message);
 
     // IChat
     void openPrivateChat(std::string const & userName);
     void openChannelChat(std::string const & channelName);
+
+    int handle(int event);
+    void draw();
 };
