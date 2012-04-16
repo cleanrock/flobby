@@ -1,11 +1,11 @@
-flobby is a spring (http://springrts.com) lobby written in C++11.
+flobby is a spring (http://springrts.com) lobby client written in C++.
 It is developed and tested on archlinux.
 
-Dependencies worth of note:
+Dependencies worth noting:
 FLTK 1.3
 google-glog
 boost
-C++11 (gcc 4.6.3 should be ok)
+C++11 (gcc 4.6 should be ok)
 
 Build and run:
 cmake .
