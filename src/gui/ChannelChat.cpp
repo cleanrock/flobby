@@ -1,5 +1,6 @@
 #include "ChannelChat.h"
 #include "TextDisplay.h"
+#include "IChatTabs.h"
 #include "Prefs.h"
 
 #include "model/Model.h"
@@ -12,8 +13,10 @@
 // we use the split setting of the ServerMessages tab in all channel tabs
 static char const * PrefServerMessagesSplitH = "ServerMessagesSplitH";
 
-ChannelChat::ChannelChat(int x, int y, int w, int h, std::string const & channelName, Model & model):
+ChannelChat::ChannelChat(int x, int y, int w, int h, std::string const & channelName,
+                         IChatTabs& iChatTabs, Model & model):
     Fl_Tile(x,y,w,h),
+    iChatTabs_(iChatTabs),
     model_(model),
     channelName_(channelName)
 {
@@ -85,8 +88,7 @@ void ChannelChat::onInput(Fl_Widget * w, void * data)
     {
         cc->model_.sayChannel(cc->channelName_, msg);
 
-        // always scroll on input
-        // TODO
+        // TODO ??? always scroll on input
     }
     cc->input_->value("");
 }
@@ -110,12 +112,12 @@ void ChannelChat::topic(std::string const & channelName, std::string const & aut
 {
     if (channelName == channelName_)
     {
-        text_->append("Topic: " + topic);
+        append("Topic: " + topic);
 
         std::string timeString(ctime(&epochSeconds));
         boost::algorithm::erase_all(timeString, "\n");
 
-        text_->append("Topic set " + timeString + " by " + author);
+        append("Topic set " + timeString + " by " + author);
     }
 }
 
@@ -138,7 +140,7 @@ void ChannelChat::userJoined(std::string const & channelName, std::string const 
         std::ostringstream oss;
         oss << "@C" << FL_DARK2 << "@." << userName << " joined";
 
-        text_->append(oss.str());
+        append(oss.str());
     }
 }
 
@@ -156,7 +158,7 @@ void ChannelChat::userLeft(std::string const & channelName, std::string const & 
         {
             oss << " (" << reason << ")";
         }
-        text_->append(oss.str());
+        append(oss.str());
     }
 }
 
@@ -164,7 +166,7 @@ void ChannelChat::said(std::string const & channelName, std::string const & user
 {
     if (channelName == channelName_)
     {
-        text_->append(userName + ": " + message);
+        append(userName + ": " + message, true);
     }
 }
 
@@ -173,4 +175,16 @@ void ChannelChat::leave()
     model_.leaveChannel(channelName_);
     text_->clear();
     userList_->clear();
+}
+
+void ChannelChat::append(std::string const & msg, bool interesting)
+{
+    text_->append(msg);
+    // make ChatTabs redraw header
+    if (interesting && !visible() && labelcolor() != FL_RED)
+    {
+        labelcolor(FL_RED);
+        iChatTabs_.redrawTabs();
+    }
+
 }

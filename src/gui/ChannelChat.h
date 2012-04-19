@@ -6,6 +6,7 @@
 #include <string>
 
 class Model;
+class IChatTabs;
 class User;
 class TextDisplay;
 class StringTable;
@@ -14,13 +15,13 @@ class Fl_Input;
 class ChannelChat: public Fl_Tile
 {
 public:
-    ChannelChat(int x, int y, int w, int h, std::string const & channelName, Model & model);
+    ChannelChat(int x, int y, int w, int h, std::string const & channelName,
+                IChatTabs& iChatTabs, Model & model);
     virtual ~ChannelChat();
     void leave();
 
-//    void initTiles();
-
 private:
+    IChatTabs & iChatTabs_;
     Model & model_;
     TextDisplay * text_;
     Fl_Input * input_;
@@ -28,10 +29,9 @@ private:
 
     std::string channelName_;
 
-    int handle(int event);
-
     static void onInput(Fl_Widget * w, void * data);
-
+    int handle(int event);
+    void append(std::string const & msg, bool interesting = false);
     StringTableRow makeRow(std::string const & userName);
     std::string flagsString(User const & user);
 

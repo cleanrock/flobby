@@ -20,27 +20,27 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <sstream>
-#include <iostream> // TODO remove
 
 
 ChatTabs::ChatTabs(int x, int y, int w, int h, Model & model):
     Fl_Tabs(x,y,w,h),
     model_(model)
 {
-    end();
+    selection_color(FL_LIGHT2);
 
     client_area(x,y,w,h);
     int const off = 0;
     y += off; h -= off;
-    server_ = new ServerMessages(x,y,w,h, model_, *this);
+    server_ = new ServerMessages(x,y,w,h, *this, *this, model_);
     add(server_);
 
     resizable(server_);
 
+    end();
+
     // model signals
     model_.connectSaidPrivate( boost::bind(&ChatTabs::saidPrivate, this, _1, _2) );
     model_.connectChannelJoined( boost::bind(&ChatTabs::channelJoined, this, _1) );
-    model_.connectSaidChannel( boost::bind(&ChatTabs::saidChannel, this, _1, _2, _3) );
 }
 
 ChatTabs::~ChatTabs()
@@ -62,7 +62,7 @@ void ChatTabs::createChat(std::string const & name, M & map)
     int x, y, w, h;
     client_area(x,y,w,h);
     typedef typename std::remove_pointer<typename M::mapped_type>::type Type;
-    Type * chat = new Type(x,y,w,h, name, model_);
+    Type * chat = new Type(x,y,w,h, name, *this, model_);
     add(chat);
     // pc->said(userName, msg); TODO remove, the signal will be sent to the newly created Chat also
     map[name] = chat;
@@ -133,27 +133,6 @@ void ChatTabs::saidPrivate(std::string const & userName, std::string const & msg
         if (find(pc) == children())
         {
             add(pc);
-        }
-        // color tab red if its not visible
-        if (value() != pc)
-        {
-            pc->labelcolor(FL_RED);
-            redraw_tabs();
-        }
-    }
-}
-
-void ChatTabs::saidChannel(std::string const & channelName, std::string const & userName, std::string const & message)
-{
-    auto it = channelChats_.find(channelName);
-    if (it != channelChats_.end())
-    {
-        // color tab red if its not visible
-        ChannelChat * cc = it->second;
-        if (value() != cc)
-        {
-            cc->labelcolor(FL_RED);
-            redraw_tabs();
         }
     }
 }
@@ -237,4 +216,9 @@ bool ChatTabs::closeChat(Fl_Widget* w)
     }
 
     return false;
+}
+
+void ChatTabs::redrawTabs()
+{
+    redraw_tabs();
 }

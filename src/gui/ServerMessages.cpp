@@ -2,6 +2,7 @@
 #include "TextDisplay.h"
 #include "StringTable.h"
 #include "Prefs.h"
+#include "IChatTabs.h"
 #include "IChat.h"
 #include "PopupMenu.h"
 
@@ -12,10 +13,12 @@
 
 static char const * PrefServerMessagesSplitH = "ServerMessagesSplitH";
 
-ServerMessages::ServerMessages(int x, int y, int w, int h, Model & model, IChat & chat):
+ServerMessages::ServerMessages(int x, int y, int w, int h,
+                               IChatTabs& iChatTabs, IChat & iChat, Model & model):
     Fl_Tile(x,y,w,h, "Server"),
-    model_(model),
-    chat_(chat)
+    iChatTabs_(iChatTabs),
+    iChat_(iChat),
+    model_(model)
 {
     text_ = new TextDisplay(x, y, w/2, h);
     userList_ = new StringTable(x+w/2, y, w/2, h, "UserList",
@@ -65,7 +68,7 @@ void ServerMessages::loginResult(bool success, std::string const & info)
     }
     else
     {
-        text_->append("Login failed: " + info);
+        append("Login failed: " + info, true);
     }
 }
 
@@ -74,13 +77,13 @@ void ServerMessages::connected(bool connected)
     if (!connected)
     {
         userList_->clear();
-        text_->append("Disconnected from server");
+        append("Disconnected from server", true);
     }
 }
 
 void ServerMessages::message(std::string const & msg)
 {
-    text_->append(msg);
+    append(msg, true);
 }
 
 void ServerMessages::userJoined(User const & user)
@@ -137,7 +140,7 @@ void ServerMessages::userClicked(int rowIndex, int button)
             switch (id)
             {
             case 1:
-                chat_.openPrivateChat(user.name());
+                iChat_.openPrivateChat(user.name());
                 break;
             case 2:
                 if (battle->passworded())
@@ -161,11 +164,35 @@ void ServerMessages::userClicked(int rowIndex, int button)
 void ServerMessages::userDoubleClicked(int rowIndex, int button)
 {
     StringTableRow const & row = userList_->getRow(static_cast<std::size_t>(rowIndex));
-    chat_.openPrivateChat(row.id_);
+    iChat_.openPrivateChat(row.id_);
 }
 
 void ServerMessages::ring(std::string const & userName)
 {
-    text_->append("ring from " + userName);
+    append("ring from " + userName, true);
     fl_beep();
+}
+
+int ServerMessages::handle(int event)
+{
+    switch (event)
+    {
+    case FL_SHOW:
+        labelcolor(FL_BLACK);
+        Fl::focus(userList_);
+        break;
+    }
+    return Fl_Group::handle(event);
+}
+
+void ServerMessages::append(std::string const & msg, bool interesting)
+{
+    text_->append(msg);
+    // make ChatTabs redraw header
+    if (interesting && !visible() && labelcolor() != FL_RED)
+    {
+        labelcolor(FL_RED);
+        iChatTabs_.redrawTabs();
+    }
+
 }

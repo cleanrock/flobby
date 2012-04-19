@@ -1,5 +1,6 @@
 #include "PrivateChat.h"
 #include "TextDisplay.h"
+#include "IChatTabs.h"
 
 #include "model/Model.h"
 
@@ -9,9 +10,11 @@
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 
-PrivateChat::PrivateChat(int x, int y, int w, int h, std::string const & userName, Model & model):
+PrivateChat::PrivateChat(int x, int y, int w, int h, std::string const & userName,
+                         IChatTabs& iChatTabs, Model & model):
     Fl_Group(x,y,w,h),
     userName_(userName),
+    iChatTabs_(iChatTabs),
     model_(model)
 {
     // make tab name unique
@@ -27,6 +30,7 @@ PrivateChat::PrivateChat(int x, int y, int w, int h, std::string const & userNam
     input_->when(FL_WHEN_ENTER_KEY);
 
     resizable(text_);
+
     end();
 
     // model signals
@@ -74,7 +78,7 @@ void PrivateChat::say(std::string const & userName, std::string const & msg)
     {
         std::ostringstream oss;
         oss << "@C" << FL_DARK2 << "@." << msg;
-        text_->append(oss.str());
+        append(oss.str());
     }
 }
 
@@ -82,7 +86,7 @@ void PrivateChat::said(std::string const & userName, std::string const & msg)
 {
     if (userName == userName_)
     {
-        text_->append(userName + ": " + msg);
+        append(userName + ": " + msg, true);
         fl_beep();
     }
 }
@@ -93,7 +97,7 @@ void PrivateChat::userJoined(User const & user)
     {
         std::ostringstream oss;
         oss << "@C" << FL_DARK2 << "@." << "user joined server";
-        text_->append(oss.str());
+        append(oss.str(), true);
     }
 }
 
@@ -103,6 +107,18 @@ void PrivateChat::userLeft(User const & user)
     {
         std::ostringstream oss;
         oss << "@C" << FL_DARK2 << "@." << "user left server";
-        text_->append(oss.str());
+        append(oss.str(), true);
     }
+}
+
+void PrivateChat::append(std::string const & msg, bool interesting)
+{
+    text_->append(msg);
+    // make ChatTabs redraw header
+    if (interesting && !visible() && labelcolor() != FL_RED)
+    {
+        labelcolor(FL_RED);
+        iChatTabs_.redrawTabs();
+    }
+
 }
