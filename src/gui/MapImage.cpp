@@ -1,13 +1,14 @@
 #include "MapImage.h"
 
+#include "FL/Fl.H"
 #include "FL/fl_draw.H"
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include <cmath>
 
-MapImage::MapImage(int X, int Y, int W, int H, char const * l):
-    Fl_Box(X, Y, W, H, l),
+MapImage::MapImage(int X, int Y, int W, int H):
+    Fl_Box(X, Y, W, H),
     ally_(-1)
 {
 }
@@ -77,4 +78,16 @@ void MapImage::setAlly(int ally)
         ally_ = ally;
         redraw();
     }
+}
+
+int MapImage::handle(int event)
+{
+    // generate callback on left clicks
+    if (event == FL_PUSH && Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks() == 0)
+    {
+        do_callback();
+        return 1;
+    }
+
+    return Fl_Box::handle(event);
 }

@@ -25,6 +25,9 @@ ServerMessages::ServerMessages(int x, int y, int w, int h,
             { "name", "flags" });
     end();
 
+    userList_->connectRowClicked( boost::bind(&ServerMessages::userClicked, this, _1, _2) );
+    userList_->connectRowDoubleClicked( boost::bind(&ServerMessages::userDoubleClicked, this, _1, _2) );
+
     // model signals
     model_.connectConnected( boost::bind(&ServerMessages::connected, this, _1) );
     model_.connectLoginResult( boost::bind(&ServerMessages::loginResult, this, _1, _2) );
@@ -33,10 +36,7 @@ ServerMessages::ServerMessages(int x, int y, int w, int h,
     model_.connectUserChanged( boost::bind(&ServerMessages::userChanged, this, _1) );
     model_.connectUserLeft( boost::bind(&ServerMessages::userLeft, this, _1) );
     model_.connectRing( boost::bind(&ServerMessages::ring, this, _1) );
-
-    userList_->connectRowClicked( boost::bind(&ServerMessages::userClicked, this, _1, _2) );
-    userList_->connectRowDoubleClicked( boost::bind(&ServerMessages::userDoubleClicked, this, _1, _2) );
-
+    model_.connectDownloadDone( boost::bind(&ServerMessages::downloadDone, this, _1) );
 }
 
 ServerMessages::~ServerMessages()
@@ -195,4 +195,9 @@ void ServerMessages::append(std::string const & msg, bool interesting)
         iChatTabs_.redrawTabs();
     }
 
+}
+
+void ServerMessages::downloadDone(std::string const & name)
+{
+    append("download attempt done: " + name, true);
 }

@@ -81,6 +81,7 @@ public:
     std::unique_ptr<uint8_t[]> getMapImage(std::string const & mapName, int mipLevel); // returns RGB data, mipLevel: 0->1024x1024, 1->512x512 ...
     std::unique_ptr<uint8_t[]> getMetalMap(std::string const & mapName, int & w, int & h); // returns single component data
     std::unique_ptr<uint8_t[]> getHeightMap(std::string const & mapName, int & w, int & h); // returns single component data
+    bool downloadMap(std::string const & mapName); // returns true if download attempt is done
 
     void refresh(); // to find new mods and maps
 
@@ -156,6 +157,10 @@ public:
     boost::signals::connection connectSpringExit(SpringExitSignal::slot_type subscriber)
     { return springExitSignal_.connect(subscriber); }
 
+    typedef boost::signal<void (std::string const & name)> DownloadDoneSignal;
+    boost::signals::connection connectDownloadDone(DownloadDoneSignal::slot_type subscriber)
+    { return downloadDoneSignal_.connect(subscriber); }
+
     typedef boost::signal<void (std::string const & msg)> ServerMsgSignal;
     boost::signals::connection connectServerMsg(ServerMsgSignal::slot_type subscriber)
     { return serverMsgSignal_.connect(subscriber); }
@@ -219,8 +224,12 @@ private:
     std::string password_;
     std::string myScriptPassword_;
     int joinedBattleId_;
-    unsigned int springId_;
     User * me_;
+    std::string downloadName_; // what is being downloaded
+
+    // process ids (0 if not running)
+    unsigned int springId_;
+    unsigned int downloaderId_;
 
     std::string springPath_;
     std::string unitSyncPath_;
@@ -249,6 +258,7 @@ private:
     BotRemovedSignal botRemovedSignal_;
     BattleChatMsgSignal battleChatMsgSignal_;
     SpringExitSignal springExitSignal_;
+    DownloadDoneSignal downloadDoneSignal_;
     ServerMsgSignal serverMsgSignal_;
     SayPrivateSignal sayPrivateSignal_;
     SaidPrivateSignal saidPrivateSignal_;

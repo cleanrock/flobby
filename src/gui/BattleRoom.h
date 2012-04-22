@@ -87,6 +87,7 @@ private:
     static void onAddBot(Fl_Widget* w, void* data);
     static void onStart(Fl_Widget* w, void* data);
     static void onLeave(Fl_Widget* w, void* data);
+    static void onMapImage(Fl_Widget* w, void* data);
 
     void close(); // call when user (me) left the battle
 
@@ -96,6 +97,7 @@ private:
     std::string syncString(User const & user);
     StringTableRow makeRow(User const & user);
     StringTableRow makeRow(Bot const & bot);
+    void downloadMap();
 
     void playerClicked(int rowIndex, int button);
     void playerDoubleClicked(int rowIndex, int button);

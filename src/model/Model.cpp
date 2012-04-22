@@ -24,8 +24,9 @@ Model::Model(IController & controller):
     connected_(false),
     loggedIn_(false),
     joinedBattleId_(-1),
+    me_(0),
     springId_(0),
-    me_(0)
+    downloaderId_(0)
 {
     controller_.setIControllerEvent(*this);
 
@@ -170,6 +171,12 @@ void Model::processDone(unsigned int id)
         springId_ = 0;
         meInGame(false);
     }
+    else if (id == downloaderId_)
+    {
+        downloadDoneSignal_(downloadName_);
+        downloaderId_ = 0;
+    }
+
 }
 
 void Model::login(const std::string & host, const std::string & port,
@@ -636,22 +643,29 @@ void Model::sendMyInitialBattleStatus(Battle const & battle)
 
 int Model::calcSync(Battle const & battle)
 {
-    int res = 0; // unknown
     int const modChecksum = unitSync_->GetPrimaryModChecksumFromName( battle.modName().c_str() );
     int const mapChecksum = unitSync_->GetMapChecksumFromName( battle.mapName().c_str() );
 
     if (modChecksum == 0 || mapChecksum == 0)
     {
-        // not synced, we dont have both mod and map
-        res = 2;
+        // not synced, we dont have either mod or map
+        return 2;
     }
     else if ((battle.modHash() == 0 || battle.modHash() == modChecksum)
             && (battle.mapHash() == 0 || battle.mapHash() == mapChecksum))
     {
-        // synced (either host dont know hash or hashes match)
-        res = 1;
+        // synced, either host dont know hash or hashes match
+        return 1;
     }
-    return res;
+    else
+    {
+        // not synced, log checksum mismatches
+        LOG_IF(WARNING, battle.modHash() != modChecksum)<< "mod checksum mismatch: "
+                << battle.modHash() << "!= " << modChecksum;
+        LOG_IF(WARNING, battle.mapHash() != mapChecksum)<< "map checksum mismatch: "
+                << battle.mapHash() << " != " << mapChecksum;
+        return 2;
+    }
 }
 
 void Model::sendMyBattleStatus()
@@ -1302,3 +1316,16 @@ void Model::ring(std::string const & userName)
 
 }
 
+bool Model::downloadMap(std::string const & mapName)
+{
+    // start pr-downloader if its not running
+    if (downloaderId_ == 0)
+    {
+        downloadName_ = mapName;
+        std::ostringstream oss;
+        oss << "pr-downloader --download-map \"" << mapName << "\"";
+        downloaderId_ = controller_.startProcess(oss.str());
+        return true;
+    }
+    return false;
+}

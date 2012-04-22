@@ -27,9 +27,6 @@
 #include <cassert>
 #include <iostream> // TODO remove
 
-// #include <png++/png.hpp> // TODO remove ?
-// #include "CImg.h" // TODO remove ?
-
 // Prefs
 static char const * PrefAppWindowX = "AppWindowX";
 static char const * PrefAppWindowY = "AppWindowY";
@@ -106,6 +103,7 @@ UserInterface::UserInterface(Model & model) :
     model.connectConnected( boost::bind(&UserInterface::connected, this, _1) );
     model.connectLoginResult( boost::bind(&UserInterface::loginResult, this, _1, _2) );
     model.connectJoinBattleFailed( boost::bind(&UserInterface::joinBattleFailed, this, _1) );
+    model.connectDownloadDone( boost::bind(&UserInterface::downloadDone, this, _1) );
 
     MyImage::registerHandler();
 }
@@ -222,7 +220,7 @@ void UserInterface::onTest(Fl_Widget *w, void* d)
 
     Model & m = ui->model_;
 
-    m.getModAIs("Zero-K v1.0.3.8");
+    //m.getModAIs("Zero-K v1.0.3.8");
     // fl_beep();
 
 #if 0
@@ -356,9 +354,7 @@ void UserInterface::onQuit(Fl_Widget *w, void* d)
 void UserInterface::menuRefresh(Fl_Widget *w, void* d)
 {
     UserInterface * ui = static_cast<UserInterface*>(d);
-    ui->model_.refresh();
-    ui->battleList_->refresh();
-    ui->battleRoom_->refresh();
+    ui->reloadMapsMods();
 }
 
 void UserInterface::menuGenerateCacheFiles(Fl_Widget *w, void* d)
@@ -478,4 +474,16 @@ void UserInterface::enableMenuItem(void(*cb)(Fl_Widget*, void*), bool enable)
     {
         mi->deactivate();
     }
+}
+
+void UserInterface::reloadMapsMods()
+{
+    model_.refresh();
+    battleList_->refresh();
+    battleRoom_->refresh();
+}
+
+void UserInterface::downloadDone(std::string const & name)
+{
+    reloadMapsMods();
 }

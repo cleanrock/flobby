@@ -7,6 +7,7 @@
 #include "MapImage.h"
 #include "AddBotDialog.h"
 #include "PopupMenu.h"
+#include "logging.h"
 
 #include "model/Model.h"
 
@@ -88,6 +89,7 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
 
     mapImageBox_ = new MapImage(rightX, y, rightW/2, rightW/2);
     mapImageBox_->box(FL_FLAT_BOX);
+    mapImageBox_->callback(BattleRoom::onMapImage, this);
 
     mapInfo_  = new Fl_Multiline_Output(rightX+rightW/2, y, rightW/2, rightW/2);
     mapInfo_->box(FL_FLAT_BOX);
@@ -164,7 +166,7 @@ void BattleRoom::setMapImage(Battle const & battle)
     {
         mapImageBox_->label(0);
         mapImageBox_->image(image);
-        currentMapImage_ = battle.mapName();
+        mapImageBox_->deactivate();
 
         MapInfo const & mapInfo = cache_.getMapInfo(battle.mapName());
         std::ostringstream oss;
@@ -178,11 +180,14 @@ void BattleRoom::setMapImage(Battle const & battle)
     else
     {
         mapImageBox_->image(0);
-        mapImageBox_->label("map\nnot\nfound");
-        currentMapImage_.clear();
+        std::ostringstream oss;
+        mapImageBox_->label("click to\ndownload map");
+        mapImageBox_->activate();
 
         mapInfo_->value(0);
     }
+
+    currentMapImage_ = battle.mapName();
 }
 
 void BattleRoom::joined(Battle const & battle)
@@ -436,6 +441,12 @@ void BattleRoom::onLeave(Fl_Widget* w, void* data)
     // o->close(); // TODO not needed here if we always get userLeftBattle(me, battle)
 }
 
+void BattleRoom::onMapImage(Fl_Widget* w, void* data)
+{
+    BattleRoom * o = static_cast<BattleRoom*>(data);
+    o->downloadMap();
+}
+
 void BattleRoom::botAdded(Bot const & bot)
 {
     playerList_->addRow(makeRow(bot));
@@ -471,7 +482,6 @@ void BattleRoom::refresh()
     {
         Battle const & b = model_.getBattle(battleId_);
         setMapImage(b);
-        playerList_->sort();
     }
 }
 
@@ -566,5 +576,18 @@ void BattleRoom::connected(bool connected)
     if (!connected)
     {
         close();
+    }
+}
+
+void BattleRoom::downloadMap()
+{
+    if (battleId_ != -1)
+    {
+        std::string mapName = model_.getBattle(battleId_).mapName();
+        if (!mapName.empty() && model_.downloadMap(mapName))
+        {
+            mapImageBox_->label("downloading..");
+            mapImageBox_->deactivate();
+        }
     }
 }

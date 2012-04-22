@@ -44,6 +44,7 @@ void Controller::send(const std::string msg)
 unsigned int Controller::startProcess(std::string const & cmd)
 {
     ++processId_;
+    processId_ = std::max(processId_, 1U); // make sure it doesn't wrap to zero (not very likely though)
 
     std::thread * t = new std::thread(boost::bind(&Controller::runProcess, this, cmd, processId_));
     procs_[processId_] = t;
@@ -62,7 +63,7 @@ void Controller::runProcess(std::string const cmd, unsigned int id)
     DLOG(INFO) << "runProcess logFile: '" << log << "'";
 
     // redirect stdout and stderr to log file
-    std::string cmd2 = cmd + " > " + log + " 2>&1";
+    std::string cmd2 = cmd + " >> " + log + " 2>&1";
     DLOG(INFO) << "runProcess system(): '" << cmd2 << "'";
     ::system(cmd2.c_str());
 
@@ -98,6 +99,7 @@ void Controller::processDoneCallback(void * data)
         {
             it->second->join();
             delete it->second;
+            // TODO delete entry in procs_
         }
         else
         {

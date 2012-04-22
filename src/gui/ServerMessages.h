@@ -44,4 +44,5 @@ private:
     void userChanged(User const & user);
     void userLeft(User const & user);
     void ring(std::string const & userName);
+    void downloadDone(std::string const & name);
 };

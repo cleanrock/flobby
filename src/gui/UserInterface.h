@@ -47,11 +47,13 @@ private:
     BattleList * battleList_;
     BattleRoom * battleRoom_;
 
+    void reloadMapsMods();
 
     // Model signal handlers
     void connected(bool connected);
     void loginResult(bool success, std::string const & info);
     void joinBattleFailed(std::string const & reason);
+    void downloadDone(std::string const & name);
 
     // FLTK callbacks
     //
