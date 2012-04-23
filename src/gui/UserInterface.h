@@ -13,7 +13,7 @@ class ProgressDialog;
 class ChannelsWindow;
 class BattleList;
 class BattleRoom;
-class ChatTabs;
+class Tabs;
 
 class Fl_Double_Window;
 class Fl_Browser;
@@ -43,7 +43,7 @@ private:
 
     Fl_Tile * tile_; // whole app window client area
     Fl_Tile * tileLeft_; // chat and battle list
-    ChatTabs * chat_;
+    Tabs * tabs_;
     BattleList * battleList_;
     BattleRoom * battleRoom_;
 

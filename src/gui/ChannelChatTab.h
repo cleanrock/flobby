@@ -6,22 +6,22 @@
 #include <string>
 
 class Model;
-class IChatTabs;
+class ITabs;
 class User;
 class TextDisplay;
 class StringTable;
 class Fl_Input;
 
-class ChannelChat: public Fl_Tile
+class ChannelChatTab: public Fl_Tile
 {
 public:
-    ChannelChat(int x, int y, int w, int h, std::string const & channelName,
-                IChatTabs& iChatTabs, Model & model);
-    virtual ~ChannelChat();
+    ChannelChatTab(int x, int y, int w, int h, std::string const & channelName,
+                ITabs& iTabs, Model & model);
+    virtual ~ChannelChatTab();
     void leave();
 
 private:
-    IChatTabs & iChatTabs_;
+    ITabs & iTabs_;
     Model & model_;
     TextDisplay * text_;
     Fl_Input * input_;

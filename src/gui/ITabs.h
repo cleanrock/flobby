@@ -1,9 +1,9 @@
 #pragma once
 
-class IChatTabs
+class ITabs
 {
 public:
     virtual void redrawTabs() = 0;
 protected:
-    ~IChatTabs() {}
+    ~ITabs() {}
 };

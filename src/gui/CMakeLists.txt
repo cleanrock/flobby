@@ -14,14 +14,14 @@ add_library (gui STATIC
     BattleInfo.cpp
     BattleList.cpp
     BattleRoom.cpp
-    ChannelChat.cpp
-    ChatTabs.cpp
+    Tabs.cpp
+    LogUsersTab.cpp
+    PrivateChatTab.cpp
+    ChannelChatTab.cpp
     Cache.cpp
     LoginDialog.cpp
     MyImage.cpp
     Prefs.cpp
-    PrivateChat.cpp
-    ServerMessages.cpp
     StringTable.cpp
     TextDisplay.cpp
     UserInterface.cpp

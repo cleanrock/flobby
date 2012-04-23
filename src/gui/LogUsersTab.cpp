@@ -1,8 +1,8 @@
-#include "ServerMessages.h"
+#include "LogUsersTab.h"
 #include "TextDisplay.h"
 #include "StringTable.h"
 #include "Prefs.h"
-#include "IChatTabs.h"
+#include "ITabs.h"
 #include "IChat.h"
 #include "PopupMenu.h"
 
@@ -13,10 +13,10 @@
 
 static char const * PrefServerMessagesSplitH = "ServerMessagesSplitH";
 
-ServerMessages::ServerMessages(int x, int y, int w, int h,
-                               IChatTabs& iChatTabs, IChat & iChat, Model & model):
-    Fl_Tile(x,y,w,h, "Server"),
-    iChatTabs_(iChatTabs),
+LogUsersTab::LogUsersTab(int x, int y, int w, int h,
+                               ITabs& iTabs, IChat & iChat, Model & model):
+    Fl_Tile(x,y,w,h, "Log && Users"),
+    iTabs_(iTabs),
     iChat_(iChat),
     model_(model)
 {
@@ -25,26 +25,26 @@ ServerMessages::ServerMessages(int x, int y, int w, int h,
             { "name", "flags" });
     end();
 
-    userList_->connectRowClicked( boost::bind(&ServerMessages::userClicked, this, _1, _2) );
-    userList_->connectRowDoubleClicked( boost::bind(&ServerMessages::userDoubleClicked, this, _1, _2) );
+    userList_->connectRowClicked( boost::bind(&LogUsersTab::userClicked, this, _1, _2) );
+    userList_->connectRowDoubleClicked( boost::bind(&LogUsersTab::userDoubleClicked, this, _1, _2) );
 
     // model signals
-    model_.connectConnected( boost::bind(&ServerMessages::connected, this, _1) );
-    model_.connectLoginResult( boost::bind(&ServerMessages::loginResult, this, _1, _2) );
-    model_.connectServerMsg( boost::bind(&ServerMessages::message, this, _1) );
-    model_.connectUserJoined( boost::bind(&ServerMessages::userJoined, this, _1) );
-    model_.connectUserChanged( boost::bind(&ServerMessages::userChanged, this, _1) );
-    model_.connectUserLeft( boost::bind(&ServerMessages::userLeft, this, _1) );
-    model_.connectRing( boost::bind(&ServerMessages::ring, this, _1) );
-    model_.connectDownloadDone( boost::bind(&ServerMessages::downloadDone, this, _1) );
+    model_.connectConnected( boost::bind(&LogUsersTab::connected, this, _1) );
+    model_.connectLoginResult( boost::bind(&LogUsersTab::loginResult, this, _1, _2) );
+    model_.connectServerMsg( boost::bind(&LogUsersTab::message, this, _1) );
+    model_.connectUserJoined( boost::bind(&LogUsersTab::userJoined, this, _1) );
+    model_.connectUserChanged( boost::bind(&LogUsersTab::userChanged, this, _1) );
+    model_.connectUserLeft( boost::bind(&LogUsersTab::userLeft, this, _1) );
+    model_.connectRing( boost::bind(&LogUsersTab::ring, this, _1) );
+    model_.connectDownloadDone( boost::bind(&LogUsersTab::downloadDone, this, _1) );
 }
 
-ServerMessages::~ServerMessages()
+LogUsersTab::~LogUsersTab()
 {
     prefs.set(PrefServerMessagesSplitH, userList_->x());
 }
 
-void ServerMessages::initTiles()
+void LogUsersTab::initTiles()
 {
     int x;
     prefs.get(PrefServerMessagesSplitH, x, 0);
@@ -54,7 +54,7 @@ void ServerMessages::initTiles()
     }
 }
 
-void ServerMessages::loginResult(bool success, std::string const & info)
+void LogUsersTab::loginResult(bool success, std::string const & info)
 {
     if (success)
     {
@@ -72,7 +72,7 @@ void ServerMessages::loginResult(bool success, std::string const & info)
     }
 }
 
-void ServerMessages::connected(bool connected)
+void LogUsersTab::connected(bool connected)
 {
     if (!connected)
     {
@@ -81,27 +81,27 @@ void ServerMessages::connected(bool connected)
     }
 }
 
-void ServerMessages::message(std::string const & msg)
+void LogUsersTab::message(std::string const & msg)
 {
     append(msg, true);
 }
 
-void ServerMessages::userJoined(User const & user)
+void LogUsersTab::userJoined(User const & user)
 {
     userList_->addRow(makeRow(user));
 }
 
-void ServerMessages::userChanged(User const & user)
+void LogUsersTab::userChanged(User const & user)
 {
     userList_->updateRow(makeRow(user));
 }
 
-void ServerMessages::userLeft(User const & user)
+void LogUsersTab::userLeft(User const & user)
 {
     userList_->removeRow(user.name());
 }
 
-StringTableRow ServerMessages::makeRow(User const & user)
+StringTableRow LogUsersTab::makeRow(User const & user)
 {
     return StringTableRow( user.name(),
         {
@@ -110,7 +110,7 @@ StringTableRow ServerMessages::makeRow(User const & user)
         } );
 }
 
-std::string ServerMessages::flagsString(User const & user)
+std::string LogUsersTab::flagsString(User const & user)
 {
     std::ostringstream oss;
     oss << (user.status().bot() ? "B" : "");
@@ -119,7 +119,7 @@ std::string ServerMessages::flagsString(User const & user)
     return oss.str();
 }
 
-void ServerMessages::userClicked(int rowIndex, int button)
+void LogUsersTab::userClicked(int rowIndex, int button)
 {
     if (button == FL_RIGHT_MOUSE)
     {
@@ -161,19 +161,19 @@ void ServerMessages::userClicked(int rowIndex, int button)
     }
 }
 
-void ServerMessages::userDoubleClicked(int rowIndex, int button)
+void LogUsersTab::userDoubleClicked(int rowIndex, int button)
 {
     StringTableRow const & row = userList_->getRow(static_cast<std::size_t>(rowIndex));
     iChat_.openPrivateChat(row.id_);
 }
 
-void ServerMessages::ring(std::string const & userName)
+void LogUsersTab::ring(std::string const & userName)
 {
     append("ring from " + userName, true);
     fl_beep();
 }
 
-int ServerMessages::handle(int event)
+int LogUsersTab::handle(int event)
 {
     switch (event)
     {
@@ -185,19 +185,19 @@ int ServerMessages::handle(int event)
     return Fl_Group::handle(event);
 }
 
-void ServerMessages::append(std::string const & msg, bool interesting)
+void LogUsersTab::append(std::string const & msg, bool interesting)
 {
     text_->append(msg);
     // make ChatTabs redraw header
     if (interesting && !visible() && labelcolor() != FL_RED)
     {
         labelcolor(FL_RED);
-        iChatTabs_.redrawTabs();
+        iTabs_.redrawTabs();
     }
 
 }
 
-void ServerMessages::downloadDone(std::string const & name)
+void LogUsersTab::downloadDone(std::string const & name)
 {
     append("download attempt done: " + name, true);
 }

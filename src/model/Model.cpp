@@ -743,6 +743,10 @@ void Model::handle_BATTLECLOSED(std::istream & is) // battleId
     int const battleId = boost::lexical_cast<int>(ex);
     Battle const & battle = getBattle(battleId);
     battleClosedSignal_(battle);
+    if (joinedBattleId_ == battleId)
+    {
+        joinedBattleId_ = -1;
+    }
     battles_.erase(battleId);
 }
 

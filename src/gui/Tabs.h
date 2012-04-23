@@ -1,36 +1,36 @@
 #pragma once
 
 #include "IChat.h"
-#include "IChatTabs.h"
+#include "ITabs.h"
 
 #include <FL/Fl_Tabs.H>
 #include <map>
 #include <string>
 
-class ServerMessages;
-class ChannelChat;
-class PrivateChat;
+class LogUsersTab;
+class ChannelChatTab;
+class PrivateChatTab;
 class Model;
 class Fl_Tabs;
 
-class ChatTabs: public Fl_Tabs, public IChat, public IChatTabs
+class Tabs: public Fl_Tabs, public IChat, public ITabs
 {
 public:
-    ChatTabs(int x, int y, int w, int h, Model & model);
-    virtual ~ChatTabs();
+    Tabs(int x, int y, int w, int h, Model & model);
+    virtual ~Tabs();
 
     void initTiles();
 
 private:
     Model & model_;
 
-    ServerMessages * server_;
+    LogUsersTab * logUsersTab_;
 
-    typedef std::map<std::string, PrivateChat*> PrivateChats;
-    PrivateChats privateChats_;
+    typedef std::map<std::string, PrivateChatTab*> PrivateChatTabs;
+    PrivateChatTabs privateChatTabs_;
 
-    typedef std::map<std::string, ChannelChat*> ChannelChats;
-    ChannelChats channelChats_;
+    typedef std::map<std::string, ChannelChatTab*> ChannelChatTabs;
+    ChannelChatTabs channelChatTabs_;
 
     template <typename M>
     void createChat(std::string const & name, M & map); // used to create both private and channel tabs
@@ -44,7 +44,7 @@ private:
     void openPrivateChat(std::string const & userName);
     void openChannelChat(std::string const & channelName);
 
-    // IChatTabs (used by child windows)
+    // ITabs (used by child windows)
     void redrawTabs();
 
     int handle(int event);

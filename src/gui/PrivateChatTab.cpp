@@ -1,6 +1,6 @@
-#include "PrivateChat.h"
+#include "PrivateChatTab.h"
 #include "TextDisplay.h"
-#include "IChatTabs.h"
+#include "ITabs.h"
 
 #include "model/Model.h"
 
@@ -10,11 +10,11 @@
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 
-PrivateChat::PrivateChat(int x, int y, int w, int h, std::string const & userName,
-                         IChatTabs& iChatTabs, Model & model):
+PrivateChatTab::PrivateChatTab(int x, int y, int w, int h, std::string const & userName,
+                         ITabs& iTabs, Model & model):
     Fl_Group(x,y,w,h),
     userName_(userName),
-    iChatTabs_(iChatTabs),
+    iTabs_(iTabs),
     model_(model)
 {
     // make tab name unique
@@ -26,7 +26,7 @@ PrivateChat::PrivateChat(int x, int y, int w, int h, std::string const & userNam
     text_ = new TextDisplay(x+m, y+m, w-2*m, h-ih-2*m);
 
     input_ = new Fl_Input(x, y+h-ih, w, ih);
-    input_->callback(PrivateChat::onInput, this);
+    input_->callback(PrivateChatTab::onInput, this);
     input_->when(FL_WHEN_ENTER_KEY);
 
     resizable(text_);
@@ -34,19 +34,19 @@ PrivateChat::PrivateChat(int x, int y, int w, int h, std::string const & userNam
     end();
 
     // model signals
-    model_.connectSayPrivate( boost::bind(&PrivateChat::say, this, _1, _2) );
-    model_.connectSaidPrivate( boost::bind(&PrivateChat::said, this, _1, _2) );
-    model_.connectUserJoined( boost::bind(&PrivateChat::userJoined, this, _1) );
-    model_.connectUserLeft( boost::bind(&PrivateChat::userLeft, this, _1) );
+    model_.connectSayPrivate( boost::bind(&PrivateChatTab::say, this, _1, _2) );
+    model_.connectSaidPrivate( boost::bind(&PrivateChatTab::said, this, _1, _2) );
+    model_.connectUserJoined( boost::bind(&PrivateChatTab::userJoined, this, _1) );
+    model_.connectUserLeft( boost::bind(&PrivateChatTab::userLeft, this, _1) );
 
     Fl::focus(input_);
 }
 
-PrivateChat::~PrivateChat()
+PrivateChatTab::~PrivateChatTab()
 {
 }
 
-int PrivateChat::handle(int event)
+int PrivateChatTab::handle(int event)
 {
     switch (event)
     {
@@ -58,9 +58,9 @@ int PrivateChat::handle(int event)
     return Fl_Group::handle(event);
 }
 
-void PrivateChat::onInput(Fl_Widget * w, void * data)
+void PrivateChatTab::onInput(Fl_Widget * w, void * data)
 {
-    PrivateChat * pc = static_cast<PrivateChat*>(data);
+    PrivateChatTab * pc = static_cast<PrivateChatTab*>(data);
 
     std::string msg(pc->input_->value());
     boost::trim(msg);
@@ -72,7 +72,7 @@ void PrivateChat::onInput(Fl_Widget * w, void * data)
     pc->input_->value("");
 }
 
-void PrivateChat::say(std::string const & userName, std::string const & msg)
+void PrivateChatTab::say(std::string const & userName, std::string const & msg)
 {
     if (userName == userName_)
     {
@@ -82,7 +82,7 @@ void PrivateChat::say(std::string const & userName, std::string const & msg)
     }
 }
 
-void PrivateChat::said(std::string const & userName, std::string const & msg)
+void PrivateChatTab::said(std::string const & userName, std::string const & msg)
 {
     if (userName == userName_)
     {
@@ -91,7 +91,7 @@ void PrivateChat::said(std::string const & userName, std::string const & msg)
     }
 }
 
-void PrivateChat::userJoined(User const & user)
+void PrivateChatTab::userJoined(User const & user)
 {
     if (user.name() == userName_)
     {
@@ -101,7 +101,7 @@ void PrivateChat::userJoined(User const & user)
     }
 }
 
-void PrivateChat::userLeft(User const & user)
+void PrivateChatTab::userLeft(User const & user)
 {
     if (user.name() == userName_)
     {
@@ -111,14 +111,14 @@ void PrivateChat::userLeft(User const & user)
     }
 }
 
-void PrivateChat::append(std::string const & msg, bool interesting)
+void PrivateChatTab::append(std::string const & msg, bool interesting)
 {
     text_->append(msg);
     // make ChatTabs redraw header
     if (interesting && !visible() && labelcolor() != FL_RED)
     {
         labelcolor(FL_RED);
-        iChatTabs_.redrawTabs();
+        iTabs_.redrawTabs();
     }
 
 }

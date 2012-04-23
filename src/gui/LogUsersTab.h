@@ -5,24 +5,24 @@
 #include <string>
 
 class Model;
-class IChatTabs;
+class ITabs;
 class IChat;
 class User;
 class Fl_Tile;
 class TextDisplay;
 class StringTable;
 
-class ServerMessages: public Fl_Tile
+class LogUsersTab: public Fl_Tile
 {
 public:
-    ServerMessages(int x, int y, int w, int h,
-                   IChatTabs& iChatTabs, IChat & chat, Model & model);
-    virtual ~ServerMessages();
+    LogUsersTab(int x, int y, int w, int h,
+                   ITabs& iChatTabs, IChat & chat, Model & model);
+    virtual ~LogUsersTab();
 
     void initTiles();
 
 private:
-    IChatTabs & iChatTabs_;
+    ITabs & iTabs_;
     IChat & iChat_;
     Model & model_;
     TextDisplay * text_;

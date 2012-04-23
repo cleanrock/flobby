@@ -1,10 +1,10 @@
-#include "ChatTabs.h"
+#include "Tabs.h"
 #include "Prefs.h"
 #include "StringTable.h"
 #include "TextDisplay.h"
-#include "ServerMessages.h"
-#include "ChannelChat.h"
-#include "PrivateChat.h"
+#include "LogUsersTab.h"
+#include "ChannelChatTab.h"
+#include "PrivateChatTab.h"
 #include "PopupMenu.h"
 
 #include "model/Model.h"
@@ -22,7 +22,7 @@
 #include <sstream>
 
 
-ChatTabs::ChatTabs(int x, int y, int w, int h, Model & model):
+Tabs::Tabs(int x, int y, int w, int h, Model & model):
     Fl_Tabs(x,y,w,h),
     model_(model)
 {
@@ -31,29 +31,29 @@ ChatTabs::ChatTabs(int x, int y, int w, int h, Model & model):
     client_area(x,y,w,h);
     int const off = 0;
     y += off; h -= off;
-    server_ = new ServerMessages(x,y,w,h, *this, *this, model_);
-    add(server_);
+    logUsersTab_ = new LogUsersTab(x,y,w,h, *this, *this, model_);
+    add(logUsersTab_);
 
-    resizable(server_);
+    resizable(logUsersTab_);
 
     end();
 
     // model signals
-    model_.connectSaidPrivate( boost::bind(&ChatTabs::saidPrivate, this, _1, _2) );
-    model_.connectChannelJoined( boost::bind(&ChatTabs::channelJoined, this, _1) );
+    model_.connectSaidPrivate( boost::bind(&Tabs::saidPrivate, this, _1, _2) );
+    model_.connectChannelJoined( boost::bind(&Tabs::channelJoined, this, _1) );
 }
 
-ChatTabs::~ChatTabs()
+Tabs::~Tabs()
 {
 }
 
-void ChatTabs::initTiles()
+void Tabs::initTiles()
 {
-    server_->initTiles();
+    logUsersTab_->initTiles();
 }
 
 template <typename M>
-void ChatTabs::createChat(std::string const & name, M & map)
+void Tabs::createChat(std::string const & name, M & map)
 {
     // assumes chat do not exists, TODO remove check ???
     typename M::const_iterator it = map.find(name);
@@ -71,17 +71,17 @@ void ChatTabs::createChat(std::string const & name, M & map)
 
 }
 
-void ChatTabs::openPrivateChat(std::string const & userName)
+void Tabs::openPrivateChat(std::string const & userName)
 {
-    PrivateChats::const_iterator it = privateChats_.find(userName);
-    if (it == privateChats_.end())
+    PrivateChatTabs::const_iterator it = privateChatTabs_.find(userName);
+    if (it == privateChatTabs_.end())
     {
-        createChat(userName, privateChats_);
+        createChat(userName, privateChatTabs_);
     }
     else
     {
         assert(it->second);
-        PrivateChat * pc = it->second;
+        PrivateChatTab * pc = it->second;
 
         // re-add it if it was closed
         if (find(pc) == children())
@@ -95,17 +95,17 @@ void ChatTabs::openPrivateChat(std::string const & userName)
 
 }
 
-void ChatTabs::openChannelChat(std::string const & channelName)
+void Tabs::openChannelChat(std::string const & channelName)
 {
-    auto it = channelChats_.find(channelName);
-    if (it == channelChats_.end())
+    auto it = channelChatTabs_.find(channelName);
+    if (it == channelChatTabs_.end())
     {
-        createChat(channelName, channelChats_);
+        createChat(channelName, channelChatTabs_);
     }
     else
     {
         assert(it->second);
-        ChannelChat * cc = it->second;
+        ChannelChatTab * cc = it->second;
 
         // re-add it if it was closed
         if (find(cc) == children())
@@ -119,16 +119,16 @@ void ChatTabs::openChannelChat(std::string const & channelName)
 
 }
 
-void ChatTabs::saidPrivate(std::string const & userName, std::string const & msg)
+void Tabs::saidPrivate(std::string const & userName, std::string const & msg)
 {
-    auto it = privateChats_.find(userName);
-    if (it == privateChats_.end())
+    auto it = privateChatTabs_.find(userName);
+    if (it == privateChatTabs_.end())
     {
-        createChat(userName, privateChats_);
+        createChat(userName, privateChatTabs_);
     }
     else
     {
-        PrivateChat * pc = it->second;
+        PrivateChatTab * pc = it->second;
         // re-add it if it was closed
         if (find(pc) == children())
         {
@@ -137,12 +137,12 @@ void ChatTabs::saidPrivate(std::string const & userName, std::string const & msg
     }
 }
 
-void ChatTabs::channelJoined(std::string const & channelName)
+void Tabs::channelJoined(std::string const & channelName)
 {
     openChannelChat(channelName);
 }
 
-int ChatTabs::handle(int event)
+int Tabs::handle(int event)
 {
     // close chats and channels (left double clicking or context menu)
     // channels are left when closed
@@ -151,7 +151,7 @@ int ChatTabs::handle(int event)
     {
         Fl_Widget* chat =  which(Fl::event_x(), Fl::event_y());
 
-        if (chat != 0 && chat != server_)
+        if (chat != 0 && chat != logUsersTab_)
         {
             if (Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks())
             {
@@ -182,18 +182,18 @@ int ChatTabs::handle(int event)
     return Fl_Tabs::handle(event);
 }
 
-void ChatTabs::draw()
+void Tabs::draw()
 {
     // workaround for bugged drawing in Fl_Tabs, needed when closing tabs
     fl_color(FL_BACKGROUND_COLOR);
-    fl_rectf(x(), y(), w(), server_->y() - y());
+    fl_rectf(x(), y(), w(), logUsersTab_->y() - y());
 
     Fl_Tabs::draw();
 }
 
-bool ChatTabs::closeChat(Fl_Widget* w)
+bool Tabs::closeChat(Fl_Widget* w)
 {
-    for (auto & pair : privateChats_)
+    for (auto & pair : privateChatTabs_)
     {
         if (pair.second == w)
         {
@@ -203,12 +203,12 @@ bool ChatTabs::closeChat(Fl_Widget* w)
         }
     }
 
-    for (auto & pair : channelChats_)
+    for (auto & pair : channelChatTabs_)
     {
         if (pair.second == w)
         {
             remove(w);
-            ChannelChat * cc = static_cast<ChannelChat*>(w);
+            ChannelChatTab * cc = static_cast<ChannelChatTab*>(w);
             cc->leave();
             redraw();
             return true;
@@ -218,7 +218,7 @@ bool ChatTabs::closeChat(Fl_Widget* w)
     return false;
 }
 
-void ChatTabs::redrawTabs()
+void Tabs::redrawTabs()
 {
     redraw_tabs();
 }

@@ -9,7 +9,7 @@
 #include "Prefs.h"
 #include "MyImage.h"
 #include "Cache.h"
-#include "ChatTabs.h"
+#include "Tabs.h"
 
 #include "model/Model.h"
 
@@ -82,11 +82,11 @@ UserInterface::UserInterface(Model & model) :
     tile_ = new Fl_Tile(0, mH, W, cH);
 
     tileLeft_ = new Fl_Tile(0, mH, leftW, cH);
-    chat_ = new ChatTabs(0, mH, leftW, cH/2, model_);
+    tabs_ = new Tabs(0, mH, leftW, cH/2, model_);
     battleList_ = new BattleList(0, mH+cH/2, leftW, cH/2, model_, cache_);
     tileLeft_->end();
 
-    battleRoom_ = new BattleRoom(leftW, mH, rightW, cH, model_, cache_, *chat_);
+    battleRoom_ = new BattleRoom(leftW, mH, rightW, cH, model_, cache_, *tabs_);
 
     tile_->end();
 
@@ -148,7 +148,7 @@ int UserInterface::run(int argc, char** argv)
         }
     }
 
-    chat_->initTiles();
+    tabs_->initTiles();
     battleRoom_->initTiles();
 
     mainWindow_->show(argc, argv);
@@ -309,7 +309,7 @@ void UserInterface::onTest(Fl_Widget *w, void* d)
 //    iControllerEvent.message("SAIDPRIVATE cavity hej hopp http://archlinux.org BBB");
 //    iControllerEvent.message("SAIDPRIVATE cavity hej hopp http://archlinux.org CCC");
 
-//    IChat * iChat = ui->chat_;
+//    IChat * iChat = ui->tabs_;
 //    iChat->openChannelChat("channel");
 }
 

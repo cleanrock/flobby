@@ -4,21 +4,21 @@
 #include <string>
 
 class Model;
-class IChatTabs;
+class ITabs;
 class User;
 class TextDisplay;
 class Fl_Input;
 
-class PrivateChat: public Fl_Group
+class PrivateChatTab: public Fl_Group
 {
 public:
-    PrivateChat(int x, int y, int w, int h, std::string const & userName,
-                IChatTabs& iChatTabs, Model & model);
-    virtual ~PrivateChat();
+    PrivateChatTab(int x, int y, int w, int h, std::string const & userName,
+                ITabs& iTabs, Model & model);
+    virtual ~PrivateChatTab();
 
 private:
     std::string userName_;
-    IChatTabs & iChatTabs_;
+    ITabs & iTabs_;
     Model & model_;
     TextDisplay * text_;
     Fl_Input * input_;

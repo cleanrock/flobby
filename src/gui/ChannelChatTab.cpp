@@ -1,6 +1,6 @@
-#include "ChannelChat.h"
+#include "ChannelChatTab.h"
 #include "TextDisplay.h"
-#include "IChatTabs.h"
+#include "ITabs.h"
 #include "Prefs.h"
 
 #include "model/Model.h"
@@ -13,10 +13,10 @@
 // we use the split setting of the ServerMessages tab in all channel tabs
 static char const * PrefServerMessagesSplitH = "ServerMessagesSplitH";
 
-ChannelChat::ChannelChat(int x, int y, int w, int h, std::string const & channelName,
-                         IChatTabs& iChatTabs, Model & model):
+ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & channelName,
+                         ITabs& iTabs, Model & model):
     Fl_Tile(x,y,w,h),
-    iChatTabs_(iChatTabs),
+    iTabs_(iTabs),
     model_(model),
     channelName_(channelName)
 {
@@ -30,7 +30,7 @@ ChannelChat::ChannelChat(int x, int y, int w, int h, std::string const & channel
     int const ih = 24; // input height
     text_ = new TextDisplay(x, y, leftW, h-ih);
     input_ = new Fl_Input(x, y+h-ih, leftW, ih);
-    input_->callback(ChannelChat::onInput, this);
+    input_->callback(ChannelChatTab::onInput, this);
     input_->when(FL_WHEN_ENTER_KEY);
     left->resizable(text_);
     left->end();
@@ -53,19 +53,19 @@ ChannelChat::ChannelChat(int x, int y, int w, int h, std::string const & channel
     end();
 
     // model signals
-    model_.connectChannelTopicSignal( boost::bind(&ChannelChat::topic, this, _1, _2, _3, _4) );
-    model_.connectChannelClients( boost::bind(&ChannelChat::clients, this, _1, _2) );
-    model_.connectUserJoinedChannel( boost::bind(&ChannelChat::userJoined, this, _1, _2) );
-    model_.connectUserLeftChannel( boost::bind(&ChannelChat::userLeft, this, _1, _2, _3) );
-    model_.connectSaidChannel( boost::bind(&ChannelChat::said, this, _1, _2, _3) );
+    model_.connectChannelTopicSignal( boost::bind(&ChannelChatTab::topic, this, _1, _2, _3, _4) );
+    model_.connectChannelClients( boost::bind(&ChannelChatTab::clients, this, _1, _2) );
+    model_.connectUserJoinedChannel( boost::bind(&ChannelChatTab::userJoined, this, _1, _2) );
+    model_.connectUserLeftChannel( boost::bind(&ChannelChatTab::userLeft, this, _1, _2, _3) );
+    model_.connectSaidChannel( boost::bind(&ChannelChatTab::said, this, _1, _2, _3) );
 
 }
 
-ChannelChat::~ChannelChat()
+ChannelChatTab::~ChannelChatTab()
 {
 }
 
-int ChannelChat::handle(int event)
+int ChannelChatTab::handle(int event)
 {
     switch (event)
     {
@@ -77,9 +77,9 @@ int ChannelChat::handle(int event)
     return Fl_Tile::handle(event);
 }
 
-void ChannelChat::onInput(Fl_Widget * w, void * data)
+void ChannelChatTab::onInput(Fl_Widget * w, void * data)
 {
-    ChannelChat * cc = static_cast<ChannelChat*>(data);
+    ChannelChatTab * cc = static_cast<ChannelChatTab*>(data);
 
     std::string msg(cc->input_->value());
     boost::trim(msg);
@@ -93,7 +93,7 @@ void ChannelChat::onInput(Fl_Widget * w, void * data)
     cc->input_->value("");
 }
 
-StringTableRow ChannelChat::makeRow(std::string const & userName)
+StringTableRow ChannelChatTab::makeRow(std::string const & userName)
 {
     return StringTableRow( userName,
         {
@@ -101,14 +101,14 @@ StringTableRow ChannelChat::makeRow(std::string const & userName)
         } );
 }
 
-std::string ChannelChat::flagsString(User const & user)
+std::string ChannelChatTab::flagsString(User const & user)
 {
     std::ostringstream oss;
     oss << (user.status().inGame() ? "G" : "");
     return oss.str();
 }
 
-void ChannelChat::topic(std::string const & channelName, std::string const & author, time_t epochSeconds, std::string const & topic)
+void ChannelChatTab::topic(std::string const & channelName, std::string const & author, time_t epochSeconds, std::string const & topic)
 {
     if (channelName == channelName_)
     {
@@ -121,7 +121,7 @@ void ChannelChat::topic(std::string const & channelName, std::string const & aut
     }
 }
 
-void ChannelChat::clients(std::string const & channelName, std::vector<std::string> const & clients)
+void ChannelChatTab::clients(std::string const & channelName, std::vector<std::string> const & clients)
 {
     if (channelName == channelName_)
     {
@@ -132,7 +132,7 @@ void ChannelChat::clients(std::string const & channelName, std::vector<std::stri
     }
 }
 
-void ChannelChat::userJoined(std::string const & channelName, std::string const & userName)
+void ChannelChatTab::userJoined(std::string const & channelName, std::string const & userName)
 {
     if (channelName == channelName_)
     {
@@ -144,7 +144,7 @@ void ChannelChat::userJoined(std::string const & channelName, std::string const 
     }
 }
 
-void ChannelChat::userLeft(std::string const & channelName, std::string const & userName, std::string const & reason)
+void ChannelChatTab::userLeft(std::string const & channelName, std::string const & userName, std::string const & reason)
 {
     if (channelName == channelName_)
     {
@@ -162,7 +162,7 @@ void ChannelChat::userLeft(std::string const & channelName, std::string const & 
     }
 }
 
-void ChannelChat::said(std::string const & channelName, std::string const & userName, std::string const & message)
+void ChannelChatTab::said(std::string const & channelName, std::string const & userName, std::string const & message)
 {
     if (channelName == channelName_)
     {
@@ -170,21 +170,21 @@ void ChannelChat::said(std::string const & channelName, std::string const & user
     }
 }
 
-void ChannelChat::leave()
+void ChannelChatTab::leave()
 {
     model_.leaveChannel(channelName_);
     text_->clear();
     userList_->clear();
 }
 
-void ChannelChat::append(std::string const & msg, bool interesting)
+void ChannelChatTab::append(std::string const & msg, bool interesting)
 {
     text_->append(msg);
     // make ChatTabs redraw header
     if (interesting && !visible() && labelcolor() != FL_RED)
     {
         labelcolor(FL_RED);
-        iChatTabs_.redrawTabs();
+        iTabs_.redrawTabs();
     }
 
 }
