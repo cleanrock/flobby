@@ -32,8 +32,6 @@ public:
             std::string const & name, std::vector<std::string> const & headers);
     virtual ~StringTable();
 
-// TODO    void resize_window(); // Resize parent window to size of table
-
     // signals
     //
     typedef boost::signal<void (int rowIndex)> SelectedRowChangedSignal;

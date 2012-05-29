@@ -94,7 +94,7 @@ void Controller::processDoneCallback(void * data)
     for (unsigned int id : c->procsDone_)
     {
         c->client_->processDone(id);
-        std::map<unsigned int, std::thread*>::iterator it =c->procs_.find(id);
+        std::map<unsigned int, std::thread*>::iterator it = c->procs_.find(id);
         if (it != c->procs_.end())
         {
             it->second->join();

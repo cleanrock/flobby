@@ -5,7 +5,6 @@
 #include <cstring>
 #include <fstream>
 #include <stdexcept>
-#include <iostream> // TODO
 
 MyImage::MyImage(std::string const & fileName):
     Fl_RGB_Image(0,0,0)

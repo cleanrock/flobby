@@ -27,7 +27,6 @@ private:
     TextDisplay * textDisplay_;
     Fl_Input * input_;
     std::string battleHost_;
-    // TODO remove int deleteLine_;
 
     void battleChatMsg(std::string const & userName, std::string const & msg);
     static void onText(Fl_Widget * w, void * data);

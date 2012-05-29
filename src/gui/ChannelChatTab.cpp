@@ -101,7 +101,7 @@ StringTableRow ChannelChatTab::makeRow(std::string const & userName)
         } );
 }
 
-std::string ChannelChatTab::flagsString(User const & user)
+std::string ChannelChatTab::statusString(User const & user)
 {
     std::ostringstream oss;
     oss << (user.status().inGame() ? "G" : "");

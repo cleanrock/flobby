@@ -1,10 +1,11 @@
+proper sound instead of pc-speaker
+do not exit with Escape key
+try to fix TinySkirmish map image
+make google-glog optional
+login automatically setting
 show ai info in add ai dialog
-kick bots
 flobby app icon
-limit battle chat, 100 lines ?
 save battle chat to file ?
-highlight tabs with new text
 alt+# shortcuts for tabs ?
 quick find in StringTable, e.g. press C key to show first entry beginning with a C
-make flobby work after disconnect/relogin, works now ?
 

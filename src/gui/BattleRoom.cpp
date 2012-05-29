@@ -108,7 +108,7 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
     int const playerH = topH - headerH;
 
     playerList_ = new StringTable(x, y, w - rightW, playerH, "PlayerList",
-            { "flags", "sync", "name", "ally", "team", "rank", "country" });
+            { "status", "sync", "name", "ally", "team", "rank", "country" });
 
     top_->resizable(playerList_);
     top_->end();
@@ -333,7 +333,7 @@ void BattleRoom::close()
     deactivate();
 }
 
-std::string BattleRoom::flagsString(User const & user)
+std::string BattleRoom::statusString(User const & user)
 {
     std::ostringstream oss;
     oss << (user.battleStatus().spectator() ? "S" : "")
@@ -368,7 +368,7 @@ StringTableRow BattleRoom::makeRow(User const & user)
 
     return StringTableRow( user.name(),
         {
-            flagsString(user),
+            statusString(user),
             syncString(user),
             user.name(),
             allyTeam.str(),

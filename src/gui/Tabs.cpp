@@ -21,7 +21,6 @@
 #include <boost/algorithm/string.hpp>
 #include <sstream>
 
-
 Tabs::Tabs(int x, int y, int w, int h, Model & model):
     Fl_Tabs(x,y,w,h),
     model_(model)
@@ -29,10 +28,7 @@ Tabs::Tabs(int x, int y, int w, int h, Model & model):
     selection_color(FL_LIGHT2);
 
     client_area(x,y,w,h);
-    int const off = 0;
-    y += off; h -= off;
     logUsersTab_ = new LogUsersTab(x,y,w,h, *this, *this, model_);
-    add(logUsersTab_);
 
     resizable(logUsersTab_);
 

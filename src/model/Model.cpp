@@ -7,7 +7,6 @@
 #include "IController.h"
 #include "Bot.h"
 #include "UnitSync.h"
-// TODO #include "IModelEvent.h"
 
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
@@ -793,7 +792,15 @@ void Model::handle_JOINEDBATTLE(std::istream & is) // battleId username [scriptP
     }
     if (u == me())
     {
-        extractWord(is, myScriptPassword_);
+        try
+        {
+            extractWord(is, myScriptPassword_);
+        }
+        catch (std::invalid_argument const & e)
+        {
+            // TODO fully OK to ignore optional scriptPassword ?
+        }
+
     }
 }
 

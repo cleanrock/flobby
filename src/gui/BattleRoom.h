@@ -93,7 +93,7 @@ private:
 
     void setMapImage(Battle const & battle);
     void setHeaderText(Battle const & battle);
-    std::string flagsString(User const & user);
+    std::string statusString(User const & user);
     std::string syncString(User const & user);
     StringTableRow makeRow(User const & user);
     StringTableRow makeRow(Bot const & bot);

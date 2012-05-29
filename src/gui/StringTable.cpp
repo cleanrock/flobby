@@ -8,7 +8,6 @@
 #include <algorithm>            // STL sort
 #include <cassert>
 #include <stdexcept>
-#include <iostream> // TODO remove
 
 // Prefs
 static char const * PrefColWidth = "ColWidth";
@@ -138,7 +137,6 @@ void StringTable::draw_cell(TableContext context, int R, int C, int X, int Y, in
             fl_push_clip(X,Y,W,H); {
                 // Bg color
                 Fl_Color bgcolor = (selectedRow_ == R) ? selection_color() : FL_WHITE;
-                // TODO remove Fl_Color bgcolor = row_selected(R) ? selection_color() : FL_WHITE;
                 fl_color(bgcolor); fl_rectf(X,Y,W,H); 
                 fl_font(FL_HELVETICA, 12);
                 fl_color(FL_BLACK); fl_draw(s, X+2,Y,W,H, FL_ALIGN_LEFT);     // +2=pad left
@@ -179,11 +177,8 @@ void StringTable::addRow(const StringTableRow & row)
     rows( static_cast<int>(rows_.size()) );
     row_height(rows()-1, col_header_height()+2);
 
-    // instant sort TODO
+    // instant sort
     sort();
-
-    // TODO not needed, rows(n) will always redraw table
-    //redraw_range(rows()-1, rows()-1, 0, cols());
 }
 
 void StringTable::updateRow(const StringTableRow & row)
@@ -198,10 +193,8 @@ void StringTable::updateRow(const StringTableRow & row)
             {
                 r.data_ = row.data_;
 
-                // instant sort TODO
+                // instant sort
                 sort();
-
-                //redraw_range(i, i, 0, cols());
             }
             return;
         }

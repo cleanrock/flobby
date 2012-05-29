@@ -2,7 +2,7 @@
 
 #include "Cache.h"
 #include <FL/Fl.H>
-#include <memory>
+#include <string>
 
 // forwards
 class Model;

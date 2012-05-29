@@ -1,7 +1,6 @@
 #include "logging.h"
 #include "TextDisplay.h"
 
-#include <iostream> // TODO remove
 #include <sstream>
 #include <ctime>
 

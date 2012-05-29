@@ -22,7 +22,7 @@ LogUsersTab::LogUsersTab(int x, int y, int w, int h,
 {
     text_ = new TextDisplay(x, y, w/2, h);
     userList_ = new StringTable(x+w/2, y, w/2, h, "UserList",
-            { "name", "flags" });
+            { "name", "status" });
     end();
 
     userList_->connectRowClicked( boost::bind(&LogUsersTab::userClicked, this, _1, _2) );
@@ -106,11 +106,11 @@ StringTableRow LogUsersTab::makeRow(User const & user)
     return StringTableRow( user.name(),
         {
             user.name(),
-            flagsString(user)
+            statusString(user)
         } );
 }
 
-std::string LogUsersTab::flagsString(User const & user)
+std::string LogUsersTab::statusString(User const & user)
 {
     std::ostringstream oss;
     oss << (user.status().bot() ? "B" : "");
@@ -182,7 +182,7 @@ int LogUsersTab::handle(int event)
         Fl::focus(userList_);
         break;
     }
-    return Fl_Group::handle(event);
+    return Fl_Tile::handle(event);
 }
 
 void LogUsersTab::append(std::string const & msg, bool interesting)

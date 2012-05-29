@@ -33,7 +33,7 @@ private:
     int handle(int event);
     void append(std::string const & msg, bool interesting = false);
     StringTableRow makeRow(std::string const & userName);
-    std::string flagsString(User const & user);
+    std::string statusString(User const & user);
 
     // model signals
     void topic(std::string const & channelName, std::string const & author, time_t epochSeconds, std::string const & topic);

@@ -1,10 +1,10 @@
-#include "logging.h"
 #include "BattleList.h"
 #include "StringTable.h"
 #include "BattleInfo.h"
 #include "BattleFilterDialog.h"
 #include "PopupMenu.h"
 #include "Prefs.h"
+#include "logging.h"
 
 #include "model/Model.h"
 
@@ -29,7 +29,7 @@ BattleList::BattleList(int x, int y, int w, int h, Model & model, Cache & cache)
 {
     int const h1 = h-128;
     battleList_ = new StringTable(x, y, w, h1, "BattleList",
-            { "flags", "title", "game", "map", "players" });
+            { "status", "title", "game", "map", "players" });
     battleList_->box(FL_NO_BOX);
 
     battleInfo_ = new BattleInfo(x, y+h1, w, h-h1, model_, cache);
@@ -221,7 +221,7 @@ void BattleList::joinBattle(Battle const & battle)
     }
 }
 
-std::string BattleList::flagsString(Battle const & battle)
+std::string BattleList::statusString(Battle const & battle)
 {
     std::ostringstream oss;
     oss << (battle.passworded() ? "P" : "")
@@ -236,7 +236,7 @@ StringTableRow BattleList::makeRow(Battle const & battle)
     players % battle.players();
 
     return StringTableRow( boost::lexical_cast<std::string>(battle.id()),
-            { flagsString(battle),
+            { statusString(battle),
               battle.title(),
               battle.modName(),
               battle.mapName(),

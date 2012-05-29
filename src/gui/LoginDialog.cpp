@@ -15,7 +15,7 @@
 
 LoginDialog::LoginDialog(Model & model):
     Fl_Window(400, 400, "Login"),
-    model_(model), // TODO remove ?
+    model_(model),
     prefs_(prefs, label())
 {
     set_modal();

@@ -1,4 +1,3 @@
-#include "logging.h"
 #include "UserInterface.h"
 #include "LoginDialog.h"
 #include "ProgressDialog.h"
@@ -10,6 +9,7 @@
 #include "MyImage.h"
 #include "Cache.h"
 #include "Tabs.h"
+#include "logging.h"
 
 #include "model/Model.h"
 
@@ -25,7 +25,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include <cassert>
-#include <iostream> // TODO remove
 
 // Prefs
 static char const * PrefAppWindowX = "AppWindowX";

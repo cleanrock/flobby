@@ -3,7 +3,8 @@
 #include "StringTable.h"
 
 #include <FL/Fl_Group.H>
-#include <memory>
+
+#include <string>
 
 class Model;
 class User;
@@ -45,7 +46,7 @@ private:
     void battleListRowDoubleClicked(int rowIndex, int button);
 
     StringTableRow makeRow(Battle const & battle);
-    std::string flagsString(Battle const & battle);
+    std::string statusString(Battle const & battle);
 
     void joinBattle(Battle const & battle);
 

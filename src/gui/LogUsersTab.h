@@ -30,7 +30,7 @@ private:
 
     int handle(int event);
     StringTableRow makeRow(User const & user);
-    std::string flagsString(User const & user);
+    std::string statusString(User const & user);
 
     void append(std::string const & msg, bool interesting = false);
     void userClicked(int rowIndex, int button);
