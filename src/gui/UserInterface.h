@@ -47,6 +47,7 @@ private:
     BattleList * battleList_;
     BattleRoom * battleRoom_;
 
+    void loadAppIcon();
     void reloadMapsMods();
 
     // Model signal handlers

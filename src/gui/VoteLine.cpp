@@ -11,10 +11,10 @@
 
 VoteLine::VoteLine(int x, int y, int w, int h, Model & model):
     Fl_Group(x, y, w, h),
-    model_(model),
-    votesYes_(0),
-    votesNo_(0),
-    votesTotal_(0)
+    model_(model)
+//    votesYes_(0),
+//    votesNo_(0),
+//    votesTotal_(0)
 {
     box(FL_FLAT_BOX);
     align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
@@ -30,7 +30,7 @@ VoteLine::VoteLine(int x, int y, int w, int h, Model & model):
 
     end();
 
-    makeVotesString();
+//    makeVotesString();
 }
 
 VoteLine::~VoteLine()
@@ -51,6 +51,26 @@ void VoteLine::onNo(Fl_Widget * w, void * data)
     o->model_.sayBattle("!vote 2");
 }
 
+void VoteLine::processHostMessage(std::string const & msg)
+{
+    size_t pos;
+
+    if ((pos = msg.find("Poll: ")) == 0)
+    {
+        // Poll line
+        copy_label(msg.substr(6).c_str());
+        if (msg.find("[END:") == std::string::npos)
+        {
+            activate();
+        }
+        else
+        {
+            deactivate();
+        }
+    }
+}
+
+/*
 void VoteLine::processHostMessage(std::string const & msg)
 {
     size_t pos;
@@ -116,3 +136,4 @@ void VoteLine::makeVotesString()
     oss << " [" << votesYes_ << "y " << votesNo_ << "n of " << votesTotal_ << "] ";
     votes_ = oss.str();
 }
+*/

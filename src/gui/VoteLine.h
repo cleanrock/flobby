@@ -21,6 +21,11 @@ private:
     Fl_Button * yes_;
     Fl_Button * no_;
 
+    static void onYes(Fl_Widget * w, void * data);
+    static void onNo(Fl_Widget * w, void * data);
+
+    // TODO keeping old for multiple host types
+/*
     std::string question_;
     int votesYes_;
     int votesNo_;
@@ -28,6 +33,5 @@ private:
     std::string votes_;
 
     void makeVotesString();
-    static void onYes(Fl_Widget * w, void * data);
-    static void onNo(Fl_Widget * w, void * data);
+*/
 };

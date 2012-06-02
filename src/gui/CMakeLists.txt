@@ -40,5 +40,6 @@ target_link_libraries (gui
     fontconfig
     Xft
     Xinerama
+    Xpm
     png
 )

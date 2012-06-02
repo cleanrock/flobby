@@ -11,6 +11,11 @@
 #include "Tabs.h"
 #include "logging.h"
 
+#include <X11/xpm.h>
+#include <FL/x.H>
+#include "icon.xpm.h"
+//#include "icon.xbm.h"
+
 #include "model/Model.h"
 
 #include <FL/Fl_Double_Window.H>
@@ -53,6 +58,8 @@ UserInterface::UserInterface(Model & model) :
 
     mainWindow_ = new Fl_Double_Window(W, H, "flobby");
     mainWindow_->user_data((void*) (this));
+
+    loadAppIcon();
 
     Fl_Menu_Item menuitems[] = {
         { "&Server",              0, 0, 0, FL_SUBMENU },
@@ -485,4 +492,18 @@ void UserInterface::reloadMapsMods()
 void UserInterface::downloadDone(std::string const & name)
 {
     reloadMapsMods();
+}
+
+void UserInterface::loadAppIcon()
+{
+    fl_open_display(); // needed if display has not been previously opened
+
+    Pixmap p, mask;
+    XpmCreatePixmapFromData(fl_display, DefaultRootWindow(fl_display),
+                                     (char**)icon_xpm, &p, &mask, NULL);
+
+//    Pixmap p = XCreateBitmapFromData(fl_display, DefaultRootWindow(fl_display),
+//                                     (char const *)icon_bits, icon_width, icon_height);
+
+    mainWindow_->icon((const void *)p);
 }
