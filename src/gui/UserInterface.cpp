@@ -57,7 +57,8 @@ UserInterface::UserInterface(Model & model) :
     int const cH = H-mH;
 
     mainWindow_ = new Fl_Double_Window(W, H, "flobby");
-    mainWindow_->user_data((void*) (this));
+    mainWindow_->user_data(this);
+    mainWindow_->callback(UserInterface::mainWindowCallback);
 
     loadAppIcon();
 
@@ -353,8 +354,7 @@ void UserInterface::joinBattleFailed(std::string const & reason)
 void UserInterface::onQuit(Fl_Widget *w, void* d)
 {
     UserInterface * ui = static_cast<UserInterface*>(d);
-    ui->channelsWindow_->hide();
-    ui->mainWindow_->hide();
+    ui->quit();
 }
 
 void UserInterface::menuRefresh(Fl_Widget *w, void* d)
@@ -506,4 +506,20 @@ void UserInterface::loadAppIcon()
 //                                     (char const *)icon_bits, icon_width, icon_height);
 
     mainWindow_->icon((const void *)p);
+}
+
+void UserInterface::mainWindowCallback(Fl_Widget * w, void * p)
+{
+    if (Fl::event() == FL_SHORTCUT && Fl::event_key() == FL_Escape)
+    {
+        return; // ignore Escape
+    }
+    UserInterface * ui = static_cast<UserInterface*>(p);
+    ui->quit();
+}
+
+void UserInterface::quit()
+{
+    channelsWindow_->hide();
+    mainWindow_->hide();
 }

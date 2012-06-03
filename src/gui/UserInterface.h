@@ -49,6 +49,7 @@ private:
 
     void loadAppIcon();
     void reloadMapsMods();
+    void quit();
 
     // Model signal handlers
     void connected(bool connected);
@@ -68,6 +69,7 @@ private:
     static void menuUnitSyncPath(Fl_Widget *w, void* d);
     static void menuChannels(Fl_Widget *w, void* d);
     static void menuBattleListFilter(Fl_Widget *w, void* d);
+    static void mainWindowCallback(Fl_Widget * w, void * p); // used to stop Escape key from exiting the program
 
     void enableMenuItem(void(*cb)(Fl_Widget*, void*), bool enable);
 

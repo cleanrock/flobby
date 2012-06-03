@@ -1,11 +1,9 @@
 proper sound instead of pc-speaker
-do not exit with Escape key
+chat line history
 try to fix TinySkirmish map image
-make google-glog optional
+make google-glog optional ?
 login automatically setting
 show ai info in add ai dialog
-flobby app icon
 save battle chat to file ?
 alt+# shortcuts for tabs ?
 quick find in StringTable, e.g. press C key to show first entry beginning with a C
-
