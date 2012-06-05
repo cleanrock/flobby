@@ -189,6 +189,11 @@ int UserInterface::run(int argc, char** argv)
 
     }
 
+    if (loginDialog_->autoLogin())
+    {
+        loginDialog_->attemptLogin();
+    }
+
     Fl::lock();
     return Fl::run();
 }
