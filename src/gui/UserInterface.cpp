@@ -9,6 +9,7 @@
 #include "MyImage.h"
 #include "Cache.h"
 #include "Tabs.h"
+// TODO #include "Sound.h"
 #include "logging.h"
 
 #include <X11/xpm.h>
@@ -113,6 +114,8 @@ UserInterface::UserInterface(Model & model) :
     model.connectDownloadDone( boost::bind(&UserInterface::downloadDone, this, _1) );
 
     MyImage::registerHandler();
+
+// TODO   sound_.reset(new Sound());
 }
 
 UserInterface::~UserInterface()
@@ -232,7 +235,9 @@ void UserInterface::onTest(Fl_Widget *w, void* d)
 
     Model & m = ui->model_;
 
-    //m.getModAIs("Zero-K v1.0.3.8");
+    // ui->sound_->play();
+
+    // m.getModAIs("Zero-K v1.0.3.8");
     // fl_beep();
 
 #if 0

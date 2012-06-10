@@ -2,6 +2,7 @@
 
 #include "Cache.h"
 #include <FL/Fl.H>
+// TODO #include <memory> // unique_ptr
 #include <string>
 
 // forwards
@@ -14,6 +15,7 @@ class ChannelsWindow;
 class BattleList;
 class BattleRoom;
 class Tabs;
+// TODO class Sound;
 
 class Fl_Double_Window;
 class Fl_Browser;
@@ -46,6 +48,8 @@ private:
     Tabs * tabs_;
     BattleList * battleList_;
     BattleRoom * battleRoom_;
+
+// TODO    std::unique_ptr<Sound> sound_;
 
     void loadAppIcon();
     void reloadMapsMods();

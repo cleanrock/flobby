@@ -32,6 +32,7 @@ add_library (gui STATIC
     BattleFilterDialog.cpp
     AddBotDialog.cpp
     PopupMenu.cpp
+#    Sound_SDL.cpp
 )
 
 target_link_libraries (gui
@@ -42,4 +43,8 @@ target_link_libraries (gui
     Xinerama
     Xpm
     png
+#    SDL
+#    SDL_mixer
+#    alut
+#    openal
 )
