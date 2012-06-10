@@ -47,12 +47,55 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
     // handle messages from host
     if (userName == battleHost_)
     {
-        oss << "@C" << FL_DARK2 << "@.";
         voteLine_->processHostMessage(msg);
+
+        // detect relayed in-game messages, e.g. "[userName] bla"
+        std::string inGameUserName;
+        std::string inGameMsg;
+
+        if (inGameMessage(msg, inGameUserName, inGameMsg))
+        {
+            oss << inGameUserName << ": " << inGameMsg;
+        }
+        else
+        {
+            oss << "@C" << FL_DARK2 << "@." << userName << ": " << msg;
+        }
     }
-    oss << userName << ": " << msg;
+    else
+    {
+        oss << userName << ": " << msg;
+    }
     textDisplay_->append(oss.str());
 
+}
+
+bool BattleChat::inGameMessage(std::string const & msg, std::string & userNameOut, std::string & msgOut)
+{
+    if (msg.size() > 0 && msg[0] == '[')
+    {
+        int level = 1;
+        int i = 1;
+        while (i < msg.size())
+        {
+            if (msg[i] == '[')
+            {
+                ++level;
+            }
+            else if (msg[i] == ']')
+            {
+                --level;
+                if (level == 0)
+                {
+                    userNameOut = msg.substr(1, i-1);
+                    msgOut = msg.substr(i+1);
+                    return true;
+                }
+            }
+            ++i;
+        }
+    }
+    return false;
 }
 
 void BattleChat::close()
@@ -80,7 +123,10 @@ void BattleChat::onText(Fl_Widget * w, void * data)
 
 void BattleChat::addInfo(std::string const & msg)
 {
-    textDisplay_->append(msg);
+    std::ostringstream oss;
+    oss << "@C" << FL_DARK2 << "@." << msg;
+
+    textDisplay_->append(oss.str());
 }
 
 void BattleChat::battleJoined(Battle const & battle)

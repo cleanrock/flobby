@@ -30,5 +30,6 @@ private:
 
     void battleChatMsg(std::string const & userName, std::string const & msg);
     static void onText(Fl_Widget * w, void * data);
+    bool inGameMessage(std::string const & msg, std::string & userNameOut, std::string & msgOut);
 };
 
