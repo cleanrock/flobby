@@ -14,7 +14,7 @@ target_link_libraries (flobby
     controller
     gui
     model
-    glog
+    log
     boost_signals
     boost_thread
     boost_system
@@ -23,6 +23,7 @@ target_link_libraries (flobby
 ) 
 
 add_subdirectory (md5)
+add_subdirectory (log)
 add_subdirectory (controller)
 add_subdirectory (model)
 add_subdirectory (gui)

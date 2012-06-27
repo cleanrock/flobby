@@ -1,5 +1,6 @@
 #include "Sound.h"
-#include "logging.h"
+
+#include "log/Log.h"
 
 #include <AL/alut.h>
 

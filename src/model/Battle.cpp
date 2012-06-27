@@ -1,7 +1,8 @@
-#include "logging.h"
 #include "Battle.h"
 #include "User.h"
 #include "LobbyProtocol.h"
+
+#include "log/Log.h"
 
 #include <boost/lexical_cast.hpp>
 #include <iostream>

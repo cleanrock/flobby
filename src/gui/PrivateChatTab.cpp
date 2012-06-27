@@ -15,7 +15,8 @@ PrivateChatTab::PrivateChatTab(int x, int y, int w, int h, std::string const & u
     Fl_Group(x,y,w,h),
     userName_(userName),
     iTabs_(iTabs),
-    model_(model)
+    model_(model),
+    logFile_("chat_" + userName)
 {
     // make tab name unique
     std::string const tabName(" "+userName_);
@@ -76,9 +77,7 @@ void PrivateChatTab::say(std::string const & userName, std::string const & msg)
 {
     if (userName == userName_)
     {
-        std::ostringstream oss;
-        oss << "@C" << FL_DARK2 << "@." << msg;
-        append(oss.str());
+        append(msg);
     }
 }
 
@@ -95,9 +94,7 @@ void PrivateChatTab::userJoined(User const & user)
 {
     if (user.name() == userName_)
     {
-        std::ostringstream oss;
-        oss << "@C" << FL_DARK2 << "@." << "user joined server";
-        append(oss.str(), true);
+        append(userName_ + " joined server");
     }
 }
 
@@ -105,15 +102,22 @@ void PrivateChatTab::userLeft(User const & user)
 {
     if (user.name() == userName_)
     {
-        std::ostringstream oss;
-        oss << "@C" << FL_DARK2 << "@." << "user left server";
-        append(oss.str(), true);
+        append(userName_ + " left server");
     }
 }
 
 void PrivateChatTab::append(std::string const & msg, bool interesting)
 {
-    text_->append(msg);
+    logFile_.log(msg);
+
+    std::ostringstream oss;
+    if (!interesting)
+    {
+        oss << "@C" << FL_DARK2 << "@.";
+    }
+    oss << msg;
+    text_->append(oss.str());
+
     // make ChatTabs redraw header
     if (interesting && !visible() && labelcolor() != FL_RED)
     {

@@ -1,5 +1,6 @@
-#include "logging.h"
 #include "MyImage.h"
+
+#include "log/Log.h"
 
 #include <FL/Fl_Shared_Image.H>
 #include <cstring>
@@ -93,7 +94,7 @@ Fl_Image * MyImage::check(char const * fileName, uchar * header, int headerSize)
 
 void MyImage::write(std::string const & path, uchar const * mapImageData, int w, int h, int d)
 {
-    DLOG(INFO) << "write " << path;
+    LOG(DEBUG) << "write " << path;
     std::ofstream ofs(path);
 
     if (!ofs.good())

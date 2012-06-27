@@ -3,10 +3,9 @@ It is developed and tested on archlinux.
 
 Dependencies worth noting:
 FLTK 1.3
-google-glog
 boost
 C++11 (gcc 4.6 should be ok)
-pr-downloader (optional)
+pr-downloader (runtime optional)
 
 To be able to download maps from within flobby you need pr-downloader installed.
 Get pr-downloader at https://github.com/abma/pr-downloader. 

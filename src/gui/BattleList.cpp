@@ -4,7 +4,7 @@
 #include "BattleFilterDialog.h"
 #include "PopupMenu.h"
 #include "Prefs.h"
-#include "logging.h"
+#include "log/Log.h"
 
 #include "model/Model.h"
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "StringTable.h"
+#include "LogFile.h"
 #include <FL/Fl_Tile.H>
 #include <vector>
 #include <string>
@@ -26,8 +27,8 @@ private:
     TextDisplay * text_;
     Fl_Input * input_;
     StringTable * userList_;
-
     std::string channelName_;
+    LogFile logFile_;
 
     static void onInput(Fl_Widget * w, void * data);
     int handle(int event);

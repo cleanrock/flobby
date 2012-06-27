@@ -33,6 +33,8 @@ add_library (gui STATIC
     AddBotDialog.cpp
     PopupMenu.cpp
 #    Sound_SDL.cpp
+    LogFile.cpp
+    LoggingDialog.cpp
 )
 
 target_link_libraries (gui

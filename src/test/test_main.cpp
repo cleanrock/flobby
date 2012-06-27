@@ -1,3 +1,5 @@
+#include "log/Log.h"
+
 #include <cppunit/CompilerOutputter.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
@@ -5,6 +7,13 @@
 
 int main(int argc, char * argv[])
 {
+    // reset log file
+    std::string logFileName = "unittest.log";
+    {
+        std::ofstream ofs(logFileName);
+    }
+    Log::logFile(logFileName);
+
     // Get the top level suite from the registry
     CppUnit::Test *suite = CppUnit::TestFactoryRegistry::getRegistry().makeTest();
 

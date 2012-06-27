@@ -1,5 +1,6 @@
 #pragma once
 
+#include "LogFile.h"
 #include <FL/Fl_Group.H>
 #include <string>
 
@@ -27,6 +28,7 @@ private:
     TextDisplay * textDisplay_;
     Fl_Input * input_;
     std::string battleHost_;
+    LogFile logFile_;
 
     void battleChatMsg(std::string const & userName, std::string const & msg);
     static void onText(Fl_Widget * w, void * data);

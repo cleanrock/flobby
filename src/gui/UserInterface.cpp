@@ -1,5 +1,6 @@
 #include "UserInterface.h"
 #include "LoginDialog.h"
+#include "LoggingDialog.h"
 #include "ProgressDialog.h"
 #include "ChannelsWindow.h"
 #include "BattleList.h"
@@ -10,7 +11,8 @@
 #include "Cache.h"
 #include "Tabs.h"
 // TODO #include "Sound.h"
-#include "logging.h"
+
+#include "log/Log.h"
 
 #include <X11/xpm.h>
 #include <FL/x.H>
@@ -74,6 +76,7 @@ UserInterface::UserInterface(Model & model) :
         { "Se&ttings",              0, 0, 0, FL_SUBMENU },
                 { "&Spring path...", 0, (Fl_Callback *)&menuSpringPath, this },
                 { "&UnitSync path...", 0, (Fl_Callback *)&menuUnitSyncPath, this },
+                { "&Logging...", 0, (Fl_Callback *)&menuLogging, this },
                 { 0 },
         { "&View",              0, 0, 0, FL_SUBMENU },
             { "&Reload available games && maps", FL_COMMAND + 'r', (Fl_Callback *)&menuRefresh, this },
@@ -102,7 +105,7 @@ UserInterface::UserInterface(Model & model) :
     mainWindow_->end();
 
     loginDialog_ = new LoginDialog(model_);
-
+    loggingDialog_ = new LoggingDialog();
     progressDialog_ = new ProgressDialog();
 
     channelsWindow_ = new ChannelsWindow(model_);
@@ -238,7 +241,7 @@ void UserInterface::onTest(Fl_Widget *w, void* d)
     // ui->sound_->play();
 
     // m.getModAIs("Zero-K v1.0.3.8");
-    // fl_beep();
+    fl_beep();
 
 #if 0
     auto maps = m.getMaps();
@@ -472,6 +475,14 @@ void UserInterface::menuUnitSyncPath(Fl_Widget *w, void* d)
     {
         fl_alert("flobby is broken without UnitSync.");
     }
+}
+
+void UserInterface::menuLogging(Fl_Widget *w, void* d)
+{
+    UserInterface * ui = static_cast<UserInterface*>(d);
+
+    ui->loggingDialog_->show();
+
 }
 
 void UserInterface::enableMenuItem(void(*cb)(Fl_Widget*, void*), bool enable)

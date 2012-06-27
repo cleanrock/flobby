@@ -1,12 +1,15 @@
 #include "Test.h"
 #include "model/Model.h"
 #include "gui/MyImage.h"
+#include "log/Log.h"
 
 #include <boost/lexical_cast.hpp>
+#include <functional>
+#include <thread>
 #include <stdexcept>
 #include <sstream>
 #include <string>
-
+#include <memory>
 
 // Registers the fixture into the 'registry'
 CPPUNIT_TEST_SUITE_REGISTRATION( Test );
@@ -370,5 +373,32 @@ void Test::testMyImage()
     // test exception is thrown if file not found
     {
         CPPUNIT_ASSERT_THROW(MyImage image("non_existing_file"), std::invalid_argument);
+    }
+}
+
+
+void Test::testLog()
+{
+    // 10 threads write 100 lines each, output is analyzed manually
+
+    int const cnt = 10;
+    std::vector< std::unique_ptr<std::thread> > threads(cnt);
+
+    for (int i=0; i<cnt; ++i)
+    {
+        threads[i].reset( new std::thread(std::bind(logThread, i)) );
+    }
+
+    for (int i=0; i<cnt; ++i)
+    {
+        threads[i]->join();
+    }
+}
+
+void Test::logThread(int id)
+{
+    for (int i=0; i<100; ++i)
+    {
+        LOG(INFO) << "test_thread_" << id; // change to WARNING to see how it looks on std::cout
     }
 }

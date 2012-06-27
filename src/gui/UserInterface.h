@@ -10,6 +10,7 @@ class Model;
 class Battle;
 class User;
 class LoginDialog;
+class LoggingDialog;
 class ProgressDialog;
 class ChannelsWindow;
 class BattleList;
@@ -40,6 +41,7 @@ private:
     Fl_Double_Window * mainWindow_;
     Fl_Menu_Bar * menuBar_;
     LoginDialog * loginDialog_;
+    LoggingDialog * loggingDialog_;
     ProgressDialog * progressDialog_;
     ChannelsWindow * channelsWindow_;
 
@@ -71,6 +73,7 @@ private:
     static void menuGenerateCacheFiles(Fl_Widget *w, void* d);
     static void menuSpringPath(Fl_Widget *w, void* d);
     static void menuUnitSyncPath(Fl_Widget *w, void* d);
+    static void menuLogging(Fl_Widget *w, void* d);
     static void menuChannels(Fl_Widget *w, void* d);
     static void menuBattleListFilter(Fl_Widget *w, void* d);
     static void mainWindowCallback(Fl_Widget * w, void * p); // used to stop Escape key from exiting the program

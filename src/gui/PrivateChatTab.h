@@ -1,5 +1,6 @@
 #pragma once
 
+#include "LogFile.h"
 #include <FL/Fl_Group.H>
 #include <string>
 
@@ -20,6 +21,7 @@ private:
     std::string userName_;
     ITabs & iTabs_;
     Model & model_;
+    LogFile logFile_;
     TextDisplay * text_;
     Fl_Input * input_;
 

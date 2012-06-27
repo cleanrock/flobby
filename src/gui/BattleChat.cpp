@@ -14,7 +14,8 @@
 
 BattleChat::BattleChat(int x, int y, int w, int h, Model & model):
     Fl_Group(x, y, w, h),
-    model_(model)
+    model_(model),
+    logFile_("battlechat")
 {
     int const ih = 24; // input height
 
@@ -42,6 +43,8 @@ BattleChat::~BattleChat()
 
 void BattleChat::battleChatMsg(std::string const & userName, std::string const & msg)
 {
+    logFile_.log(userName + ": " + msg);
+
     std::ostringstream oss;
 
     // handle messages from host
@@ -123,6 +126,7 @@ void BattleChat::onText(Fl_Widget * w, void * data)
 
 void BattleChat::addInfo(std::string const & msg)
 {
+    logFile_.log(msg);
     std::ostringstream oss;
     oss << "@C" << FL_DARK2 << "@." << msg;
 

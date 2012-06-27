@@ -5,9 +5,9 @@ add_executable (unittest
 
 target_link_libraries (unittest
     cppunit
-    glog
     model
     gui
+    log
     dl
     boost_system
 ) 

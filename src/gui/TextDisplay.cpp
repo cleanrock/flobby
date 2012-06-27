@@ -1,5 +1,6 @@
-#include "logging.h"
 #include "TextDisplay.h"
+
+#include "log/Log.h"
 
 #include <sstream>
 #include <ctime>
@@ -84,10 +85,10 @@ int TextDisplay::handle(int event)
                 {
                     size_t end = text.find_first_of(" \t\r\n\v\f", pos);
                     std::string const link = text.substr(pos, end-pos);
-                    DLOG(INFO) << "link: '" << link << "'";
+                    LOG(DEBUG) << "link: '" << link << "'";
 
                     std::string const cmd = "xdg-open " + link;
-                    ::system(cmd.c_str());
+                    std::system(cmd.c_str());
                 }
             }
             return 1;

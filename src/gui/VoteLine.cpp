@@ -1,7 +1,8 @@
 #include "VoteLine.h"
 
+#include "log/Log.h"
 #include "model/Model.h"
-#include "logging.h"
+
 #include <FL/Fl_Button.H>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>

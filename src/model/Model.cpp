@@ -1,4 +1,3 @@
-#include "logging.h"
 #include "Model.h"
 #include "LobbyProtocol.h"
 #include "User.h"
@@ -7,6 +6,8 @@
 #include "IController.h"
 #include "Bot.h"
 #include "UnitSync.h"
+
+#include "log/Log.h"
 
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
@@ -87,7 +88,7 @@ void Model::setUnitSyncPath(std::string const & path)
     writeableDataDir_ = unitSync_->GetWritableDataDirectory();
     assert(!writeableDataDir_.empty());
 
-    DLOG(INFO) << "writeableDataDir_:" << writeableDataDir_;
+    LOG(DEBUG) << "writeableDataDir_:" << writeableDataDir_;
 }
 
 Battle & Model::getBattle(std::string const & str)
@@ -108,7 +109,7 @@ Battle & Model::battle(int battleId)
 
 void Model::connected(bool connected)
 {
-    DLOG(INFO) << "Model::connected:" << connected;
+    LOG(DEBUG) << "Model::connected:" << connected;
 
     if (connected_ != connected)
     {
@@ -156,14 +157,14 @@ void Model::attemptLogin()
 
 void Model::message(std::string const & msg)
 {
-    DLOG(INFO) << "message: " << msg;
+    LOG(DEBUG) << "message: " << msg;
 
     processServerMsg(msg);
 }
 
 void Model::processDone(unsigned int id)
 {
-    DLOG(INFO) << "processDone:" << id;
+    LOG(DEBUG) << "processDone:" << id;
     if (id == springId_)
     {
         springExitSignal_();
@@ -374,7 +375,7 @@ void Model::sayPrivate(std::string const & userName, std::string const & msg)
 
 void Model::startSpring()
 {
-    DLOG(INFO) << "startSpring";
+    LOG(DEBUG) << "startSpring";
 
     if (springId_ != 0)
     {
@@ -507,7 +508,7 @@ std::unique_ptr<uint8_t[]>  Model::getInfoMap(std::string const & mapName, std::
         LOG(WARNING) << "GetInfoMapSize failed: " << mapName;
         return 0;
     }
-    DLOG(INFO) << "InfoMapSize: " << mapName << " / " << type << ", " << w << "x" << h;
+    LOG(DEBUG) << "InfoMapSize: " << mapName << " / " << type << ", " << w << "x" << h;
 
     std::unique_ptr<uint8_t[]> data(new uint8_t[w*h]);
     int res = unitSync_->GetInfoMap(mapName.c_str(), type.c_str(), data.get(), 1 /* one byte */);
@@ -527,7 +528,7 @@ void Model::getMapSize(std::string const & mapName, int & w, int & h)
     {
         throw std::runtime_error("GetInfoMapSize failed:" + mapName);
     }
-    DLOG(INFO) << "InfoMapSize: " << w << "x" << h;
+    LOG(DEBUG) << "InfoMapSize: " << w << "x" << h;
 }
 
 void Model::refresh()
@@ -540,7 +541,7 @@ void Model::refresh()
     if (joinedBattleId_ != -1)
     {
         int const sync = calcSync(getBattle(joinedBattleId_));
-        DLOG(INFO) << "refresh sync:" << sync;
+        LOG(DEBUG) << "refresh sync:" << sync;
         User & u = me();
         if (sync != u.battleStatus().sync())
         {
@@ -858,8 +859,8 @@ void Model::handle_JOINBATTLE(std::istream & is) // battleId hashCode
     b.modHash(boost::lexical_cast<int>(ex));
     script_.clear();
     bots_.clear();
-    DLOG(INFO) << "modHash " << b.modHash();
-    DLOG(INFO) << "mapHash " << b.mapHash();
+    LOG(DEBUG) << "modHash " << b.modHash();
+    LOG(DEBUG) << "mapHash " << b.mapHash();
 }
 
 void Model::handle_JOINBATTLEFAILED(std::istream & is) // {reason}

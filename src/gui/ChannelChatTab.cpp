@@ -18,7 +18,8 @@ ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & c
     Fl_Tile(x,y,w,h),
     iTabs_(iTabs),
     model_(model),
-    channelName_(channelName)
+    channelName_(channelName),
+    logFile_("channel_" + channelName)
 {
     // make tab name unique
     std::string const tabName("#"+channelName);
@@ -138,7 +139,7 @@ void ChannelChatTab::userJoined(std::string const & channelName, std::string con
     {
         userList_->addRow(makeRow(userName));
         std::ostringstream oss;
-        oss << "@C" << FL_DARK2 << "@." << userName << " joined";
+        oss << userName << " joined";
 
         append(oss.str());
     }
@@ -152,7 +153,7 @@ void ChannelChatTab::userLeft(std::string const & channelName, std::string const
         userList_->removeRow(userName);
 
         std::ostringstream oss;
-        oss << "@C" << FL_DARK2 << "@." << userName << " left";
+        oss << userName << " left";
 
         if (!reason.empty())
         {
@@ -179,7 +180,16 @@ void ChannelChatTab::leave()
 
 void ChannelChatTab::append(std::string const & msg, bool interesting)
 {
-    text_->append(msg);
+    logFile_.log(msg);
+
+    std::ostringstream oss;
+    if (!interesting)
+    {
+        oss << "@C" << FL_DARK2 << "@.";
+    }
+    oss << msg;
+    text_->append(oss.str());
+
     // make ChatTabs redraw header
     if (interesting && !visible() && labelcolor() != FL_RED)
     {

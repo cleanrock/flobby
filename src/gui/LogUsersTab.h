@@ -1,6 +1,7 @@
 #pragma once
 
 #include "StringTable.h"
+#include "LogFile.h"
 #include <FL/Fl_Tile.H>
 #include <string>
 
@@ -27,6 +28,7 @@ private:
     Model & model_;
     TextDisplay * text_;
     StringTable * userList_;
+    LogFile logFile_;
 
     int handle(int event);
     StringTableRow makeRow(User const & user);

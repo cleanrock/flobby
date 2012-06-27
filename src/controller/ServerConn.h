@@ -19,7 +19,7 @@ class ServerConn
 {
 public:
     ServerConn(std::string const & host, std::string const & service, IServerEvent & iServerEvent);
-	virtual ~ServerConn();
+    virtual ~ServerConn();
 
     void send(std::string msg);
 

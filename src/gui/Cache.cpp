@@ -1,7 +1,7 @@
 #include "Cache.h"
 #include "MyImage.h"
-#include "logging.h"
 
+#include "log/Log.h"
 #include "model/Model.h"
 
 #include <FL/Fl_Shared_Image.H>

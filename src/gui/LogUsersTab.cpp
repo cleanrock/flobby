@@ -18,7 +18,8 @@ LogUsersTab::LogUsersTab(int x, int y, int w, int h,
     Fl_Tile(x,y,w,h, "Log && Users"),
     iTabs_(iTabs),
     iChat_(iChat),
-    model_(model)
+    model_(model),
+    logFile_("messages")
 {
     text_ = new TextDisplay(x, y, w/2, h);
     userList_ = new StringTable(x+w/2, y, w/2, h, "UserList",
@@ -187,6 +188,8 @@ int LogUsersTab::handle(int event)
 
 void LogUsersTab::append(std::string const & msg, bool interesting)
 {
+    logFile_.log(msg);
+
     text_->append(msg);
     // make ChatTabs redraw header
     if (interesting && !visible() && labelcolor() != FL_RED)

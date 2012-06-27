@@ -7,8 +7,8 @@
 #include "MapImage.h"
 #include "AddBotDialog.h"
 #include "PopupMenu.h"
-#include "logging.h"
 
+#include "log/Log.h"
 #include "model/Model.h"
 
 #include <FL/Fl_RGB_Image.H>

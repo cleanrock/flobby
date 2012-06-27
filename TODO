@@ -1,8 +1,7 @@
-proper sound instead of pc-speaker
+check that fist message is TASServer
+proper sound instead of pc-speaker ?
 chat line history
 try to fix TinySkirmish map image
-make google-glog optional ?
 show ai info in add ai dialog
-save battle chat to file ?
 alt+# shortcuts for tabs ?
 quick find in StringTable, e.g. press C key to show first entry beginning with a C

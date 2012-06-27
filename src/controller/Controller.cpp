@@ -1,8 +1,8 @@
-#include "logging.h"
 #include "Controller.h"
 #include "ServerConn.h"
 #include "model/Model.h"
 #include "IServerEvent.h"
+#include "log/Log.h"
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
@@ -54,18 +54,18 @@ unsigned int Controller::startProcess(std::string const & cmd)
 
 void Controller::runProcess(std::string const cmd, unsigned int id)
 {
-    DLOG(INFO) << "runProcess: '" << cmd << "'";
+    LOG(DEBUG) << "runProcess: '" << cmd << "'";
 
     // create log filename
     std::string const first = cmd.substr(0, cmd.find(' '));
-    boost::filesystem3::path const path(first);
+    boost::filesystem::path const path(first);
     std::string const log = "flobby_process_" + path.stem().string() + ".log";
-    DLOG(INFO) << "runProcess logFile: '" << log << "'";
+    LOG(DEBUG) << "runProcess logFile: '" << log << "'";
 
     // redirect stdout and stderr to log file
     std::string cmd2 = cmd + " >> " + log + " 2>&1";
-    DLOG(INFO) << "runProcess system(): '" << cmd2 << "'";
-    ::system(cmd2.c_str());
+    LOG(DEBUG) << "runProcess system(): '" << cmd2 << "'";
+    std::system(cmd2.c_str());
 
 //    FILE * f = ::popen(cmd.c_str(), "re"); // e = close-on-exec
 //    if (f != NULL)
@@ -128,7 +128,7 @@ void Controller::message(std::string const & msg)
     {
         boost::lock_guard<boost::mutex> lock(mutex_);
         recvQueue_.push_back(msg);
-        DLOG_IF(INFO, recvQueue_.size() > 1) << "recvQueue_.size():" << recvQueue_.size();
+        LOG_IF(DEBUG, recvQueue_.size() > 1) << "recvQueue_.size():" << recvQueue_.size();
     }
 
     ui_->addCallbackEvent(&messageCallback, this);

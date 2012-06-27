@@ -1,6 +1,6 @@
-#include "logging.h"
 #include "ServerConn.h"
 #include "IServerEvent.h"
+#include "log/Log.h"
 
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
@@ -30,7 +30,7 @@ ServerConn::~ServerConn()
 {
     doClose();
     thread_->join();
-    DLOG(INFO) << "ServerConn destroyed";
+    LOG(DEBUG) << "ServerConn destroyed";
 }
 
 
@@ -113,7 +113,7 @@ void ServerConn::readHandler(const boost::system::error_code& error, std::size_t
     }
     else
     {
-        DLOG(WARNING) << "read failed";
+        LOG(DEBUG) << "read failed";
         doClose();
     }
 }
@@ -125,7 +125,7 @@ void ServerConn::send(std::string msg)
     {
         msg.append(1, '\n');
     }
-    DLOG(INFO) << "ServerConn::send " << msg;
+    LOG(DEBUG) << "ServerConn::send " << msg;
     ioService_.post(boost::bind(&ServerConn::doSend, this, msg));
 }
 
@@ -177,7 +177,7 @@ void ServerConn::doClose()
     if (socket_.is_open())
     {
         socket_.close();
-        DLOG(INFO) << "closed";
+        LOG(DEBUG) << "closed";
         client_.connected(false);
 
     }

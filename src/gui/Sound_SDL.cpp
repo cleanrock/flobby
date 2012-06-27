@@ -1,5 +1,6 @@
 #include "Sound.h"
-#include "logging.h"
+
+#include "log/Log.h"
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_mixer.h>
