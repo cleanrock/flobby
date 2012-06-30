@@ -10,6 +10,7 @@
 #include "log/Log.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <stdexcept>
 #include <sstream>
 #include <iostream> // TODO remove
@@ -22,6 +23,7 @@
 Model::Model(IController & controller):
     controller_(controller),
     connected_(false),
+    checkFirstMsg_(false),
     loggedIn_(false),
     joinedBattleId_(-1),
     me_(0),
@@ -120,6 +122,7 @@ void Model::connected(bool connected)
     {
         if (connected)
         {
+            checkFirstMsg_ = true; // check that first message is TASServer
             attemptLogin();
         }
         else
@@ -317,14 +320,32 @@ void Model::processServerMsg(const std::string & msg)
     {
         std::string ex;
         LobbyProtocol::extractWord(iss, ex);
-        auto res = messageHandlers_.find(ex);
-        if (res != messageHandlers_.end())
+
+        if (checkFirstMsg_)
         {
-            res->second(iss);
+            if (boost::iequals(ex, "TASSERVER"))
+            {
+                handle_TASSERVER(iss);
+                checkFirstMsg_ = false;
+            }
+            else
+            {
+                LOG(WARNING) << "Disconnecting, first message is not TASSERVER:" << msg;
+                serverMsgSignal_("Bad first msg from server: " + msg.substr(0, 32));
+                disconnect();
+            }
         }
         else
         {
-            LOG(WARNING) << "Unhandled message:" << msg;
+            auto res = messageHandlers_.find(ex);
+            if (res != messageHandlers_.end())
+            {
+                res->second(iss);
+            }
+            else
+            {
+                LOG(WARNING) << "Unhandled message:" << msg;
+            }
         }
     }
     catch (std::exception const & e)
@@ -674,6 +695,28 @@ void Model::sendMyBattleStatus()
     oss << "MYBATTLESTATUS " << me().battleStatus() << " 255"; // TODO color
     controller_.send(oss.str());
 
+}
+
+void Model::handle_TASSERVER(std::istream & is) // protocolVersion springVersion udpPort serverMode (e.g 0.35 88 8201 0)
+{
+    using namespace LobbyProtocol;
+
+    ServerInfo si;
+    std::string ex;
+
+    extractWord(is, ex);
+    si.protocolVersion_ = ex;
+
+    extractWord(is, ex);
+    si.springVersion_ = ex;
+
+    extractWord(is, ex);
+    si.udpPort_ = boost::lexical_cast<unsigned short>(ex);
+
+    extractWord(is, ex);
+    si.serverMode_ = boost::lexical_cast<unsigned short>(ex);
+
+    serverInfoSignal_(si);
 }
 
 void Model::handle_ACCEPTED(std::istream & is) // userName

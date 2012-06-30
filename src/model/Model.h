@@ -9,6 +9,7 @@
 #include "Channel.h"
 #include "MapInfo.h"
 #include "StartRect.h"
+#include "ServerInfo.h"
 #include "AI.h"
 
 #include <boost/signal.hpp>
@@ -92,6 +93,10 @@ public:
     typedef boost::signal<void (bool connected)> ConnectedSignal;
     boost::signals::connection connectConnected(ConnectedSignal::slot_type subscriber)
     { return connectedSignal_.connect(subscriber); }
+
+    typedef boost::signal<void (ServerInfo const & serverInfo)> ServerInfoSignal;
+    boost::signals::connection connectServerInfo(ServerInfoSignal::slot_type subscriber)
+    { return serverInfoSignal_.connect(subscriber); }
 
     typedef boost::signal<void (bool success, std::string const & msg)> LoginResultSignal;
     boost::signals::connection connectLoginResult(LoginResultSignal::slot_type subscriber)
@@ -216,6 +221,7 @@ public:
 private:
     IController & controller_;
     bool connected_;
+    bool checkFirstMsg_;
     bool loggedIn_; // set to true when we get LOGININFOEND
     std::unique_ptr<UnitSync> unitSync_;
 
@@ -242,6 +248,7 @@ private:
     void processDone(unsigned int id);
 
     ConnectedSignal connectedSignal_;
+    ServerInfoSignal serverInfoSignal_;
     LoginResultSignal loginResultSignal_;
     UserJoinedSignal userJoinedSignal_;
     UserChangedSignal userChangedSignal_;
@@ -301,6 +308,7 @@ private:
 
     typedef std::unordered_map<std::string, std::function<void (std::istream &)>> MessageHandlers;
     MessageHandlers messageHandlers_;
+    void handle_TASSERVER(std::istream & is);
     void handle_ACCEPTED(std::istream & is);
     void handle_DENIED(std::istream & is);
     void handle_ADDUSER(std::istream & is);

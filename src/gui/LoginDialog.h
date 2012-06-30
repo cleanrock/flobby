@@ -35,6 +35,9 @@ private:
 
     static void callback(Fl_Widget*, void*);
     void onLogin();
+
+    // model signals
+    void connected(bool connected);
     void loginResult(bool success, std::string const & info);
 
 };

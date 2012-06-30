@@ -31,6 +31,7 @@ LogUsersTab::LogUsersTab(int x, int y, int w, int h,
 
     // model signals
     model_.connectConnected( boost::bind(&LogUsersTab::connected, this, _1) );
+    model_.connectServerInfo( boost::bind(&LogUsersTab::serverInfo, this, _1) );
     model_.connectLoginResult( boost::bind(&LogUsersTab::loginResult, this, _1, _2) );
     model_.connectServerMsg( boost::bind(&LogUsersTab::message, this, _1) );
     model_.connectUserJoined( boost::bind(&LogUsersTab::userJoined, this, _1) );
@@ -53,6 +54,13 @@ void LogUsersTab::initTiles()
     {
         position(userList_->x(), 0, x, 0);
     }
+}
+
+void LogUsersTab::serverInfo(ServerInfo const & si)
+{
+    std::ostringstream oss;
+    oss << "ServerInfo: " << si;
+    append(oss.str());
 }
 
 void LogUsersTab::loginResult(bool success, std::string const & info)

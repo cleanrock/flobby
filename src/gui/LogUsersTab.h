@@ -12,6 +12,7 @@ class User;
 class Fl_Tile;
 class TextDisplay;
 class StringTable;
+class ServerInfo;
 
 class LogUsersTab: public Fl_Tile
 {
@@ -40,6 +41,7 @@ private:
 
     // model signals
     void connected(bool connected);
+    void serverInfo(ServerInfo const & si);
     void loginResult(bool success, std::string const & info);
     void message(std::string const & msg);
     void userJoined(User const & user);

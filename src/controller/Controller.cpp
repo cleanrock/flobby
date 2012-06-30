@@ -80,7 +80,7 @@ void Controller::runProcess(std::string const cmd, unsigned int id)
 //    }
 
     {
-        boost::lock_guard<boost::mutex> lock(mutex_);
+        boost::lock_guard<boost::mutex> lock(mutexProcess_);
         procsDone_.insert(id);
     }
     ui_->addCallbackEvent(&processDoneCallback, this);
@@ -90,7 +90,7 @@ void Controller::processDoneCallback(void * data)
 {
     Controller* c = static_cast<Controller*>(data);
 
-    boost::lock_guard<boost::mutex> lock(c->mutex_);
+    boost::lock_guard<boost::mutex> lock(c->mutexProcess_);
     for (unsigned int id : c->procsDone_)
     {
         c->client_->processDone(id);
@@ -112,8 +112,9 @@ void Controller::processDoneCallback(void * data)
 void Controller::connected(bool connected)
 {
     {
-        boost::lock_guard<boost::mutex> lock(mutex_);
-        connected_ = connected;
+        boost::lock_guard<boost::mutex> lock(mutexConnected_);
+        connectedQueue_.push_back(connected);
+        LOG_IF(DEBUG, connectedQueue_.size() > 1) << "connectedQueue_.size():" << connectedQueue_.size();
     }
     ui_->addCallbackEvent(&connectedCallback, this);
 }
@@ -126,7 +127,7 @@ void Controller::disconnect()
 void Controller::message(std::string const & msg)
 {
     {
-        boost::lock_guard<boost::mutex> lock(mutex_);
+        boost::lock_guard<boost::mutex> lock(mutexRecv_);
         recvQueue_.push_back(msg);
         LOG_IF(DEBUG, recvQueue_.size() > 1) << "recvQueue_.size():" << recvQueue_.size();
     }
@@ -138,8 +139,13 @@ void Controller::connectedCallback(void * data)
 {
     Controller* c = static_cast<Controller*>(data);
 
-    boost::lock_guard<boost::mutex> lock(c->mutex_);
-    c->client_->connected(c->connected_);
+    boost::lock_guard<boost::mutex> lock(c->mutexConnected_);
+
+    while (!c->connectedQueue_.empty())
+    {
+        c->client_->connected(c->connectedQueue_.front());
+        c->connectedQueue_.pop_front();
+    }
 }
 
 
@@ -148,7 +154,7 @@ void Controller::messageCallback(void *data)
 {
     Controller* c = static_cast<Controller*>(data);
 
-    boost::lock_guard<boost::mutex> lock(c->mutex_);
+    boost::lock_guard<boost::mutex> lock(c->mutexRecv_);
 
     while (!c->recvQueue_.empty())
     {

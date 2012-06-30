@@ -61,6 +61,7 @@ LoginDialog::LoginDialog(Model & model):
     end();
 
     // model signal handlers
+    model.connectConnected( boost::bind(&LoginDialog::connected, this, _1) );
     model.connectLoginResult( boost::bind(&LoginDialog::loginResult, this, _1, _2) );
 
 }
@@ -123,6 +124,15 @@ void LoginDialog::loginResult(bool success, std::string const & info)
     {
         info_->label(0);
         hide();
+    }
+}
+
+void LoginDialog::connected(bool connected)
+{
+    if (!connected)
+    {
+        hide();
+        activate();
     }
 }
 

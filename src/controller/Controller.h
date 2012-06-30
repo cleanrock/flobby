@@ -45,10 +45,15 @@ private:
     bool connected_;
     std::unique_ptr<ServerConn> server_;
 
+    typedef std::deque<bool> ConnectedQueue;
+    ConnectedQueue connectedQueue_;
+
     typedef std::deque<std::string> RecvQueue;
     RecvQueue recvQueue_;
 
-    boost::mutex mutex_;
+    boost::mutex mutexConnected_;
+    boost::mutex mutexRecv_;
+    boost::mutex mutexProcess_;
 
     // IServerEvent (called by server_ from its own thread)
     //
