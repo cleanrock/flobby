@@ -42,7 +42,8 @@ Log::~Log()
         ofs_.open(fileName_, std::fstream::app);
         if (!ofs_.good())
         {
-            throw std::runtime_error("failed to open log file: " + fileName_);
+            std::cout << "failed to open log file: " << fileName_ << std::endl;
+            std::abort();
         }
 
         char buf[32];
