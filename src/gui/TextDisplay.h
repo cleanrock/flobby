@@ -14,6 +14,9 @@ public:
     void append(std::string const & text); // prepends with time stamp and adds newline at end
 
 private:
+    bool scrollToBottom_;
+
     int handle(int event);
+    void draw();
 
 };

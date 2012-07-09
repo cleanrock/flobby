@@ -6,14 +6,16 @@
 #include <ctime>
 
 TextDisplay::TextDisplay(int x, int y, int w, int h, char const * label):
-    Fl_Browser(x, y, w, h, label)
+    Fl_Browser(x, y, w, h, label),
+    scrollToBottom_(false)
 {
-    // TODO box(FL_THIN_DOWN_FRAME);
     textsize(12);
-    // TODO wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
 
     static int colWidths[] = { 65, 0 };
     column_widths(colWidths);
+
+    // always show scrollbars until i can get "scroll to bottom" to work when horz scrollbar pops up
+    has_scrollbar(BOTH_ALWAYS);
 }
 
 TextDisplay::~TextDisplay()
@@ -31,7 +33,7 @@ void TextDisplay::append(std::string const & text)
         std::time_t t = std::time(0);
         std::tm tm = *std::localtime(&t);
         // TODO replace with std::put_time when its available in gcc
-        strftime(buf, 16, "%H:%M:%S", &tm);
+        std::strftime(buf, 16, "%H:%M:%S", &tm);
     }
     else
     {
@@ -41,10 +43,11 @@ void TextDisplay::append(std::string const & text)
     oss << "@C" << FL_GRAY << "@." << buf << '\t' // time in gray in first column
         << text;
 
-    // hack to make sure we scroll when multiple appends are called
-    float const scrollV = scrollbar.value();
-    bool const scroll = (   (scrollV == 0 && scrollbar.maximum() == 1)
-                         || (scrollV > 0 && scrollV == scrollbar.maximum()) );
+    // make sure we scroll to bottom when last line is visible
+    if (scrollToBottom_ == false && size() > 0 && displayed(size()))
+    {
+        scrollToBottom_ = true;
+    }
 
     add(oss.str().c_str());
 
@@ -52,11 +55,6 @@ void TextDisplay::append(std::string const & text)
     while (size() > 200)
     {
         remove(1);
-    }
-
-    if (scroll)
-    {
-        make_visible(size());
     }
 }
 
@@ -98,3 +96,12 @@ int TextDisplay::handle(int event)
     return Fl_Browser::handle(event);
 }
 
+void TextDisplay::draw()
+{
+    if (scrollToBottom_)
+    {
+        bottomline(size());
+        scrollToBottom_ = false;
+    }
+    Fl_Browser::draw();
+}
