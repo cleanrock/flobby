@@ -166,7 +166,7 @@ void BattleRoom::setMapImage(Battle const & battle)
     {
         mapImageBox_->label(0);
         mapImageBox_->image(image);
-        mapImageBox_->deactivate();
+        mapImageBox_->activate();
 
         MapInfo const & mapInfo = cache_.getMapInfo(battle.mapName());
         std::ostringstream oss;
@@ -444,7 +444,7 @@ void BattleRoom::onLeave(Fl_Widget* w, void* data)
 void BattleRoom::onMapImage(Fl_Widget* w, void* data)
 {
     BattleRoom * o = static_cast<BattleRoom*>(data);
-    o->downloadMap();
+    o->handleOnMapImage();
 }
 
 void BattleRoom::botAdded(Bot const & bot)
@@ -579,15 +579,81 @@ void BattleRoom::connected(bool connected)
     }
 }
 
-void BattleRoom::downloadMap()
+void BattleRoom::handleOnMapImage()
 {
-    if (battleId_ != -1)
+    if (battleId_ == -1)
     {
-        std::string mapName = model_.getBattle(battleId_).mapName();
-        if (!mapName.empty() && model_.downloadMap(mapName))
-        {
-            mapImageBox_->label("downloading..");
-            mapImageBox_->deactivate();
-        }
+        LOG(WARNING)<< "battleId_ == -1";
+        return;
+    }
+
+    std::string const mapName = model_.getBattle(battleId_).mapName();
+    if (mapName.empty())
+    {
+        LOG(WARNING)<< "mapName empty";
+        return;
+    }
+
+    switch (Fl::event())
+    {
+        case FL_PUSH: // mouse button single click
+            switch (Fl::event_button())
+            {
+                case FL_LEFT_MOUSE: // start download or display minimap
+                {
+                    if (mapImageBox_->image() == 0 && model_.downloadMap(mapName))
+                    {
+                        mapImageBox_->label("downloading...");
+                        mapImageBox_->deactivate();
+                    }
+                    else
+                    {
+                        Fl_Image * image = cache_.getMapImage(mapName);
+                        if (image && image != mapImageBox_->image())
+                        {
+                            mapImageBox_->image(image);
+                            mapImageBox_->redraw();
+                        }
+                    }
+                }
+                break;
+            }
+            break;
+
+        case FL_MOUSEWHEEL:
+            if (mapImageBox_->image() != 0)
+            {
+                Fl_Image * imageCurrent = mapImageBox_->image();
+                Fl_Image * imageHeight = cache_.getHeightImage(mapName);
+                Fl_Image * imageMap = cache_.getMapImage(mapName);
+                Fl_Image * imageMetal = cache_.getMetalImage(mapName);
+                if (Fl::event_dy() < 0) // wheel up
+                {
+                    if (imageCurrent == imageMap)
+                    {
+                        mapImageBox_->image(imageHeight);
+                        mapImageBox_->redraw();
+                    }
+                    else if (imageCurrent == imageMetal)
+                    {
+                        mapImageBox_->image(imageMap);
+                        mapImageBox_->redraw();
+                    }
+                }
+                else if (Fl::event_dy() > 0) // wheel down
+                {
+                    if (imageCurrent == imageMap)
+                    {
+                        mapImageBox_->image(imageMetal);
+                        mapImageBox_->redraw();
+                    }
+                    else if (imageCurrent == imageHeight)
+                    {
+                        mapImageBox_->image(imageMap);
+                        mapImageBox_->redraw();
+                    }
+                }
+            }
+            break;
     }
 }

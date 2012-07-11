@@ -82,8 +82,8 @@ void MapImage::setAlly(int ally)
 
 int MapImage::handle(int event)
 {
-    // generate callback on left clicks
-    if (event == FL_PUSH && Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks() == 0)
+    // generate callback on mouse button and wheel
+    if (event == FL_PUSH || event == FL_MOUSEWHEEL)
     {
         do_callback();
         return 1;

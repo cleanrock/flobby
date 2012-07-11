@@ -97,7 +97,7 @@ private:
     std::string syncString(User const & user);
     StringTableRow makeRow(User const & user);
     StringTableRow makeRow(Bot const & bot);
-    void downloadMap();
+    void handleOnMapImage();
 
     void playerClicked(int rowIndex, int button);
     void playerDoubleClicked(int rowIndex, int button);
