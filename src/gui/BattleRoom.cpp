@@ -621,12 +621,13 @@ void BattleRoom::handleOnMapImage()
             break;
 
         case FL_MOUSEWHEEL:
-            if (mapImageBox_->image() != 0)
+            Fl_Image * imageCurrent = mapImageBox_->image();
+            if (imageCurrent != 0)
             {
-                Fl_Image * imageCurrent = mapImageBox_->image();
                 Fl_Image * imageHeight = cache_.getHeightImage(mapName);
                 Fl_Image * imageMap = cache_.getMapImage(mapName);
                 Fl_Image * imageMetal = cache_.getMetalImage(mapName);
+
                 if (Fl::event_dy() < 0) // wheel up
                 {
                     if (imageCurrent == imageMap)

@@ -69,6 +69,7 @@ UserInterface::UserInterface(Model & model) :
         { "&Server",              0, 0, 0, FL_SUBMENU },
             { "&Login...", FL_COMMAND +'l', (Fl_Callback *)&menuLogin, this },
             { "&Disconnect", 0, (Fl_Callback *)&menuDisconnect, this, FL_MENU_INACTIVE },
+            { "&Join channel...", FL_COMMAND +'j', (Fl_Callback *)&menuJoinChannel, this, FL_MENU_INACTIVE },
             { "&Channels...", FL_COMMAND +'h', (Fl_Callback *)&menuChannels, this, FL_MENU_INACTIVE },
 //            { "&Test", FL_COMMAND +'t', (Fl_Callback *)&onTest, this }, // TODO remove
             { "E&xit", FL_COMMAND +'q', (Fl_Callback *)&onQuit, this },
@@ -225,6 +226,16 @@ void UserInterface::menuDisconnect(Fl_Widget *w, void* d)
     ui->model_.disconnect();
 }
 
+void UserInterface::menuJoinChannel(Fl_Widget *w, void* d)
+{
+    UserInterface * ui = static_cast<UserInterface*>(d);
+    char const * str = fl_input("Join channel");
+    if (str)
+    {
+        ui->model_.joinChannel(str);
+    }
+}
+
 void UserInterface::menuChannels(Fl_Widget *w, void* d)
 {
     UserInterface * ui = static_cast<UserInterface*>(d);
@@ -335,11 +346,12 @@ void UserInterface::onTest(Fl_Widget *w, void* d)
 
 void UserInterface::connected(bool connected)
 {
-    enableMenuItem(UserInterface::menuDisconnect, connected ? true : false);
+    enableMenuItem(UserInterface::menuDisconnect, connected);
 
     if (!connected)
     {
         enableMenuItem(UserInterface::menuLogin, true);
+        enableMenuItem(UserInterface::menuJoinChannel, false);
         enableMenuItem(UserInterface::menuChannels, false);
         channelsWindow_->hide();
     }
@@ -347,16 +359,9 @@ void UserInterface::connected(bool connected)
 
 void UserInterface::loginResult(bool success, std::string const & info)
 {
-    enableMenuItem(UserInterface::menuLogin, success ? false : true);
-    enableMenuItem(UserInterface::menuChannels, success ? true : false);
-
-    // TODO do something here ???
-    if (!success)
-    {
-    }
-    else
-    {
-    }
+    enableMenuItem(UserInterface::menuLogin, !success);
+    enableMenuItem(UserInterface::menuJoinChannel, success);
+    enableMenuItem(UserInterface::menuChannels, success);
 }
 
 void UserInterface::joinBattleFailed(std::string const & reason)
@@ -393,6 +398,8 @@ void UserInterface::menuGenerateCacheFiles(Fl_Widget *w, void* d)
         try
         {
             ui->cache_.getMapImage(map);
+            ui->cache_.getMetalImage(map);
+            ui->cache_.getHeightImage(map);
             ui->cache_.getMapInfo(map);
         }
         catch (std::exception const & e)
