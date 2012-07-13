@@ -12,6 +12,7 @@ class User;
 class LoginDialog;
 class LoggingDialog;
 class ProgressDialog;
+class TextDialog;
 class ChannelsWindow;
 class BattleList;
 class BattleRoom;
@@ -44,6 +45,7 @@ private:
     LoggingDialog * loggingDialog_;
     ProgressDialog * progressDialog_;
     ChannelsWindow * channelsWindow_;
+    TextDialog * autoJoinChannelsDialog_;
 
     Fl_Tile * tile_; // whole app window client area
     Fl_Tile * tileLeft_; // chat and battle list
@@ -63,6 +65,9 @@ private:
     void joinBattleFailed(std::string const & reason);
     void downloadDone(std::string const & name);
 
+    // other signal handlers
+    void autoJoinChannels(std::string const & text);
+
     // FLTK callbacks
     //
     static void menuLogin(Fl_Widget* w, void* d);
@@ -78,6 +83,7 @@ private:
     static void menuChannels(Fl_Widget *w, void* d);
     static void menuBattleListFilter(Fl_Widget *w, void* d);
     static void mainWindowCallback(Fl_Widget * w, void * p); // used to stop Escape key from exiting the program
+    static void menuChannelsAutoJoin(Fl_Widget *w, void* d);
 
     void enableMenuItem(void(*cb)(Fl_Widget*, void*), bool enable);
 

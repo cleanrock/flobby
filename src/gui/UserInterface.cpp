@@ -10,6 +10,7 @@
 #include "MyImage.h"
 #include "Cache.h"
 #include "Tabs.h"
+#include "TextDialog.h"
 // TODO #include "Sound.h"
 
 #include "log/Log.h"
@@ -32,6 +33,7 @@
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 #include <cassert>
 
 // Prefs
@@ -43,6 +45,7 @@ static char const * PrefAppWindowSplitH = "AppWindowSplitH";
 static char const * PrefLeftSplitV = "LeftSplitV";
 static char const * PrefSpringPath = "SpringPath";
 static char const * PrefUnitSyncPath = "UnitSyncPath";
+static char const * PrefAutoJoinChannels = "AutoJoinChannels";
 
 UserInterface::UserInterface(Model & model) :
     model_(model),
@@ -77,6 +80,7 @@ UserInterface::UserInterface(Model & model) :
         { "Se&ttings",              0, 0, 0, FL_SUBMENU },
                 { "&Spring path...", 0, (Fl_Callback *)&menuSpringPath, this },
                 { "&UnitSync path...", 0, (Fl_Callback *)&menuUnitSyncPath, this },
+                { "&Channels to auto-join...", 0, (Fl_Callback *)&menuChannelsAutoJoin, this },
                 { "&Logging...", 0, (Fl_Callback *)&menuLogging, this },
                 { 0 },
         { "&View",              0, 0, 0, FL_SUBMENU },
@@ -108,7 +112,8 @@ UserInterface::UserInterface(Model & model) :
     loginDialog_ = new LoginDialog(model_);
     loggingDialog_ = new LoggingDialog();
     progressDialog_ = new ProgressDialog();
-
+    autoJoinChannelsDialog_ = new TextDialog("Channels to auto-join", "One channel per line");
+    autoJoinChannelsDialog_->connectTextSave(boost::bind(&UserInterface::autoJoinChannels, this, _1));
     channelsWindow_ = new ChannelsWindow(model_);
 
     // model signal handlers
@@ -362,6 +367,14 @@ void UserInterface::loginResult(bool success, std::string const & info)
     enableMenuItem(UserInterface::menuLogin, !success);
     enableMenuItem(UserInterface::menuJoinChannel, success);
     enableMenuItem(UserInterface::menuChannels, success);
+
+    if (success)
+    {
+        char * val;
+        prefs.get(PrefAutoJoinChannels, val, "");
+        autoJoinChannels(val);
+        ::free(val);
+    }
 }
 
 void UserInterface::joinBattleFailed(std::string const & reason)
@@ -484,6 +497,20 @@ void UserInterface::menuUnitSyncPath(Fl_Widget *w, void* d)
     }
 }
 
+void UserInterface::menuChannelsAutoJoin(Fl_Widget *w, void* d)
+{
+    UserInterface * ui = static_cast<UserInterface*>(d);
+
+    char * val;
+    prefs.get(PrefAutoJoinChannels, val, "");
+    std::string text(val);
+    ::free(val);
+
+    boost::replace_all(text, " ", "\n");
+
+    ui->autoJoinChannelsDialog_->show(text.c_str());
+}
+
 void UserInterface::menuLogging(Fl_Widget *w, void* d)
 {
     UserInterface * ui = static_cast<UserInterface*>(d);
@@ -520,6 +547,25 @@ void UserInterface::reloadMapsMods()
 void UserInterface::downloadDone(std::string const & name)
 {
     reloadMapsMods();
+}
+
+void UserInterface::autoJoinChannels(std::string const & text)
+{
+    std::vector<std::string> channels;
+
+    namespace ba = boost::algorithm;
+    ba::split( channels, text, ba::is_any_of("\n "), ba::token_compress_on );
+
+    std::ostringstream oss;
+    for (auto & v : channels)
+    {
+        if (!v.empty())
+        {
+            oss << v << " ";
+            model_.joinChannel(v);
+        }
+    }
+    prefs.set(PrefAutoJoinChannels, oss.str().c_str());
 }
 
 void UserInterface::loadAppIcon()

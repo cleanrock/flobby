@@ -35,6 +35,7 @@ add_library (gui STATIC
 #    Sound_SDL.cpp
     LogFile.cpp
     LoggingDialog.cpp
+    TextDialog.cpp
 )
 
 target_link_libraries (gui

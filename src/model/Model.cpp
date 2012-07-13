@@ -1119,7 +1119,7 @@ void Model::getChannels()
 
 void Model::joinChannel(std::string const & channelName)
 {
-    if (!channelName.empty())
+    if (!channelName.empty() && connected_)
     {
         std::ostringstream oss;
         oss << "JOIN " << channelName;
