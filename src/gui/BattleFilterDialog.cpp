@@ -1,5 +1,6 @@
 #include "BattleFilterDialog.h"
 #include "Prefs.h"
+#include "Sound.h"
 
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Int_Input.H>
@@ -55,7 +56,7 @@ void BattleFilterDialog::onFilterSet()
     if (players < 0)
     {
         box_->label("Players must be a non-negative number");
-        fl_beep();
+        Sound::beep();
         return;
     }
 

@@ -32,7 +32,7 @@ add_library (gui STATIC
     BattleFilterDialog.cpp
     AddBotDialog.cpp
     PopupMenu.cpp
-#    Sound_SDL.cpp
+    Sound.cpp
     LogFile.cpp
     LoggingDialog.cpp
     TextDialog.cpp

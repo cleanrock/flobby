@@ -11,14 +11,12 @@
 #include "Cache.h"
 #include "Tabs.h"
 #include "TextDialog.h"
-// TODO #include "Sound.h"
 
 #include "log/Log.h"
 
 #include <X11/xpm.h>
 #include <FL/x.H>
 #include "icon.xpm.h"
-//#include "icon.xbm.h"
 
 #include "model/Model.h"
 
@@ -254,10 +252,10 @@ void UserInterface::onTest(Fl_Widget *w, void* d)
 
     Model & m = ui->model_;
 
+    // Sound::beep();
     // ui->sound_->play();
 
     // m.getModAIs("Zero-K v1.0.3.8");
-    fl_beep();
 
 #if 0
     auto maps = m.getMaps();

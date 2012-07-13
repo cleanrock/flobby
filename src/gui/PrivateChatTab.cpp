@@ -1,6 +1,7 @@
 #include "PrivateChatTab.h"
 #include "TextDisplay.h"
 #include "ITabs.h"
+#include "Sound.h"
 
 #include "model/Model.h"
 
@@ -86,7 +87,7 @@ void PrivateChatTab::said(std::string const & userName, std::string const & msg)
     if (userName == userName_)
     {
         append(userName + ": " + msg, true);
-        fl_beep();
+        Sound::beep();
     }
 }
 

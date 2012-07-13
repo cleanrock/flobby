@@ -1,5 +1,7 @@
 #include "LoginDialog.h"
 #include "Prefs.h"
+#include "Sound.h"
+
 #include "md5/md5.h"
 #include "md5/base64.h"
 
@@ -118,7 +120,7 @@ void LoginDialog::loginResult(bool success, std::string const & info)
     {
         show();
         info_->copy_label(info.c_str());
-        fl_beep();
+        Sound::beep();
     }
     else
     {

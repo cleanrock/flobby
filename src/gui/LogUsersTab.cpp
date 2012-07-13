@@ -5,6 +5,7 @@
 #include "ITabs.h"
 #include "IChat.h"
 #include "PopupMenu.h"
+#include "Sound.h"
 
 #include "model/Model.h"
 
@@ -179,7 +180,7 @@ void LogUsersTab::userDoubleClicked(int rowIndex, int button)
 void LogUsersTab::ring(std::string const & userName)
 {
     append("ring from " + userName, true);
-    fl_beep();
+    Sound::beep();
 }
 
 int LogUsersTab::handle(int event)
