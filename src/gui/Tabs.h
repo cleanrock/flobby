@@ -37,6 +37,7 @@ private:
     bool closeChat(Fl_Widget* w); // returns true if chat closed
 
     // model signal handlers
+    void connected(bool connected);
     void saidPrivate(std::string const & userName, std::string const & msg); // msg from other, needed here to create new private chat tabs
     void channelJoined(std::string const & channelName);
 

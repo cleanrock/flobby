@@ -190,6 +190,10 @@ public:
     boost::signals::connection connectChannelTopicSignal(ChannelTopicSignal::slot_type subscriber)
     { return channelTopicSignal_.connect(subscriber); }
 
+    typedef boost::signal<void (std::string const & channelName, std::string const & message)> ChannelMessageSignal;
+    boost::signals::connection connectChannelMessageSignal(ChannelMessageSignal::slot_type subscriber)
+    { return channelMessageSignal_.connect(subscriber); }
+
     typedef boost::signal<void (std::string const & channelName, std::vector<std::string> const & clients)> ChannelClientsSignal;
     boost::signals::connection connectChannelClients(ChannelClientsSignal::slot_type subscriber)
     { return channelClientsSignal_.connect(subscriber); }
@@ -222,6 +226,7 @@ private:
     IController & controller_;
     bool connected_;
     bool checkFirstMsg_;
+    bool loginInProgress_;
     bool loggedIn_; // set to true when we get LOGININFOEND
     std::unique_ptr<UnitSync> unitSync_;
 
@@ -272,6 +277,7 @@ private:
     ChannelsSignal channelsSignal_;
     ChannelJoinedSignal channelJoinedSignal_;
     ChannelTopicSignal channelTopicSignal_;
+    ChannelMessageSignal channelMessageSignal_;
     ChannelClientsSignal channelClientsSignal_;
     UserJoinedChannelSignal userJoinedChannelSignal_;
     UserLeftChannelSignal userLeftChannelSignal_;
@@ -341,6 +347,7 @@ private:
     void handle_JOINED(std::istream & is);
     void handle_LEFT(std::istream & is);
     void handle_CHANNELTOPIC(std::istream & is);
+    void handle_CHANNELMESSAGE(std::istream & is);
     void handle_SAID_SAIDEX(std::istream & is);
     void handle_RING(std::istream & is);
     void handle_ADDSTARTRECT(std::istream & is);

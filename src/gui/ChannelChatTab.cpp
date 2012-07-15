@@ -55,6 +55,7 @@ ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & c
 
     // model signals
     model_.connectChannelTopicSignal( boost::bind(&ChannelChatTab::topic, this, _1, _2, _3, _4) );
+    model_.connectChannelMessageSignal( boost::bind(&ChannelChatTab::message, this, _1, _2) );
     model_.connectChannelClients( boost::bind(&ChannelChatTab::clients, this, _1, _2) );
     model_.connectUserJoinedChannel( boost::bind(&ChannelChatTab::userJoined, this, _1, _2) );
     model_.connectUserLeftChannel( boost::bind(&ChannelChatTab::userLeft, this, _1, _2, _3) );
@@ -88,8 +89,6 @@ void ChannelChatTab::onInput(Fl_Widget * w, void * data)
     if (!msg.empty())
     {
         cc->model_.sayChannel(cc->channelName_, msg);
-
-        // TODO ??? always scroll on input
     }
     cc->input_->value("");
 }
@@ -119,6 +118,14 @@ void ChannelChatTab::topic(std::string const & channelName, std::string const & 
         boost::algorithm::erase_all(timeString, "\n");
 
         append("Topic set " + timeString + " by " + author);
+    }
+}
+
+void ChannelChatTab::message(std::string const & channelName, std::string const & message)
+{
+    if (channelName == channelName_)
+    {
+        append(message, true);
     }
 }
 
@@ -180,6 +187,12 @@ void ChannelChatTab::leave()
 
 void ChannelChatTab::append(std::string const & msg, bool interesting)
 {
+    if (msg.empty())
+    {
+        text_->append(msg);
+        return;
+    }
+
     logFile_.log(msg);
 
     std::ostringstream oss;

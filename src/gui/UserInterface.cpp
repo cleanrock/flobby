@@ -78,13 +78,13 @@ UserInterface::UserInterface(Model & model) :
         { "Se&ttings",              0, 0, 0, FL_SUBMENU },
                 { "&Spring path...", 0, (Fl_Callback *)&menuSpringPath, this },
                 { "&UnitSync path...", 0, (Fl_Callback *)&menuUnitSyncPath, this },
+                { "&Battle list filter...", 0, (Fl_Callback *)&menuBattleListFilter, this },
                 { "&Channels to auto-join...", 0, (Fl_Callback *)&menuChannelsAutoJoin, this },
                 { "&Logging...", 0, (Fl_Callback *)&menuLogging, this },
                 { 0 },
-        { "&View",              0, 0, 0, FL_SUBMENU },
+        { "&Other",              0, 0, 0, FL_SUBMENU },
             { "&Reload available games && maps", FL_COMMAND + 'r', (Fl_Callback *)&menuRefresh, this },
             { "&Generate missing cache files", 0, (Fl_Callback *)&menuGenerateCacheFiles, this },
-            { "&Battle list filter...", 0, (Fl_Callback *)&menuBattleListFilter, this },
             { 0 },
 
         { 0 }

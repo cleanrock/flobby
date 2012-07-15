@@ -35,6 +35,7 @@ Tabs::Tabs(int x, int y, int w, int h, Model & model):
     end();
 
     // model signals
+    model_.connectConnected( boost::bind(&Tabs::connected, this, _1) );
     model_.connectSaidPrivate( boost::bind(&Tabs::saidPrivate, this, _1, _2) );
     model_.connectChannelJoined( boost::bind(&Tabs::channelJoined, this, _1) );
 }
@@ -217,4 +218,23 @@ bool Tabs::closeChat(Fl_Widget* w)
 void Tabs::redrawTabs()
 {
     redraw_tabs();
+}
+
+void Tabs::connected(bool connected)
+{
+    if (!connected)
+    {
+        for (auto & pair : privateChatTabs_)
+        {
+            remove(pair.second);
+        }
+
+        for (auto & pair : channelChatTabs_)
+        {
+            remove(pair.second);
+            ChannelChatTab * cc = static_cast<ChannelChatTab*>(pair.second);
+            cc->leave();
+        }
+        redraw();
+    }
 }

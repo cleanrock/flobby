@@ -63,6 +63,7 @@ Model::Model(IController & controller):
     ADD_MSG_HANDLER(ENDOFCHANNELS)
     ADD_MSG_HANDLER(JOIN)
     ADD_MSG_HANDLER(CHANNELTOPIC)
+    ADD_MSG_HANDLER(CHANNELMESSAGE)
     ADD_MSG_HANDLER(CLIENTS)
     ADD_MSG_HANDLER(JOINED)
     ADD_MSG_HANDLER(LEFT)
@@ -113,42 +114,40 @@ void Model::connected(bool connected)
 {
     LOG(DEBUG) << "Model::connected:" << connected;
 
+    // only react on connection change
     if (connected_ != connected)
     {
-        connectedSignal_(connected);
-    }
+        connected_ = connected;
 
-    if (!connected_)
-    {
+        connectedSignal_(connected);
+
         if (connected)
         {
             checkFirstMsg_ = true; // check that first message is TASServer
+
             attemptLogin();
         }
         else
         {
-            loginResultSignal_(false, "no connection to server");
+            // reset model on disconnect
+            loggedIn_ = false;
+            userName_.clear();
+            password_.clear();
+            myScriptPassword_.clear();
+            joinedBattleId_ = -1;
+            springId_ = 0;
+            me_ = 0;
+            battles_.clear();
+            users_.clear();
+            bots_.clear();
         }
     }
 
-    // reset model on disconnect
-    if (connected_ && !connected)
+    if (!connected && loginInProgress_)
     {
-        connected_ = false;
-        loggedIn_ = false;
-        userName_.clear();
-        password_.clear();
-        myScriptPassword_.clear();
-        joinedBattleId_ = -1;
-        springId_ = 0;
-        me_ = 0;
-        battles_.clear();
-        users_.clear();
-        bots_.clear();
-
+        loginResultSignal_(false, "no connection to server");
+        loginInProgress_ = false;
     }
-
-    connected_ = connected;
 }
 
 void Model::attemptLogin()
@@ -185,6 +184,7 @@ void Model::processDone(unsigned int id)
 void Model::login(const std::string & host, const std::string & port,
         const std::string & username, const std::string & password)
 {
+    loginInProgress_ = true;
     userName_ = username;
     password_ = password;
     if (!connected_)
@@ -732,6 +732,7 @@ void Model::handle_DENIED(std::istream & is) // {reason}
     using namespace LobbyProtocol;
     std::string ex;
     extractSentence(is, ex);
+    loginInProgress_ = false;
     loginResultSignal_(false, ex);
 }
 
@@ -888,6 +889,7 @@ void Model::handle_CLIENTSTATUS(std::istream & is) // userName status
 void Model::handle_LOGININFOEND(std::istream & is)
 {
     loggedIn_ = true;
+    loginInProgress_ = false;
     loginResultSignal_(true, "");
 }
 
@@ -1139,7 +1141,7 @@ void Model::sayChannel(std::string const & channelName, std::string const & mess
 
 void Model::leaveChannel(std::string const & channelName)
 {
-    if (!channelName.empty())
+    if (!channelName.empty() && connected_)
     {
         std::ostringstream oss;
         oss << "LEAVE " << channelName;
@@ -1223,6 +1225,19 @@ void Model::handle_CHANNELTOPIC(std::istream & is) // channelName author changed
     extractSentence(is, topic);
 
     channelTopicSignal_(channelName, author, ms/1000, topic);
+}
+
+void Model::handle_CHANNELMESSAGE(std::istream & is) // channelName {message}
+{
+    using namespace LobbyProtocol;
+
+    std::string channelName;
+    extractWord(is, channelName);
+
+    std::string message;
+    extractSentence(is, message);
+
+    channelMessageSignal_(channelName, message);
 }
 
 void Model::handle_SAID_SAIDEX(std::istream & is) // channelName userName {message}

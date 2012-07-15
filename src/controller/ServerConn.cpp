@@ -2,9 +2,8 @@
 #include "IServerEvent.h"
 #include "log/Log.h"
 
-#include <boost/thread.hpp>
 #include <boost/bind.hpp>
-
+#include <thread>
 #include <cassert>
 
 using boost::asio::ip::tcp;
@@ -23,7 +22,9 @@ ServerConn::ServerConn(std::string const & host, std::string const & service, IS
                     boost::asio::placeholders::error,
                     boost::asio::placeholders::iterator));
 
-    thread_.reset( new boost::thread( boost::bind(&boost::asio::io_service::run, &ioService_) ) );
+    // casting below is to avoid confusing eclipse when binding to overloaded run method
+    auto f = boost::bind( static_cast<std::size_t (boost::asio::io_service::*)(void)>(&boost::asio::io_service::run), &ioService_);
+    thread_.reset( new std::thread(f) );
 }
 
 ServerConn::~ServerConn()
@@ -32,26 +33,6 @@ ServerConn::~ServerConn()
     thread_->join();
     LOG(DEBUG) << "ServerConn destroyed";
 }
-
-
-
-//void ServerConn::connect(const std::string & host, const std::string & service)
-//{
-//    tcp::resolver::query query(host, service);
-//
-//    resolver_.async_resolve(
-//            query,
-//            boost::bind(&ServerConn::resolveHandler, this,
-//                    boost::asio::placeholders::error,
-//                    boost::asio::placeholders::iterator));
-//
-//    thread_.reset( new boost::thread( boost::bind(&boost::asio::io_service::run, &ioService_) ) );
-//}
-
-//void ServerConn::disconnect()
-//{
-//    doClose();
-//}
 
 void ServerConn::resolveHandler(const boost::system::error_code& error,
         boost::asio::ip::tcp::resolver::iterator iterator)
@@ -77,7 +58,6 @@ void ServerConn::connectHandler(const boost::system::error_code& error)
     if (!error)
     {
         client_.connected(true);
-//        connectedSignal_(true);
         boost::asio::async_read_until(
                 socket_,
                 recvBuf_,
@@ -101,7 +81,6 @@ void ServerConn::readHandler(const boost::system::error_code& error, std::size_t
         std::string line;
         std::getline(is, line);
         client_.message(line);
-//        msgSignal_(line);
 
         boost::asio::async_read_until(
                 socket_,
@@ -165,14 +144,9 @@ void ServerConn::writeHandler(const boost::system::error_code& error)
     }
 }
 
-//void ServerConn::setIServerEvent(IServerEvent & iServerEvent)
-//{
-//    client_ = &iServerEvent;
-//}
-
 void ServerConn::doClose()
 {
-    boost::lock_guard<boost::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(mutex_);
 
     if (socket_.is_open())
     {
@@ -182,15 +156,3 @@ void ServerConn::doClose()
 
     }
 }
-
-//// signal subscription
-////
-//ServerConn::Connection ServerConn::subscribeConnected(ConnectedSignal::slot_type subscriber)
-//{
-//    return connectedSignal_.connect(subscriber);
-//}
-//
-//ServerConn::Connection ServerConn::subscribeMsg(MsgSignal::slot_type subscriber)
-//{
-//    return msgSignal_.connect(subscriber);
-//}

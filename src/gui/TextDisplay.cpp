@@ -60,7 +60,7 @@ void TextDisplay::append(std::string const & text)
 
 int TextDisplay::handle(int event)
 {
-    // make mousewheel scroll half a page
+    // make mouse wheel scroll half a page
     if (event == FL_MOUSEWHEEL)
     {
         int const rowsPerPage = h()/incr_height();
@@ -69,14 +69,12 @@ int TextDisplay::handle(int event)
 
     switch (event)
     {
-    case FL_PUSH:
+    case FL_PUSH: // handle double click on lines with web link
         if (Fl::event_clicks() && Fl::event_button() == FL_LEFT_MOUSE)
         {
             void * item = find_item(Fl::event_y());
             if (item)
             {
-                // TODO replace with std::regex when it works
-
                 std::string const text = item_text(item);
                 size_t pos = text.find("http://");
                 if (pos != std::string::npos)

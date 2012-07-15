@@ -126,9 +126,13 @@ void BattleChat::onText(Fl_Widget * w, void * data)
 
 void BattleChat::addInfo(std::string const & msg)
 {
-    logFile_.log(msg);
     std::ostringstream oss;
-    oss << "@C" << FL_DARK2 << "@." << msg;
+
+    if (!msg.empty())
+    {
+        logFile_.log(msg);
+        oss << "@C" << FL_DARK2 << "@." << msg;
+    }
 
     textDisplay_->append(oss.str());
 }

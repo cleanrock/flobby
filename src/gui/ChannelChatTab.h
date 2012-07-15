@@ -38,6 +38,7 @@ private:
 
     // model signals
     void topic(std::string const & channelName, std::string const & author, time_t epochSeconds, std::string const & topic);
+    void message(std::string const & channelName, std::string const & message);
     void clients(std::string const & channelName, std::vector<std::string> const & clients);
     void userJoined(std::string const & channelName, std::string const & userName);
     void userLeft(std::string const & channelName, std::string const & userName, std::string const & reason);
