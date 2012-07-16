@@ -36,6 +36,7 @@ add_library (gui STATIC
     LogFile.cpp
     LoggingDialog.cpp
     TextDialog.cpp
+    SpringDialog.cpp
 )
 
 target_link_libraries (gui

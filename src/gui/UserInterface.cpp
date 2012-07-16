@@ -11,6 +11,7 @@
 #include "Cache.h"
 #include "Tabs.h"
 #include "TextDialog.h"
+#include "SpringDialog.h"
 
 #include "log/Log.h"
 
@@ -41,8 +42,6 @@ static char const * PrefAppWindowW  = "AppWindowW";
 static char const * PrefAppWindowH = "AppWindowH";
 static char const * PrefAppWindowSplitH = "AppWindowSplitH";
 static char const * PrefLeftSplitV = "LeftSplitV";
-static char const * PrefSpringPath = "SpringPath";
-static char const * PrefUnitSyncPath = "UnitSyncPath";
 static char const * PrefAutoJoinChannels = "AutoJoinChannels";
 
 UserInterface::UserInterface(Model & model) :
@@ -76,8 +75,7 @@ UserInterface::UserInterface(Model & model) :
             { "E&xit", FL_COMMAND +'q', (Fl_Callback *)&onQuit, this },
             { 0 },
         { "Se&ttings",              0, 0, 0, FL_SUBMENU },
-                { "&Spring path...", 0, (Fl_Callback *)&menuSpringPath, this },
-                { "&UnitSync path...", 0, (Fl_Callback *)&menuUnitSyncPath, this },
+                { "&Spring...", 0, (Fl_Callback *)&menuSpring, this },
                 { "&Battle list filter...", 0, (Fl_Callback *)&menuBattleListFilter, this },
                 { "&Channels to auto-join...", 0, (Fl_Callback *)&menuChannelsAutoJoin, this },
                 { "&Logging...", 0, (Fl_Callback *)&menuLogging, this },
@@ -107,6 +105,8 @@ UserInterface::UserInterface(Model & model) :
     mainWindow_->resizable(tile_);
     mainWindow_->end();
 
+    springDialog_ = new SpringDialog(model_);
+    springDialog_->connectProfileSet(boost::bind(&UserInterface::springProfileSet, this, _1));
     loginDialog_ = new LoginDialog(model_);
     loggingDialog_ = new LoggingDialog();
     progressDialog_ = new ProgressDialog();
@@ -171,35 +171,9 @@ int UserInterface::run(int argc, char** argv)
     mainWindow_->show(argc, argv);
 
     // set Spring and UnitSync paths
-    {
-        char buf[257];
-        std::string str;
+    bool const pathsOk = springDialog_->setPaths();
 
-        prefs.get(PrefSpringPath, buf, "", 256);
-        str = buf;
-        if (!boost::filesystem::is_regular_file(str))
-        {
-            menuSpringPath(0, this);
-        }
-        else
-        {
-            model_.setSpringPath(str);
-        }
-
-        prefs.get(PrefUnitSyncPath, buf, "", 256);
-        str = buf;
-        if (!boost::filesystem::is_regular_file(str))
-        {
-            menuUnitSyncPath(0, this);
-        }
-        else
-        {
-            model_.setUnitSyncPath(str);
-        }
-
-    }
-
-    if (loginDialog_->autoLogin())
+    if (pathsOk && loginDialog_->autoLogin())
     {
         loginDialog_->attemptLogin();
     }
@@ -431,68 +405,10 @@ void UserInterface::menuBattleListFilter(Fl_Widget *w, void* d)
     ui->battleList_->showFilterDialog();
 }
 
-void UserInterface::menuSpringPath(Fl_Widget *w, void* d)
+void UserInterface::menuSpring(Fl_Widget *w, void* d)
 {
     UserInterface * ui = static_cast<UserInterface*>(d);
-
-    Fl_Native_File_Chooser fc;
-    fc.options(Fl_Native_File_Chooser::NO_OPTIONS);
-    fc.title("Select spring executable");
-    fc.type(Fl_Native_File_Chooser::BROWSE_FILE);
-
-    char buf[257];
-    if (prefs.get(PrefSpringPath, buf, "/usr/bin/spring", 256))
-    {
-        fc.preset_file(buf);
-    }
-    else
-    {
-        fc.preset_file(buf);
-//        fc.directory(buf);
-    }
-
-    int res = fc.show();
-    if (res == 0 && boost::filesystem::is_regular_file(fc.filename()))
-    {
-        ui->model_.setSpringPath(fc.filename());
-        prefs.set(PrefSpringPath, fc.filename());
-    }
-    if ( !boost::filesystem::is_regular_file(ui->model_.getSpringPath()) )
-    {
-        fl_alert("flobby is broken without spring.");
-    }
-}
-
-void UserInterface::menuUnitSyncPath(Fl_Widget *w, void* d)
-{
-    UserInterface * ui = static_cast<UserInterface*>(d);
-
-    Fl_Native_File_Chooser fc;
-    fc.options(Fl_Native_File_Chooser::NO_OPTIONS);
-    fc.title("Select UnitSync library");
-    fc.type(Fl_Native_File_Chooser::BROWSE_FILE);
-
-    char buf[257];
-    if (prefs.get(PrefUnitSyncPath, buf, "/usr/lib/libunitsync.so", 256))
-    {
-        fc.preset_file(buf);
-    }
-    else
-    {
-        fc.preset_file(buf);
-//        fc.directory(buf);
-    }
-
-    int res = fc.show();
-    if (res == 0 && boost::filesystem::is_regular_file(fc.filename()))
-    {
-        ui->model_.setUnitSyncPath(fc.filename());
-        prefs.set(PrefUnitSyncPath, fc.filename());
-    }
-    if ( !boost::filesystem::is_regular_file(ui->model_.getUnitSyncPath()) )
-    {
-        fl_alert("flobby is broken without UnitSync.");
-    }
+    ui->springDialog_->show();
 }
 
 void UserInterface::menuChannelsAutoJoin(Fl_Widget *w, void* d)
@@ -564,6 +480,12 @@ void UserInterface::autoJoinChannels(std::string const & text)
         }
     }
     prefs.set(PrefAutoJoinChannels, oss.str().c_str());
+}
+
+void UserInterface::springProfileSet(std::string const & profile)
+{
+    std::string title = "flobby - " + profile;
+    mainWindow_->copy_label(title.c_str());
 }
 
 void UserInterface::loadAppIcon()

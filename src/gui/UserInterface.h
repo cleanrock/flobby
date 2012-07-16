@@ -1,14 +1,15 @@
 #pragma once
 
 #include "Cache.h"
+
 #include <FL/Fl.H>
-// TODO #include <memory> // unique_ptr
 #include <string>
 
 // forwards
 class Model;
 class Battle;
 class User;
+class SpringDialog;
 class LoginDialog;
 class LoggingDialog;
 class ProgressDialog;
@@ -17,7 +18,6 @@ class ChannelsWindow;
 class BattleList;
 class BattleRoom;
 class Tabs;
-// TODO class Sound;
 
 class Fl_Double_Window;
 class Fl_Browser;
@@ -41,6 +41,7 @@ private:
 
     Fl_Double_Window * mainWindow_;
     Fl_Menu_Bar * menuBar_;
+    SpringDialog * springDialog_;
     LoginDialog * loginDialog_;
     LoggingDialog * loggingDialog_;
     ProgressDialog * progressDialog_;
@@ -52,8 +53,6 @@ private:
     Tabs * tabs_;
     BattleList * battleList_;
     BattleRoom * battleRoom_;
-
-// TODO    std::unique_ptr<Sound> sound_;
 
     void loadAppIcon();
     void reloadMapsMods();
@@ -67,6 +66,7 @@ private:
 
     // other signal handlers
     void autoJoinChannels(std::string const & text);
+    void springProfileSet(std::string const & profile);
 
     // FLTK callbacks
     //
@@ -76,8 +76,7 @@ private:
     static void onTest(Fl_Widget* w, void* d);
     static void menuRefresh(Fl_Widget *w, void* d);
     static void menuGenerateCacheFiles(Fl_Widget *w, void* d);
-    static void menuSpringPath(Fl_Widget *w, void* d);
-    static void menuUnitSyncPath(Fl_Widget *w, void* d);
+    static void menuSpring(Fl_Widget *w, void* d);
     static void menuLogging(Fl_Widget *w, void* d);
     static void menuJoinChannel(Fl_Widget *w, void* d);
     static void menuChannels(Fl_Widget *w, void* d);
