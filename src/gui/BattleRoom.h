@@ -12,7 +12,7 @@ class Model;
 class StartRect;
 class Bot;
 class Cache;
-class IChat;
+class ITabs;
 class MapImage;
 class AddBotDialog;
 
@@ -26,7 +26,7 @@ class Fl_Multiline_Output;
 class BattleRoom: public Fl_Tile
 {
 public:
-    BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache, IChat & chat);
+    BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache, ITabs & iTabs);
     virtual ~BattleRoom();
 
     void initTiles();
@@ -56,7 +56,7 @@ public:
 private:
     Model & model_;
     Cache & cache_;
-    IChat & chat_;
+    ITabs & iTabs_;
     int battleId_;
     bool lastRunning_;
 

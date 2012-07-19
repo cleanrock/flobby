@@ -14,11 +14,12 @@ static char const * PrefColWidth = "ColWidth";
 static char const * PrefSortCol = "SortCol";
 static char const * PrefSortReverse = "SortReverse";
 
-StringTable::StringTable(int x, int y, int w, int h, std::string const & name, std::vector<std::string> const & headers) :
+StringTable::StringTable(int x, int y, int w, int h, std::string const & name, std::vector<std::string> const & headers, bool savePrefs) :
     Fl_Table_Row(x,y,w,h, name.c_str()),
     selectedRow_(-1),
     headers_(headers),
-    prefs_(prefs, label())
+    prefs_(prefs, label()),
+    savePrefs_(savePrefs)
 {
     labeltype(FL_NO_LABEL);
     end();
@@ -50,6 +51,10 @@ StringTable::StringTable(int x, int y, int w, int h, std::string const & name, s
 }
 
 StringTable::~StringTable()
+{
+}
+
+void StringTable::savePrefs()
 {
     // store column widths
     for (int c = 0; c < cols(); ++c)
@@ -252,65 +257,72 @@ int StringTable::handle(int event)
 
     switch (event)
     {
-    case FL_FOCUS:
-        return 1;
-
-    case FL_KEYDOWN:
-    {
-        int const key = Fl::event_key();
-        switch (key)
-        {
-        case FL_Up:
-            selectRow(selectedRow_- 1);
-            if (selectedRow_ < (toprow + 1))
-            {
-                row_position(selectedRow_ - 1);
-            }
+        case FL_FOCUS:
             return 1;
 
-        case FL_Down:
-            selectRow(selectedRow_ + 1);
-            if (selectedRow_ > (botrow - 1))
-            {
-                row_position(toprow + (selectedRow_ + 1 - botrow));
-            }
-            return 1;
-
-        case FL_Page_Up:
+        case FL_KEYDOWN:
         {
-            selectRow(selectedRow_ - rowsPerPage);
-            if (selectedRow_ < (toprow + 1))
+            int const key = Fl::event_key();
+            switch (key)
             {
+            case FL_Up:
+                selectRow(selectedRow_- 1);
+                if (selectedRow_ < (toprow + 1))
+                {
+                    row_position(selectedRow_ - 1);
+                }
+                return 1;
+
+            case FL_Down:
+                selectRow(selectedRow_ + 1);
+                if (selectedRow_ > (botrow - 1))
+                {
+                    row_position(toprow + (selectedRow_ + 1 - botrow));
+                }
+                return 1;
+
+            case FL_Page_Up:
+            {
+                selectRow(selectedRow_ - rowsPerPage);
+                if (selectedRow_ < (toprow + 1))
+                {
+                    row_position(selectedRow_);
+                }
+                return 1;
+            }
+            case FL_Page_Down:
+            {
+                selectRow(selectedRow_ + rowsPerPage);
+                if (selectedRow_ > (botrow - 1))
+                {
+                    row_position(selectedRow_);
+                }
+                return 1;
+            }
+            case FL_Home:
+                selectRow(0);
                 row_position(selectedRow_);
-            }
-            return 1;
-        }
-        case FL_Page_Down:
-        {
-            selectRow(selectedRow_ + rowsPerPage);
-            if (selectedRow_ > (botrow - 1))
-            {
-                row_position(selectedRow_);
-            }
-            return 1;
-        }
-        case FL_Home:
-            selectRow(0);
-            row_position(selectedRow_);
-            return 1;
+                return 1;
 
-        case FL_End:
-            selectRow(rows());
-            row_position(selectedRow_);
-            return 1;
+            case FL_End:
+                selectRow(rows());
+                row_position(selectedRow_);
+                return 1;
+            default:
+                return 0;
+            }
+        }
+        break;
+
         default:
-            return 0;
+        {
+            int res = Fl_Table_Row::handle(event);
+            if (savePrefs_ && event == FL_RELEASE)
+            {
+                savePrefs();
+            }
+            return res;
         }
-    }
-    break;
-
-    default:
-        return Fl_Table_Row::handle(event);
     }
 }
 
@@ -322,8 +334,8 @@ void StringTable::event_callback(Fl_Widget*, void *data) {
 
 void StringTable::event_callback2()
 {
-    int ROW = callback_row();
-    int COL = callback_col();
+    int row = callback_row();
+    int col = callback_col();
     TableContext context = callback_context();
 
     switch (context)
@@ -331,7 +343,7 @@ void StringTable::event_callback2()
     case CONTEXT_COL_HEADER: // someone clicked on column header
         if (Fl::event() == FL_RELEASE && Fl::event_button() == FL_LEFT_MOUSE)
         {
-            if (sort_lastcol_ == COL)
+            if (sort_lastcol_ == col)
             { // Click same column? Toggle sort
                 sort_reverse_ ^= 1;
             }
@@ -339,8 +351,8 @@ void StringTable::event_callback2()
             { // Click diff column? Up sort
                 sort_reverse_ = 0;
             }
-            sort_column(COL, sort_reverse_);
-            sort_lastcol_ = COL;
+            sort_column(col, sort_reverse_);
+            sort_lastcol_ = col;
         }
         break;
 
@@ -351,12 +363,12 @@ void StringTable::event_callback2()
             if (Fl::event_clicks())
             {
                 // row will be selected before the double-click is seen, i.e. selectRow in else below has been done
-                rowDoubleClickedSignal_(ROW, button);
+                rowDoubleClickedSignal_(row, button);
             }
             else
             {
-                selectRow(ROW);
-                rowClickedSignal_(ROW, button);
+                selectRow(row);
+                rowClickedSignal_(row, button);
             }
         }
         break;

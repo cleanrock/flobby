@@ -29,7 +29,8 @@ class StringTable : public Fl_Table_Row
 {
 public:
     StringTable(int x, int y, int w, int h,
-            std::string const & name, std::vector<std::string> const & headers);
+            std::string const & name, std::vector<std::string> const & headers,
+            bool savePrefs = true);
     virtual ~StringTable();
 
     // signals
@@ -62,6 +63,7 @@ private:
                    int X=0, int Y=0, int W=0, int H=0);
     void sort_column(int col, int reverse=0);                   // sort table by a column
     void draw_sort_arrow(int X,int Y,int W,int H,int sort);
+    void savePrefs();
 
 
     struct SortColumn
@@ -75,6 +77,7 @@ private:
     int sort_reverse_;
     int sort_lastcol_;
     Fl_Preferences prefs_;
+    bool savePrefs_;
 
     static void event_callback(Fl_Widget*, void*);
     void event_callback2();

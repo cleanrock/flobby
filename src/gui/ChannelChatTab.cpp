@@ -1,4 +1,5 @@
 #include "ChannelChatTab.h"
+#include "UserList.h"
 #include "TextDisplay.h"
 #include "ITabs.h"
 #include "Prefs.h"
@@ -38,8 +39,7 @@ ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & c
 
     // right side (user list)
     int const rightW = w - leftW;
-    userList_ = new StringTable(x+leftW, y, rightW, h, "ChannelUserList",
-            { "name" });
+    userList_ = new UserList(x+leftW, y, rightW, h, model_, iTabs_);
 
     // setup split
     {
@@ -93,21 +93,6 @@ void ChannelChatTab::onInput(Fl_Widget * w, void * data)
     cc->input_->value("");
 }
 
-StringTableRow ChannelChatTab::makeRow(std::string const & userName)
-{
-    return StringTableRow( userName,
-        {
-            userName
-        } );
-}
-
-std::string ChannelChatTab::statusString(User const & user)
-{
-    std::ostringstream oss;
-    oss << (user.status().inGame() ? "G" : "");
-    return oss.str();
-}
-
 void ChannelChatTab::topic(std::string const & channelName, std::string const & author, time_t epochSeconds, std::string const & topic)
 {
     if (channelName == channelName_)
@@ -135,7 +120,7 @@ void ChannelChatTab::clients(std::string const & channelName, std::vector<std::s
     {
         for (std::string const & userName : clients)
         {
-            userList_->addRow(makeRow(userName));
+            userList_->add(userName);
         }
     }
 }
@@ -144,7 +129,7 @@ void ChannelChatTab::userJoined(std::string const & channelName, std::string con
 {
     if (channelName == channelName_)
     {
-        userList_->addRow(makeRow(userName));
+        userList_->add(userName);
         std::ostringstream oss;
         oss << userName << " joined";
 
@@ -157,7 +142,7 @@ void ChannelChatTab::userLeft(std::string const & channelName, std::string const
     if (channelName == channelName_)
     {
 
-        userList_->removeRow(userName);
+        userList_->remove(userName);
 
         std::ostringstream oss;
         oss << userName << " left";

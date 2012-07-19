@@ -28,7 +28,7 @@ Tabs::Tabs(int x, int y, int w, int h, Model & model):
     selection_color(FL_LIGHT2);
 
     client_area(x,y,w,h);
-    logUsersTab_ = new LogUsersTab(x,y,w,h, *this, *this, model_);
+    logUsersTab_ = new LogUsersTab(x,y,w,h, *this, model_);
 
     resizable(logUsersTab_);
 
@@ -50,9 +50,9 @@ void Tabs::initTiles()
 }
 
 template <typename M>
-void Tabs::createChat(std::string const & name, M & map)
+typename M::mapped_type Tabs::createChat(std::string const & name, M & map)
 {
-    // assumes chat do not exists, TODO remove check ???
+    // assumes chat do not exists
     typename M::const_iterator it = map.find(name);
     assert(it == map.end());
 
@@ -61,71 +61,73 @@ void Tabs::createChat(std::string const & name, M & map)
     typedef typename std::remove_pointer<typename M::mapped_type>::type Type;
     Type * chat = new Type(x,y,w,h, name, *this, model_);
     add(chat);
-    // pc->said(userName, msg); TODO remove, the signal will be sent to the newly created Chat also
+    chat->hide();
     map[name] = chat;
-    value(chat);
-    chat->show(); // to get keyboard focus in input widget
 
+    return chat;
 }
 
 void Tabs::openPrivateChat(std::string const & userName)
 {
+    PrivateChatTab * pc;
     PrivateChatTabs::const_iterator it = privateChatTabs_.find(userName);
     if (it == privateChatTabs_.end())
     {
-        createChat(userName, privateChatTabs_);
+        pc = createChat(userName, privateChatTabs_);
     }
     else
     {
         assert(it->second);
-        PrivateChatTab * pc = it->second;
+        pc = it->second;
 
         // re-add it if it was closed
         if (find(pc) == children())
         {
             add(pc);
         }
-
-        value(pc);
-        pc->show();
     }
 
+    value(pc);
+    pc->show();
 }
 
 void Tabs::openChannelChat(std::string const & channelName)
 {
     auto it = channelChatTabs_.find(channelName);
+    ChannelChatTab * cc;
     if (it == channelChatTabs_.end())
     {
-        createChat(channelName, channelChatTabs_);
+        cc = createChat(channelName, channelChatTabs_);
     }
     else
     {
         assert(it->second);
-        ChannelChatTab * cc = it->second;
+        cc = it->second;
 
         // re-add it if it was closed
         if (find(cc) == children())
         {
             add(cc);
         }
-
-        value(cc);
-        cc->show();
     }
 
+    value(cc);
+    cc->show();
 }
 
 void Tabs::saidPrivate(std::string const & userName, std::string const & msg)
 {
+    PrivateChatTab * pc;
+
     auto it = privateChatTabs_.find(userName);
     if (it == privateChatTabs_.end())
     {
-        createChat(userName, privateChatTabs_);
+        pc = createChat(userName, privateChatTabs_);
+        // we don't need to call pc->said(userName, msg) here since the signal will be sent to the newly created Chat also
     }
     else
     {
-        PrivateChatTab * pc = it->second;
+        pc = it->second;
         // re-add it if it was closed
         if (find(pc) == children())
         {
@@ -195,6 +197,7 @@ bool Tabs::closeChat(Fl_Widget* w)
         if (pair.second == w)
         {
             remove(w);
+            w->hide();
             redraw();
             return true;
         }
@@ -207,6 +210,7 @@ bool Tabs::closeChat(Fl_Widget* w)
             remove(w);
             ChannelChatTab * cc = static_cast<ChannelChatTab*>(w);
             cc->leave();
+            w->hide();
             redraw();
             return true;
         }

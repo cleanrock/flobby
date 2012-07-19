@@ -39,6 +39,7 @@ add_library (gui STATIC
     SpringDialog.cpp
     RegisterDialog.cpp
     AgreementDialog.cpp
+    UserList.cpp
 )
 
 target_link_libraries (gui

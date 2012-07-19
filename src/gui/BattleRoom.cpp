@@ -2,7 +2,7 @@
 #include "StringTable.h"
 #include "BattleChat.h"
 #include "Cache.h"
-#include "IChat.h"
+#include "ITabs.h"
 #include "Prefs.h"
 #include "MapImage.h"
 #include "AddBotDialog.h"
@@ -25,11 +25,11 @@
 
 static char const * PrefBattleRoomSplitV = "BattleRoomSplitV";
 
-BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache, IChat & chat):
+BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache, ITabs & iTabs):
     Fl_Tile(x,y,w,h),
     model_(model),
     cache_(cache),
-    chat_(chat),
+    iTabs_(iTabs),
     battleId_(-1),
     lastRunning_(false)
 {
@@ -505,7 +505,7 @@ void BattleRoom::playerClicked(int rowIndex, int button)
                 switch (id)
                 {
                 case 1:
-                    chat_.openPrivateChat(user.name());
+                    iTabs_.openPrivateChat(user.name());
                     break;
                 }
             }
@@ -545,7 +545,7 @@ void BattleRoom::playerDoubleClicked(int rowIndex, int button)
         {
             User const & user = model_.getUser(row.id_);
             // player if we get here, i.e. getUser doesnt throw
-            chat_.openPrivateChat(user.name());
+            iTabs_.openPrivateChat(user.name());
         }
         catch (std::invalid_argument const & e)
         {
