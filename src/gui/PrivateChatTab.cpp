@@ -119,7 +119,7 @@ void PrivateChatTab::append(std::string const & msg, bool interesting)
     oss << msg;
     text_->append(oss.str());
 
-    // make ChatTabs redraw header
+    // make Tabs redraw header
     if (interesting && !visible() && labelcolor() != FL_RED)
     {
         labelcolor(FL_RED);

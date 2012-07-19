@@ -9,16 +9,14 @@ class Model;
 class Fl_Input;
 class Fl_Secret_Input;
 class Fl_Box;
-class Fl_Check_Button;
+class Fl_Return_Button;
 
-class LoginDialog: public Fl_Window
+class RegisterDialog: public Fl_Window
 {
 public:
-    LoginDialog(Model & model);
-    virtual ~LoginDialog();
+    RegisterDialog(Model & model);
+    virtual ~RegisterDialog();
 
-    bool autoLogin() const;
-    void attemptLogin();
     void show();
 
 private:
@@ -29,19 +27,21 @@ private:
     Fl_Input * port_;
     Fl_Input * userName_;
     Fl_Secret_Input * password_;
-    Fl_Check_Button * autoLogin_;
+    Fl_Secret_Input * password2_;
+    Fl_Input * email_;
     Fl_Box * info_;
+    Fl_Return_Button * register_;
 
+    bool registerInProgress_;
     std::string passwordHash_;
-    bool loginInProgress_;
 
     static void callback(Fl_Widget*, void*);
+    void onRegister();
 
-    void loadLoginPrefs();
-    void onLogin();
+    void infoError(std::string const & text);
 
     // model signals
     void connected(bool connected);
-    void loginResult(bool success, std::string const & info);
+    void registerResult(bool success, std::string const & info);
 
 };

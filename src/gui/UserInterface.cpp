@@ -1,5 +1,7 @@
 #include "UserInterface.h"
 #include "LoginDialog.h"
+#include "RegisterDialog.h"
+#include "AgreementDialog.h"
 #include "LoggingDialog.h"
 #include "ProgressDialog.h"
 #include "ChannelsWindow.h"
@@ -69,6 +71,7 @@ UserInterface::UserInterface(Model & model) :
         { "&Server",              0, 0, 0, FL_SUBMENU },
             { "&Login...", FL_COMMAND +'l', (Fl_Callback *)&menuLogin, this },
             { "&Disconnect", 0, (Fl_Callback *)&menuDisconnect, this, FL_MENU_INACTIVE },
+            { "&Register...", 0, (Fl_Callback *)&menuRegister, this },
             { "&Join channel...", FL_COMMAND +'j', (Fl_Callback *)&menuJoinChannel, this, FL_MENU_INACTIVE },
             { "&Channels...", FL_COMMAND +'h', (Fl_Callback *)&menuChannels, this, FL_MENU_INACTIVE },
 //            { "&Test", FL_COMMAND +'t', (Fl_Callback *)&onTest, this }, // TODO remove
@@ -108,6 +111,8 @@ UserInterface::UserInterface(Model & model) :
     springDialog_ = new SpringDialog(model_);
     springDialog_->connectProfileSet(boost::bind(&UserInterface::springProfileSet, this, _1));
     loginDialog_ = new LoginDialog(model_);
+    registerDialog_ = new RegisterDialog(model_);
+    agreementDialog_ = new AgreementDialog(model_, *loginDialog_);
     loggingDialog_ = new LoggingDialog();
     progressDialog_ = new ProgressDialog();
     autoJoinChannelsDialog_ = new TextDialog("Channels to auto-join", "One channel per line");
@@ -201,6 +206,12 @@ void UserInterface::menuDisconnect(Fl_Widget *w, void* d)
 {
     UserInterface * ui = static_cast<UserInterface*>(d);
     ui->model_.disconnect();
+}
+
+void UserInterface::menuRegister(Fl_Widget *w, void* d)
+{
+    UserInterface * ui = static_cast<UserInterface*>(d);
+    ui->registerDialog_->show();
 }
 
 void UserInterface::menuJoinChannel(Fl_Widget *w, void* d)
@@ -324,6 +335,7 @@ void UserInterface::onTest(Fl_Widget *w, void* d)
 void UserInterface::connected(bool connected)
 {
     enableMenuItem(UserInterface::menuDisconnect, connected);
+    enableMenuItem(UserInterface::menuRegister, !connected);
 
     if (!connected)
     {

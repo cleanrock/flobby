@@ -13,7 +13,6 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <stdexcept>
 #include <sstream>
-#include <iostream> // TODO remove
 
 #define ADD_MSG_HANDLER(MSG) \
     messageHandlers_[#MSG] = std::bind(&Model::handle_##MSG, this, std::placeholders::_1);
@@ -72,6 +71,10 @@ Model::Model(IController & controller):
     ADD_MSG_HANDLER(RING)
     ADD_MSG_HANDLER(ADDSTARTRECT)
     ADD_MSG_HANDLER(REMOVESTARTRECT)
+    ADD_MSG_HANDLER(REGISTRATIONACCEPTED)
+    ADD_MSG_HANDLER(REGISTRATIONDENIED)
+    ADD_MSG_HANDLER(AGREEMENT)
+    ADD_MSG_HANDLER(AGREEMENTEND)
 
 }
 
@@ -114,40 +117,32 @@ void Model::connected(bool connected)
 {
     LOG(DEBUG) << "Model::connected:" << connected;
 
-    // only react on connection change
-    if (connected_ != connected)
+    connected_ = connected;
+    if (connected_)
     {
-        connected_ = connected;
+        checkFirstMsg_ = true; // check that first message is TASServer
+    }
+    else
+    {
+        // reset model on disconnect
+        loggedIn_ = false;
+        userName_.clear();
+        password_.clear();
+        myScriptPassword_.clear();
+        joinedBattleId_ = -1;
+        springId_ = 0;
+        me_ = 0;
+        battles_.clear();
+        users_.clear();
+        bots_.clear();
 
-        connectedSignal_(connected);
-
-        if (connected)
+        if (loginInProgress_)
         {
-            checkFirstMsg_ = true; // check that first message is TASServer
-
-            attemptLogin();
-        }
-        else
-        {
-            // reset model on disconnect
-            loggedIn_ = false;
-            userName_.clear();
-            password_.clear();
-            myScriptPassword_.clear();
-            joinedBattleId_ = -1;
-            springId_ = 0;
-            me_ = 0;
-            battles_.clear();
-            users_.clear();
-            bots_.clear();
+            loginResultSignal_(false, "no connection to server");
+            loginInProgress_ = false;
         }
     }
-
-    if (!connected && loginInProgress_)
-    {
-        loginResultSignal_(false, "no connection to server");
-        loginInProgress_ = false;
-    }
+    connectedSignal_(connected_);
 }
 
 void Model::attemptLogin()
@@ -181,20 +176,62 @@ void Model::processDone(unsigned int id)
 
 }
 
-void Model::login(const std::string & host, const std::string & port,
-        const std::string & username, const std::string & password)
+void Model::connect(const std::string & host, const std::string & port)
 {
-    loginInProgress_ = true;
-    userName_ = username;
-    password_ = password;
     if (!connected_)
     {
         controller_.connect(host, port);
     }
     else
     {
-        attemptLogin();
+        connectedSignal_(true);
     }
+}
+
+void Model::login(const std::string & username, const std::string & password)
+{
+    if (connected_)
+    {
+        loginInProgress_ = true;
+        userName_ = username;
+        password_ = password;
+
+        std::ostringstream oss;
+        oss << "LOGIN " << userName_ << " " << password_ << " 0 * flobby 0.1";
+        controller_.send(oss.str());
+    }
+    else
+    {
+        loginResultSignal_(false, "not connected");
+    }
+}
+
+void Model::registerAccount(std::string const & userName, std::string const & passwordHash, std::string const & email)
+{
+    if (connected_)
+    {
+        LOG_IF(FATAL, userName.empty())<< "userName empty";
+        LOG_IF(FATAL, passwordHash.empty())<< "passwordHash empty";
+
+        std::ostringstream oss;
+        oss << "REGISTER " << userName << " " << passwordHash;
+        if (!email.empty())
+        {
+            oss << " " << email;
+        }
+        controller_.send(oss.str());
+    }
+    else
+    {
+        registerResultSignal_(false, "not connected");
+    }
+}
+
+void Model::confirmAgreement()
+{
+    std::ostringstream oss;
+    oss << "CONFIRMAGREEMENT";
+    controller_.send(oss.str());
 }
 
 std::vector<Battle const *> Model::getBattles()
@@ -386,7 +423,7 @@ void Model::sayPrivate(std::string const & userName, std::string const & msg)
 {
     if (userName.empty() || msg.empty())
     {
-        // TODO
+        LOG(WARNING)<< "userName.empty():"<< userName.empty() << " msg.empty():"<< msg.empty();
         return;
     }
     std::ostringstream oss;
@@ -1318,24 +1355,125 @@ void Model::handle_REMOVESTARTRECT(std::istream & is) // allyNo
     removeStartRectSignal_(ally);
 }
 
+void Model::handle_REGISTRATIONACCEPTED(std::istream & is)
+{
+    registerResultSignal_(true, "");
+}
+
+void Model::handle_REGISTRATIONDENIED(std::istream & is) // {reason}
+{
+    using namespace LobbyProtocol;
+
+    std::string reason;
+    extractSentence(is, reason);
+
+    registerResultSignal_(false, reason);
+}
+
+void Model::handle_AGREEMENT(std::istream & is) // {text}
+{
+    using namespace LobbyProtocol;
+
+    std::string text;
+    extractSentence(is, text);
+    agreementStream_ << text << "\n";
+}
+
+void Model::handle_AGREEMENTEND(std::istream & is)
+{
+    // try to remove all RTF stuff since we can't display it with FLTK
+
+    std::string a = agreementStream_.str();
+    agreementStream_.str("");
+
+    std::string::size_type pos;
+
+    // remove all up to and first '{'
+    if ( (pos = a.find_first_of('{')) != std::string::npos)
+    {
+        a.replace(0, pos+1, "");
+    }
+    // remove all after last '}'
+    if ( (pos = a.find_last_of('}')) != std::string::npos)
+    {
+        a.replace(pos, std::string::npos, "");
+    }
+
+    // remove everything contained in {}
+    pos = 0;
+    while ( (pos = a.find_first_of('{', pos)) != std::string::npos)
+    {
+        int level = 1;
+        std::string::size_type posNext = pos;
+        while ( (posNext = a.find_first_of("{}", posNext+1)) != std::string::npos)
+        {
+            if (a[posNext] == '{')
+            {
+                ++level;
+            }
+            else
+            {
+                --level;
+                if (level == 0)
+                {
+                    a.replace(pos, posNext-pos+1, "");
+                    break;
+                }
+            }
+        }
+        if (level != 0)
+        {
+            // should not happen, we keep it unchanged
+            LOG(WARNING)<< "end of '{' not found:" << a.substr(pos);
+            break;
+        }
+    }
+
+    // remove all "\... " and "\...\n"
+    pos = 0;
+    while ((pos = a.find_first_of('\\', pos)) != std::string::npos)
+    {
+            std::string::size_type posEnd;
+            if ( (posEnd = a.find_first_of(" \n", pos+1)) != std::string::npos)
+            {
+                if (a[posEnd] == ' ')
+                {
+                    a.replace(pos, posEnd-pos+1, "");
+                }
+                else
+                {
+                    a.replace(pos, posEnd-pos, "");
+                }
+            }
+            else
+            {
+                // should not happen, we keep it unchanged
+                LOG(WARNING)<< "end of backslash content not found:" << a.substr(pos);
+                break;
+            }
+    }
+
+    agreementSignal_(a);
+}
+
 std::vector<AI> Model::getModAIs(std::string const & modName)
 {
     std::vector<AI> ais;
 
     int modIndex = unitSync_->GetPrimaryModIndex(modName.c_str());
-    std::cout << "modIndex " << modIndex << std::endl; // TODO remove
+//    std::cout << "modIndex " << modIndex << std::endl; // TODO remove
 
     if (modIndex >= 0)
     {
         const char* archiveName = unitSync_->GetPrimaryModArchive(modIndex);
-        std::cout << "archiveName " << archiveName << std::endl; // TODO remove
+//        std::cout << "archiveName " << archiveName << std::endl; // TODO remove
         unitSync_->AddAllArchives(archiveName);
         int aiCount = unitSync_->GetSkirmishAICount();
-        std::cout << "aiCount " << aiCount << std::endl; // TODO remove
+//        std::cout << "aiCount " << aiCount << std::endl; // TODO remove
 
         for (int ai=0; ai<aiCount; ++ai)
         {
-            std::cout << "\tai " << ai << std::endl; // TODO remove
+//            std::cout << "\tai " << ai << std::endl; // TODO remove
             int infoKeyCount = unitSync_->GetSkirmishAIInfoCount(ai);
             for (int infoKeyIndex=0; infoKeyIndex<infoKeyCount; ++infoKeyIndex)
             {
@@ -1344,7 +1482,7 @@ std::vector<AI> Model::getModAIs(std::string const & modName)
                 if (infoKeyType == "string")
                 {
                     std::string infoKeyValue = unitSync_->GetInfoValueString(infoKeyIndex);
-                    std::cout << "\t\t" << infoKeyName << "=" << infoKeyValue << std::endl; // TODO remove
+//                    std::cout << "\t\t" << infoKeyName << "=" << infoKeyValue << std::endl; // TODO remove
                     if (infoKeyName == "shortName")
                     {
                         AI ai;

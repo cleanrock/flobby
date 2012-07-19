@@ -17,42 +17,29 @@
 #include <boost/bind.hpp>
 
 // Prefs
-static char const * PrefAutoLogin = "AutoLogin";
+static char const * const PrefAutoLogin = "AutoLogin";
 
 LoginDialog::LoginDialog(Model & model):
     Fl_Window(400, 400, "Login"),
     model_(model),
-    prefs_(prefs, label())
+    prefs_(prefs, PrefLogin),
+    loginInProgress_(false)
 {
     set_modal();
 
-    char str[65];
-    int autoLogin;
-
     host_ = new Fl_Input(10, 30, 250, 30, "Host");
     host_->align(FL_ALIGN_TOP_LEFT);
-    prefs_.get(host_->label(), str, "springrts.com", 64);
-    host_->value(str);
 
     port_ = new Fl_Input(270, 30, 120, 30, "Port");
     port_->align(FL_ALIGN_TOP_LEFT);
-    prefs_.get(port_->label(), str, "8200", 64);
-    port_->value(str);
 
     userName_ = new Fl_Input(10, 100, 380, 30, "User name");
     userName_->align(FL_ALIGN_TOP_LEFT);
-    prefs_.get(userName_->label(), str, "", 64);
-    userName_->value(str);
 
     password_ = new Fl_Secret_Input(10, 170, 380, 30, "Password");
     password_->align(FL_ALIGN_TOP_LEFT);
-    prefs_.get(password_->label(), str, "", 64);
-    passwordHash_ = str;
-    password_->value(str);
 
     autoLogin_ = new Fl_Check_Button(10, 220, 380, 30, "Login automatically");
-    prefs_.get(PrefAutoLogin, autoLogin, 0);
-    autoLogin_->value(autoLogin);
 
     info_ = new Fl_Box(10, 250, 380, 90);
     info_->labelcolor(FL_RED);
@@ -62,6 +49,8 @@ LoginDialog::LoginDialog(Model & model):
 
     end();
 
+    loadLoginPrefs();
+
     // model signal handlers
     model.connectConnected( boost::bind(&LoginDialog::connected, this, _1) );
     model.connectLoginResult( boost::bind(&LoginDialog::loginResult, this, _1, _2) );
@@ -70,11 +59,34 @@ LoginDialog::LoginDialog(Model & model):
 
 LoginDialog::~LoginDialog()
 {
-    prefs_.set(host_->label(), host_->value());
-    prefs_.set(port_->label(), port_->value());
-    prefs_.set(userName_->label(), userName_->value());
-    prefs_.set(password_->label(), passwordHash_.c_str());
-    prefs_.set(PrefAutoLogin, static_cast<int>(autoLogin_->value()) );
+}
+
+void LoginDialog::loadLoginPrefs()
+{
+    char str[128];
+
+    prefs_.get(PrefLoginHost, str, "springrts.com", sizeof(str));
+    host_->value(str);
+
+    prefs_.get(PrefLoginPort, str, "8200", sizeof(str));
+    port_->value(str);
+
+    prefs_.get(PrefLoginUser, str, "", sizeof(str));
+    userName_->value(str);
+
+    prefs_.get(PrefLoginPassword, str, "", sizeof(str));
+    passwordHash_ = str;
+    password_->value(str);
+
+    int autoLogin;
+    prefs_.get(PrefAutoLogin, autoLogin, 0);
+    autoLogin_->value(autoLogin);
+}
+
+void LoginDialog::show()
+{
+    loadLoginPrefs();
+    Fl_Window::show();
 }
 
 void LoginDialog::callback(Fl_Widget*, void *data)
@@ -85,12 +97,8 @@ void LoginDialog::callback(Fl_Widget*, void *data)
 
 void LoginDialog::attemptLogin()
 {
-    model_.login(
-        host_->value(),
-        port_->value(),
-        userName_->value(),
-        passwordHash_ );
-
+    loginInProgress_ = true;
+    model_.connect(host_->value(), port_->value());
     deactivate();
 }
 
@@ -115,15 +123,24 @@ void LoginDialog::onLogin()
 
 void LoginDialog::loginResult(bool success, std::string const & info)
 {
+    loginInProgress_ = false;
     activate();
     if (!success)
     {
         show();
         info_->copy_label(info.c_str());
         Sound::beep();
+        model_.disconnect();
     }
     else
     {
+        // save login prefs on successful login
+        prefs_.set(PrefLoginHost, host_->value());
+        prefs_.set(PrefLoginPort, port_->value());
+        prefs_.set(PrefLoginUser, userName_->value());
+        prefs_.set(PrefLoginPassword, passwordHash_.c_str());
+        prefs_.set(PrefAutoLogin, static_cast<int>(autoLogin_->value()) );
+
         info_->label(0);
         hide();
     }
@@ -131,10 +148,19 @@ void LoginDialog::loginResult(bool success, std::string const & info)
 
 void LoginDialog::connected(bool connected)
 {
-    if (!connected)
+    if (loginInProgress_)
     {
-        hide();
-        activate();
+        loginInProgress_ = false;
+        if (!connected)
+        {
+            activate();
+            show();
+            info_->copy_label("no connection");
+        }
+        else
+        {
+            model_.login(userName_->value(), passwordHash_);
+        }
     }
 }
 

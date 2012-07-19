@@ -37,6 +37,8 @@ add_library (gui STATIC
     LoggingDialog.cpp
     TextDialog.cpp
     SpringDialog.cpp
+    RegisterDialog.cpp
+    AgreementDialog.cpp
 )
 
 target_link_libraries (gui

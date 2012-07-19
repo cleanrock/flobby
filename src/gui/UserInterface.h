@@ -11,6 +11,8 @@ class Battle;
 class User;
 class SpringDialog;
 class LoginDialog;
+class RegisterDialog;
+class AgreementDialog;
 class LoggingDialog;
 class ProgressDialog;
 class TextDialog;
@@ -43,6 +45,8 @@ private:
     Fl_Menu_Bar * menuBar_;
     SpringDialog * springDialog_;
     LoginDialog * loginDialog_;
+    RegisterDialog * registerDialog_;
+    AgreementDialog * agreementDialog_;
     LoggingDialog * loggingDialog_;
     ProgressDialog * progressDialog_;
     ChannelsWindow * channelsWindow_;
@@ -72,6 +76,7 @@ private:
     //
     static void menuLogin(Fl_Widget* w, void* d);
     static void menuDisconnect(Fl_Widget* w, void* d);
+    static void menuRegister(Fl_Widget* w, void* d);
     static void onQuit(Fl_Widget* w, void* d);
     static void onTest(Fl_Widget* w, void* d);
     static void menuRefresh(Fl_Widget *w, void* d);

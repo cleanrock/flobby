@@ -37,8 +37,11 @@ public:
     std::string const & getSpringPath() const { return springPath_; }
     std::string const & getUnitSyncPath() const { return unitSyncPath_; }
 
-    void login(const std::string & host, const std::string & port,
-            const std::string & username, const std::string & password);
+    void connect(std::string const & host, std::string const & port);
+    void login(std::string const & username, std::string const & passwordHash);
+
+    void registerAccount(std::string const & username, std::string const & passwordHash, std::string const & email);
+    void confirmAgreement();
 
     std::vector<Battle const *> getBattles();
     Battle const & getBattle(int battleId);
@@ -74,7 +77,6 @@ public:
     std::string const & getWriteableDataDir() const;
 
     // map
-    //
     unsigned int getMapChecksum(std::string const & mapName); // returns 0 if map not found
     std::vector<std::string> getMaps();
     MapInfo getMapInfo(std::string const & mapName);
@@ -101,6 +103,14 @@ public:
     typedef boost::signal<void (bool success, std::string const & msg)> LoginResultSignal;
     boost::signals::connection connectLoginResult(LoginResultSignal::slot_type subscriber)
     { return loginResultSignal_.connect(subscriber); }
+
+    typedef boost::signal<void (bool success, std::string const & msg)> RegisterResultSignal;
+    boost::signals::connection connectRegisterResult(RegisterResultSignal::slot_type subscriber)
+    { return registerResultSignal_.connect(subscriber); }
+
+    typedef boost::signal<void (std::string const & text)> AgreementSignal;
+    boost::signals::connection connectAgreement(AgreementSignal::slot_type subscriber)
+    { return agreementSignal_.connect(subscriber); }
 
     typedef boost::signal<void (User const & user)> UserJoinedSignal;
     boost::signals::connection connectUserJoined(UserJoinedSignal::slot_type subscriber)
@@ -255,6 +265,8 @@ private:
     ConnectedSignal connectedSignal_;
     ServerInfoSignal serverInfoSignal_;
     LoginResultSignal loginResultSignal_;
+    RegisterResultSignal registerResultSignal_;
+    AgreementSignal agreementSignal_;
     UserJoinedSignal userJoinedSignal_;
     UserChangedSignal userChangedSignal_;
     UserLeftSignal userLeftSignal_;
@@ -293,6 +305,7 @@ private:
 
     std::map<int, std::shared_ptr<Battle> > battles_;
 
+    std::ostringstream agreementStream_;
 
     Bots bots_;
     Channels channels_; // last retrieved channel list
@@ -352,5 +365,9 @@ private:
     void handle_RING(std::istream & is);
     void handle_ADDSTARTRECT(std::istream & is);
     void handle_REMOVESTARTRECT(std::istream & is);
+    void handle_REGISTRATIONACCEPTED(std::istream & is);
+    void handle_REGISTRATIONDENIED(std::istream & is);
+    void handle_AGREEMENT(std::istream & is);
+    void handle_AGREEMENTEND(std::istream & is);
 
 };
