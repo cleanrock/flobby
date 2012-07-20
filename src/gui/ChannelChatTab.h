@@ -21,6 +21,8 @@ public:
     virtual ~ChannelChatTab();
     void leave();
 
+    static bool showJoinLeave_;
+
 private:
     ITabs & iTabs_;
     Model & model_;
@@ -31,6 +33,7 @@ private:
     LogFile logFile_;
 
     static void onInput(Fl_Widget * w, void * data);
+
     int handle(int event);
     void append(std::string const & msg, bool interesting = false);
 

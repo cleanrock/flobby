@@ -14,6 +14,8 @@
 // we use the split setting of the ServerMessages tab in all channel tabs
 static char const * PrefServerMessagesSplitH = "ServerMessagesSplitH";
 
+bool ChannelChatTab::showJoinLeave_ = false;
+
 ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & channelName,
                          ITabs& iTabs, Model & model):
     Fl_Tile(x,y,w,h),
@@ -127,7 +129,7 @@ void ChannelChatTab::clients(std::string const & channelName, std::vector<std::s
 
 void ChannelChatTab::userJoined(std::string const & channelName, std::string const & userName)
 {
-    if (channelName == channelName_)
+    if (showJoinLeave_ && channelName == channelName_)
     {
         userList_->add(userName);
         std::ostringstream oss;
@@ -139,9 +141,8 @@ void ChannelChatTab::userJoined(std::string const & channelName, std::string con
 
 void ChannelChatTab::userLeft(std::string const & channelName, std::string const & userName, std::string const & reason)
 {
-    if (channelName == channelName_)
+    if (showJoinLeave_ && channelName == channelName_)
     {
-
         userList_->remove(userName);
 
         std::ostringstream oss;

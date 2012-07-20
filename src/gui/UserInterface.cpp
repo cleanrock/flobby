@@ -14,14 +14,14 @@
 #include "Tabs.h"
 #include "TextDialog.h"
 #include "SpringDialog.h"
+#include "ChatSettingsDialog.h"
 
 #include "log/Log.h"
+#include "model/Model.h"
 
 #include <X11/xpm.h>
 #include <FL/x.H>
 #include "icon.xpm.h"
-
-#include "model/Model.h"
 
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Menu_Bar.H>
@@ -80,7 +80,8 @@ UserInterface::UserInterface(Model & model) :
         { "Se&ttings",              0, 0, 0, FL_SUBMENU },
                 { "&Spring...", 0, (Fl_Callback *)&menuSpring, this },
                 { "&Battle list filter...", 0, (Fl_Callback *)&menuBattleListFilter, this },
-                { "&Channels to auto-join...", 0, (Fl_Callback *)&menuChannelsAutoJoin, this },
+                { "Channels to &auto-join...", 0, (Fl_Callback *)&menuChannelsAutoJoin, this },
+                { "&Chat...", 0, (Fl_Callback *)&menuChatSettings, this },
                 { "&Logging...", 0, (Fl_Callback *)&menuLogging, this },
                 { 0 },
         { "&Other",              0, 0, 0, FL_SUBMENU },
@@ -108,6 +109,8 @@ UserInterface::UserInterface(Model & model) :
     mainWindow_->resizable(tile_);
     mainWindow_->end();
 
+    channelsWindow_ = new ChannelsWindow(model_);
+
     springDialog_ = new SpringDialog(model_);
     springDialog_->connectProfileSet(boost::bind(&UserInterface::springProfileSet, this, _1));
     loginDialog_ = new LoginDialog(model_);
@@ -115,9 +118,9 @@ UserInterface::UserInterface(Model & model) :
     agreementDialog_ = new AgreementDialog(model_, *loginDialog_);
     loggingDialog_ = new LoggingDialog();
     progressDialog_ = new ProgressDialog();
+    chatSettingsDialog_ = new ChatSettingsDialog();
     autoJoinChannelsDialog_ = new TextDialog("Channels to auto-join", "One channel per line");
     autoJoinChannelsDialog_->connectTextSave(boost::bind(&UserInterface::autoJoinChannels, this, _1));
-    channelsWindow_ = new ChannelsWindow(model_);
 
     // model signal handlers
     model.connectConnected( boost::bind(&UserInterface::connected, this, _1) );
@@ -435,6 +438,13 @@ void UserInterface::menuChannelsAutoJoin(Fl_Widget *w, void* d)
     boost::replace_all(text, " ", "\n");
 
     ui->autoJoinChannelsDialog_->show(text.c_str());
+}
+
+void UserInterface::menuChatSettings(Fl_Widget *w, void* d)
+{
+    UserInterface * ui = static_cast<UserInterface*>(d);
+
+    ui->chatSettingsDialog_->show();
 }
 
 void UserInterface::menuLogging(Fl_Widget *w, void* d)

@@ -40,6 +40,7 @@ add_library (gui STATIC
     RegisterDialog.cpp
     AgreementDialog.cpp
     UserList.cpp
+    ChatSettingsDialog.cpp
 )
 
 target_link_libraries (gui

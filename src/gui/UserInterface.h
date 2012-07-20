@@ -20,6 +20,7 @@ class ChannelsWindow;
 class BattleList;
 class BattleRoom;
 class Tabs;
+class ChatSettingsDialog;
 
 class Fl_Double_Window;
 class Fl_Browser;
@@ -43,14 +44,17 @@ private:
 
     Fl_Double_Window * mainWindow_;
     Fl_Menu_Bar * menuBar_;
+
+    ChannelsWindow * channelsWindow_;
+
     SpringDialog * springDialog_;
     LoginDialog * loginDialog_;
     RegisterDialog * registerDialog_;
     AgreementDialog * agreementDialog_;
     LoggingDialog * loggingDialog_;
     ProgressDialog * progressDialog_;
-    ChannelsWindow * channelsWindow_;
     TextDialog * autoJoinChannelsDialog_;
+    ChatSettingsDialog * chatSettingsDialog_;
 
     Fl_Tile * tile_; // whole app window client area
     Fl_Tile * tileLeft_; // chat and battle list
@@ -88,6 +92,7 @@ private:
     static void menuBattleListFilter(Fl_Widget *w, void* d);
     static void mainWindowCallback(Fl_Widget * w, void * p); // used to stop Escape key from exiting the program
     static void menuChannelsAutoJoin(Fl_Widget *w, void* d);
+    static void menuChatSettings(Fl_Widget *w, void* d);
 
     void enableMenuItem(void(*cb)(Fl_Widget*, void*), bool enable);
 
