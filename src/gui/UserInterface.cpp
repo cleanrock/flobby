@@ -72,6 +72,7 @@ UserInterface::UserInterface(Model & model) :
             { "&Login...", FL_COMMAND +'l', (Fl_Callback *)&menuLogin, this },
             { "&Disconnect", 0, (Fl_Callback *)&menuDisconnect, this, FL_MENU_INACTIVE },
             { "&Register...", 0, (Fl_Callback *)&menuRegister, this },
+            { "Re&name account...", 0, (Fl_Callback *)&menuRenameAccount, this },
             { "&Join channel...", FL_COMMAND +'j', (Fl_Callback *)&menuJoinChannel, this, FL_MENU_INACTIVE },
             { "&Channels...", FL_COMMAND +'h', (Fl_Callback *)&menuChannels, this, FL_MENU_INACTIVE },
 //            { "&Test", FL_COMMAND +'t', (Fl_Callback *)&onTest, this }, // TODO remove
@@ -217,6 +218,16 @@ void UserInterface::menuRegister(Fl_Widget *w, void* d)
     ui->registerDialog_->show();
 }
 
+void UserInterface::menuRenameAccount(Fl_Widget *w, void* d)
+{
+    UserInterface * ui = static_cast<UserInterface*>(d);
+    char const * str = fl_input("New name");
+    if (str && ::strlen(str) > 0)
+    {
+        ui->model_.renameAccount(str);
+    }
+}
+
 void UserInterface::menuJoinChannel(Fl_Widget *w, void* d)
 {
     UserInterface * ui = static_cast<UserInterface*>(d);
@@ -345,6 +356,7 @@ void UserInterface::connected(bool connected)
         enableMenuItem(UserInterface::menuLogin, true);
         enableMenuItem(UserInterface::menuJoinChannel, false);
         enableMenuItem(UserInterface::menuChannels, false);
+        enableMenuItem(UserInterface::menuRenameAccount, false);
         channelsWindow_->hide();
     }
 }
@@ -354,6 +366,7 @@ void UserInterface::loginResult(bool success, std::string const & info)
     enableMenuItem(UserInterface::menuLogin, !success);
     enableMenuItem(UserInterface::menuJoinChannel, success);
     enableMenuItem(UserInterface::menuChannels, success);
+    enableMenuItem(UserInterface::menuRenameAccount, success);
 
     if (success)
     {

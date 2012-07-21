@@ -42,6 +42,7 @@ public:
 
     void registerAccount(std::string const & username, std::string const & passwordHash, std::string const & email);
     void confirmAgreement();
+    void renameAccount(std::string const & username);
 
     std::vector<Battle const *> getBattles();
     Battle const & getBattle(int battleId);

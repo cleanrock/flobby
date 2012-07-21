@@ -234,6 +234,18 @@ void Model::confirmAgreement()
     controller_.send(oss.str());
 }
 
+void Model::renameAccount(std::string const & userName)
+{
+    if (connected_)
+    {
+        LOG_IF(FATAL, userName.empty())<< "userName empty";
+
+        std::ostringstream oss;
+        oss << "RENAMEACCOUNT " << userName;
+        controller_.send(oss.str());
+    }
+}
+
 std::vector<Battle const *> Model::getBattles()
 {
     std::vector<Battle const *> battles;
