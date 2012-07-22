@@ -75,6 +75,8 @@ Model::Model(IController & controller):
     ADD_MSG_HANDLER(REGISTRATIONDENIED)
     ADD_MSG_HANDLER(AGREEMENT)
     ADD_MSG_HANDLER(AGREEMENTEND)
+    ADD_MSG_HANDLER(SETSCRIPTTAGS)
+    ADD_MSG_HANDLER(REMOVESCRIPTTAGS)
 
 }
 
@@ -976,7 +978,28 @@ void Model::handle_SETSCRIPTTAGS(std::istream & is) // {data} [{data} ...]
         while (true)
         {
             extractSentence(is, ex); // will break out of loop when it throws
-            script_.add(ex);
+            auto keyValuePair = script_.add(ex);
+            setScriptTagSignal_(keyValuePair.first, keyValuePair.second);
+        }
+    }
+    catch (...)
+    {
+        // no more data
+    }
+}
+
+void Model::handle_REMOVESCRIPTTAGS(std::istream & is) // key [key ...]
+{
+    // REMOVESCRIPTTAGS is not used/sent as far as i can tell
+    using namespace LobbyProtocol;
+    std::string ex;
+    try
+    {
+        while (true)
+        {
+            extractWord(is, ex); // will break out of loop when it throws
+            std::string const key = script_.remove(ex);
+            removeScriptTagSignal_(key);
         }
     }
     catch (...)

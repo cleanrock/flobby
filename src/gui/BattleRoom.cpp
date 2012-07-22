@@ -7,6 +7,7 @@
 #include "MapImage.h"
 #include "AddBotDialog.h"
 #include "PopupMenu.h"
+#include "GameSettings.h"
 
 #include "log/Log.h"
 #include "model/Model.h"
@@ -95,9 +96,7 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
     mapInfo_->box(FL_FLAT_BOX);
     mapInfo_->color(FL_BACKGROUND2_COLOR);
 
-    settings_  = new Fl_Box(rightX, y+rightW/2, rightW, topH-rightW/2);
-    settings_->box(FL_FLAT_BOX);
-    settings_->label("TODO");
+    settings_  = new GameSettings(rightX, y+rightW/2, rightW, topH-rightW/2, model );
 
     topRight_->resizable(settings_);
     topRight_->end();
@@ -219,7 +218,6 @@ void BattleRoom::joined(Battle const & battle)
         playerList_->addRow(makeRow(b));
     }
 
-    playerList_->sort();
     battleChat_->battleJoined(battle);
 }
 
@@ -330,6 +328,8 @@ void BattleRoom::close()
 
     mapImageBox_->removeAllStartRects();
 
+    settings_->clear();
+
     deactivate();
 }
 
@@ -438,7 +438,7 @@ void BattleRoom::onLeave(Fl_Widget* w, void* data)
 {
     BattleRoom * o = static_cast<BattleRoom*>(data);
     o->model_.leaveBattle();
-    // o->close(); // TODO not needed here if we always get userLeftBattle(me, battle)
+    // call to o->close(); not needed here if we always get userLeftBattle(me, battle)
 }
 
 void BattleRoom::onMapImage(Fl_Widget* w, void* data)
@@ -464,7 +464,7 @@ void BattleRoom::botRemoved(Bot const & bot)
 
 void BattleRoom::springExit()
 {
-    // TODO this is probably not needed since model will set BattleStatus to NOT InGame when spring exit
+    // this is probably not needed since model will set BattleStatus to NOT InGame when spring exit
 }
 
 void BattleRoom::setHeaderText(Battle const & battle)

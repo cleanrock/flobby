@@ -41,6 +41,7 @@ add_library (gui STATIC
     AgreementDialog.cpp
     UserList.cpp
     ChatSettingsDialog.cpp
+    GameSettings.cpp
 )
 
 target_link_libraries (gui

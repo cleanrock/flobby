@@ -233,6 +233,14 @@ public:
     boost::signals::connection connectRemoveStartRect(RemoveStartRectSignal::slot_type subscriber)
     { return removeStartRectSignal_.connect(subscriber); }
 
+    typedef boost::signal<void (std::string const & key, std::string const & value)> SetScriptTagSignal;
+    boost::signals::connection connectSetScriptTag(SetScriptTagSignal::slot_type subscriber)
+    { return setScriptTagSignal_.connect(subscriber); }
+
+    typedef boost::signal<void (std::string const & key)> RemoveScriptTagSignal;
+    boost::signals::connection connectRemoveScriptTag(RemoveScriptTagSignal::slot_type subscriber)
+    { return removeScriptTagSignal_.connect(subscriber); }
+
 private:
     IController & controller_;
     bool connected_;
@@ -298,6 +306,8 @@ private:
     RingSignal ringSignal_;
     AddStartRectSignal addStartRectSignal_;
     RemoveStartRectSignal removeStartRectSignal_;
+    SetScriptTagSignal setScriptTagSignal_;
+    RemoveScriptTagSignal removeScriptTagSignal_;
 
     void attemptLogin();
     void processServerMsg(const std::string & msg);
@@ -343,6 +353,7 @@ private:
     void handle_JOINBATTLE(std::istream & is);
     void handle_JOINBATTLEFAILED(std::istream & is);
     void handle_SETSCRIPTTAGS(std::istream & is);
+    void handle_REMOVESCRIPTTAGS(std::istream & is);
     void handle_CLIENTBATTLESTATUS(std::istream & is);
     void handle_REQUESTBATTLESTATUS(std::istream & is);
     void handle_SAIDBATTLE_SAIDBATTLEEX(std::istream & is);

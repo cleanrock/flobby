@@ -20,39 +20,22 @@ void Script::clear()
     root_.values_.clear();
 }
 
-void Script::add(std::string const & str)
+std::pair<std::string, std::string> Script::add(std::string const & str)
 {
-    // TODO add parsing error handling
+    std::string key, value;
+    Node & node = parse(str, key, value);
+    node.values_[key] = value;
 
-    std::istringstream iss(str);
+    return std::make_pair(key, value);
+}
 
-    std::string ex;
-    Node * node = &root_;
+std::string Script::remove(std::string const & key)
+{
+    std::string key2, value; // value unused
+    Node & node = parse(key, key2, value);
+    node.values_.erase(key2);
 
-    // create/find node in tree
-    std::getline(iss, ex, '/');
-    while (!iss.eof())
-    {
-        boost::to_upper(ex);
-
-        int level = node->level_;
-        node = &node->nodes_[ex];
-        node->name_ = ex;
-        node->level_ = ++level;
-
-        std::getline(iss, ex, '/');
-    }
-
-    // ex now contain key=value
-    {
-        iss.str(ex);
-        iss.seekg(0);
-        std::string key;
-        std::getline(iss, key, '=');
-        std::string value;
-        std::getline(iss, value);
-        node->values_[key] = value;
-    }
+    return key2;
 }
 
 void Script::write(std::string const & fileName)
@@ -85,4 +68,36 @@ void Script::Node::write(std::ostream & os)
     {
         os << ind << "}\n";
     }
+}
+
+Script::Node & Script::parse(std::string const & str, std::string & key, std::string & value)
+{
+    // TODO add parsing error handling
+
+    std::istringstream iss(str);
+
+    std::string ex;
+    Node * node = &root_;
+
+    // create/find node in tree
+    std::getline(iss, ex, '/');
+    while (!iss.eof())
+    {
+        boost::to_upper(ex);
+
+        int level = node->level_;
+        node = &node->nodes_[ex];
+        node->name_ = ex;
+        node->level_ = ++level;
+
+        std::getline(iss, ex, '/');
+    }
+
+    // ex now contain key=value
+    iss.str(ex);
+    iss.seekg(0);
+    std::getline(iss, key, '=');
+    std::getline(iss, value);
+
+    return *node;
 }

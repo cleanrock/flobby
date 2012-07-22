@@ -15,6 +15,7 @@ class Cache;
 class ITabs;
 class MapImage;
 class AddBotDialog;
+class GameSettings;
 
 class Fl_Widget;
 class Fl_Button;
@@ -73,7 +74,7 @@ private:
     Fl_Group * topRight_;
     MapImage * mapImageBox_;
     Fl_Multiline_Output * mapInfo_;
-    Fl_Box * settings_;
+    GameSettings * settings_;
     std::string currentMapImage_; // optimization, indicates what map image is currently shown to avoid setting the same image
 
     StringTable * playerList_;

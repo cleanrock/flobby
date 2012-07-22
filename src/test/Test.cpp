@@ -282,6 +282,13 @@ void Test::testScript()
     script.add("GAME/Sub1/key1=val1");
     script.add("GAME/Sub1/Sub2/key2=val2");
 
+    auto keyValuePair = script.add("GAME/Sub2/removed=removedValue");
+    CPPUNIT_ASSERT_EQUAL( keyValuePair.first, std::string("removed") );
+    CPPUNIT_ASSERT_EQUAL( keyValuePair.second, std::string("removedValue") );
+
+    auto key =  script.remove("GAME/Sub2/removed");
+    CPPUNIT_ASSERT_EQUAL( key, std::string("removed") );
+
     script.write("./script.txt");
 }
 

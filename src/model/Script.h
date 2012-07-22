@@ -10,7 +10,8 @@ public:
     virtual ~Script();
 
     void clear();
-    void add(std::string const & str); // e.g. GAME/MODOPTIONS/maxunits=3000
+    std::pair<std::string, std::string> add(std::string const & str); // e.g. str=GAME/MODOPTIONS/maxunits=3000, returns maxunits,3000
+    std::string remove(std::string const & key); // e.g. GAME/MODOPTIONS/maxunits, returns maxunits
     void write(std::string const & fileName);
 
 private:
@@ -25,4 +26,7 @@ private:
     };
 
     Node root_;
+
+    Node & parse(std::string const & str, std::string & key, std::string & value); // key and value are output parameters
+
 };

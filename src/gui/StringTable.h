@@ -48,6 +48,7 @@ public:
     void addRow(StringTableRow const & row);
     void updateRow(StringTableRow const & row);
     void removeRow(std::string const & id);
+    bool rowExist(std::string const & id);
     void sort();
     void clear();
 

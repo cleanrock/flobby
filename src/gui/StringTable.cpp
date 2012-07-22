@@ -237,6 +237,18 @@ void StringTable::removeRow(std::string const & id)
     throw std::runtime_error("row not found:" + id);
 }
 
+bool StringTable::rowExist(std::string const & id)
+{
+    for (StringTableRow & r : rows_)
+    {
+        if (r.id_ == id)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void StringTable::clear()
 {
     selectedRow_ = -1;
