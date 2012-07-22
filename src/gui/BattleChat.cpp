@@ -1,6 +1,7 @@
 #include "BattleChat.h"
 #include "StringTable.h"
 #include "TextDisplay.h"
+#include "ChatInput.h"
 #include "VoteLine.h"
 
 #include "model/Model.h"
@@ -26,9 +27,8 @@ BattleChat::BattleChat(int x, int y, int w, int h, Model & model):
     int const m = 0; // margin
     textDisplay_ = new TextDisplay(x+m, y+ih+m, w-2*m, h-2*ih-2*m);
 
-    input_ = new Fl_Input(x, y+h-ih, w, ih);
-    input_->callback(BattleChat::onText, this);
-    input_->when(FL_WHEN_ENTER_KEY);
+    input_ = new ChatInput(x, y+h-ih, w, ih);
+    input_->connectText( boost::bind(&BattleChat::onText, this, _1) );
 
     resizable(textDisplay_);
     end();
@@ -110,18 +110,9 @@ void BattleChat::close()
     addInfo("");
 }
 
-void BattleChat::onText(Fl_Widget * w, void * data)
+void BattleChat::onText(std::string const & text)
 {
-    BattleChat * bc = static_cast<BattleChat*>(data);
-
-    std::string msg(bc->input_->value());
-    boost::trim(msg);
-
-    if (!msg.empty())
-    {
-        bc->model_.sayBattle(msg);
-    }
-    bc->input_->value("");
+    model_.sayBattle(text);
 }
 
 void BattleChat::addInfo(std::string const & msg)

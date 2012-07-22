@@ -1,11 +1,11 @@
 #include "PrivateChatTab.h"
 #include "TextDisplay.h"
+#include "ChatInput.h"
 #include "ITabs.h"
 #include "Sound.h"
 
 #include "model/Model.h"
 
-#include <FL/Fl_Input.H>
 #include <FL/Fl.H>
 #include <FL/fl_ask.H>
 #include <boost/bind.hpp>
@@ -27,9 +27,8 @@ PrivateChatTab::PrivateChatTab(int x, int y, int w, int h, std::string const & u
     int const ih = 24; // input height
     text_ = new TextDisplay(x+m, y+m, w-2*m, h-ih-2*m);
 
-    input_ = new Fl_Input(x, y+h-ih, w, ih);
-    input_->callback(PrivateChatTab::onInput, this);
-    input_->when(FL_WHEN_ENTER_KEY);
+    input_ = new ChatInput(x, y+h-ih, w, ih);
+    input_->connectText( boost::bind(&PrivateChatTab::onInput, this, _1) );
 
     resizable(text_);
 
@@ -60,18 +59,9 @@ int PrivateChatTab::handle(int event)
     return Fl_Group::handle(event);
 }
 
-void PrivateChatTab::onInput(Fl_Widget * w, void * data)
+void PrivateChatTab::onInput(std::string const & text)
 {
-    PrivateChatTab * pc = static_cast<PrivateChatTab*>(data);
-
-    std::string msg(pc->input_->value());
-    boost::trim(msg);
-
-    if (!msg.empty())
-    {
-        pc->model_.sayPrivate(pc->userName_, msg);
-    }
-    pc->input_->value("");
+    model_.sayPrivate(userName_, text);
 }
 
 void PrivateChatTab::say(std::string const & userName, std::string const & msg)

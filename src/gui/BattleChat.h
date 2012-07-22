@@ -9,8 +9,7 @@ class Battle;
 class Model;
 class VoteLine;
 class TextDisplay;
-class Fl_Input;
-class Fl_Widget;
+class ChatInput;
 
 class BattleChat: public Fl_Group
 {
@@ -26,12 +25,12 @@ private:
     Model & model_;
     VoteLine * voteLine_;
     TextDisplay * textDisplay_;
-    Fl_Input * input_;
+    ChatInput * input_;
     std::string battleHost_;
     LogFile logFile_;
 
     void battleChatMsg(std::string const & userName, std::string const & msg);
-    static void onText(Fl_Widget * w, void * data);
+    void onText(std::string const & text);
     bool inGameMessage(std::string const & msg, std::string & userNameOut, std::string & msgOut);
 };
 

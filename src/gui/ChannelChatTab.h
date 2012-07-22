@@ -11,7 +11,7 @@ class ITabs;
 class User;
 class TextDisplay;
 class UserList;
-class Fl_Input;
+class ChatInput;
 
 class ChannelChatTab: public Fl_Tile
 {
@@ -27,13 +27,12 @@ private:
     ITabs & iTabs_;
     Model & model_;
     TextDisplay * text_;
-    Fl_Input * input_;
+    ChatInput * input_;
     UserList * userList_;
     std::string channelName_;
     LogFile logFile_;
 
-    static void onInput(Fl_Widget * w, void * data);
-
+    void onInput(std::string const & text);
     int handle(int event);
     void append(std::string const & msg, bool interesting = false);
 

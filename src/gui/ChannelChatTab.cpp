@@ -1,12 +1,12 @@
 #include "ChannelChatTab.h"
 #include "UserList.h"
 #include "TextDisplay.h"
+#include "ChatInput.h"
 #include "ITabs.h"
 #include "Prefs.h"
 
 #include "model/Model.h"
 
-#include <FL/Fl_Input.H>
 #include <FL/Fl.H>
 #include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
@@ -33,9 +33,8 @@ ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & c
     Fl_Group * left = new Fl_Group(x, y, leftW, h);
     int const ih = 24; // input height
     text_ = new TextDisplay(x, y, leftW, h-ih);
-    input_ = new Fl_Input(x, y+h-ih, leftW, ih);
-    input_->callback(ChannelChatTab::onInput, this);
-    input_->when(FL_WHEN_ENTER_KEY);
+    input_ = new ChatInput(x, y+h-ih, leftW, ih);
+    input_->connectText( boost::bind(&ChannelChatTab::onInput, this, _1) );
     left->resizable(text_);
     left->end();
 
@@ -81,18 +80,9 @@ int ChannelChatTab::handle(int event)
     return Fl_Tile::handle(event);
 }
 
-void ChannelChatTab::onInput(Fl_Widget * w, void * data)
+void ChannelChatTab::onInput(std::string const & text)
 {
-    ChannelChatTab * cc = static_cast<ChannelChatTab*>(data);
-
-    std::string msg(cc->input_->value());
-    boost::trim(msg);
-
-    if (!msg.empty())
-    {
-        cc->model_.sayChannel(cc->channelName_, msg);
-    }
-    cc->input_->value("");
+    model_.sayChannel(channelName_, text);
 }
 
 void ChannelChatTab::topic(std::string const & channelName, std::string const & author, time_t epochSeconds, std::string const & topic)
