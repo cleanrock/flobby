@@ -1,11 +1,12 @@
 #pragma once
 
 #include "model/MapInfo.h"
+
+#include <FL/Fl_Shared_Image.H> // included here so user can easily cast to Fl_Image
 #include <map>
 #include <string>
 
 class Model;
-class Fl_Image;
 
 class Cache
 {
@@ -15,9 +16,9 @@ public:
 
     MapInfo const & getMapInfo(std::string const & mapName);
 
-    Fl_Image * getMapImage(std::string const & mapName); // returns 0 if map not found
-    Fl_Image * getMetalImage(std::string const & mapName);
-    Fl_Image * getHeightImage(std::string const & mapName);
+    Fl_Shared_Image * getMapImage(std::string const & mapName); // returns 0 if map not found
+    Fl_Shared_Image * getMetalImage(std::string const & mapName);
+    Fl_Shared_Image * getHeightImage(std::string const & mapName);
 
 private:
     Model & model_;

@@ -4,7 +4,6 @@
 #include "log/Log.h"
 #include "model/Model.h"
 
-#include <FL/Fl_Shared_Image.H>
 #include <sstream> // ostringstream
 #include <fstream>
 #include <boost/filesystem.hpp>
@@ -32,7 +31,7 @@ std::string const & Cache::basePath()
     return basePath_;
 }
 
-Fl_Image * Cache::getMapImage(std::string const & mapName)
+Fl_Shared_Image * Cache::getMapImage(std::string const & mapName)
 {
     unsigned int const chksum = model_.getMapChecksum(mapName);
     if (chksum == 0)
@@ -71,7 +70,7 @@ Fl_Image * Cache::getMapImage(std::string const & mapName)
     return image;
 }
 
-Fl_Image * Cache::getMetalImage(std::string const & mapName)
+Fl_Shared_Image * Cache::getMetalImage(std::string const & mapName)
 {
     unsigned int const chksum = model_.getMapChecksum(mapName);
     if (chksum == 0)
@@ -112,7 +111,7 @@ Fl_Image * Cache::getMetalImage(std::string const & mapName)
     return image;
 }
 
-Fl_Image * Cache::getHeightImage(std::string const & mapName)
+Fl_Shared_Image * Cache::getHeightImage(std::string const & mapName)
 {
     unsigned int const chksum = model_.getMapChecksum(mapName);
     if (chksum == 0)

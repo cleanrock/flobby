@@ -404,15 +404,23 @@ void UserInterface::menuGenerateCacheFiles(Fl_Widget *w, void* d)
     ui->progressDialog_->show();
 
     int cnt = 0;
-    for (auto map : maps)
+    for (auto const & map : maps)
     {
         float const percentage = 100*static_cast<float>(cnt)/maps.size();
         ui->progressDialog_->progress(percentage, map);
         try
         {
-            ui->cache_.getMapImage(map);
-            ui->cache_.getMetalImage(map);
-            ui->cache_.getHeightImage(map);
+            Fl_Shared_Image * img;
+
+            img = ui->cache_.getMapImage(map);
+            if (img) img->release();
+
+            img = ui->cache_.getMetalImage(map);
+            if (img) img->release();
+
+            img = ui->cache_.getHeightImage(map);
+            if (img) img->release();
+
             ui->cache_.getMapInfo(map);
         }
         catch (std::exception const & e)
