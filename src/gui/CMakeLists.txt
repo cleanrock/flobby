@@ -23,7 +23,7 @@ add_library (gui STATIC
     MyImage.cpp
     Prefs.cpp
     StringTable.cpp
-    TextDisplay.cpp
+    TextDisplay2.cpp
     UserInterface.cpp
     ChannelsWindow.cpp
     MapImage.cpp

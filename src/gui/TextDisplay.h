@@ -1,3 +1,4 @@
+// this class is not used
 #pragma once
 
 #include <FL/Fl_Browser.H>
@@ -11,7 +12,7 @@ public:
     TextDisplay(int x, int y, int w, int h, char const * label = 0);
     virtual ~TextDisplay();
 
-    void append(std::string const & text); // prepends with time stamp and adds newline at end
+    void append(std::string const & text, bool interesting = true); // prepends with time stamp
 
 private:
     bool scrollToBottom_;

@@ -7,7 +7,7 @@
 class Model;
 class ITabs;
 class User;
-class TextDisplay;
+class TextDisplay2;
 class ChatInput;
 
 class PrivateChatTab: public Fl_Group
@@ -22,7 +22,7 @@ private:
     ITabs & iTabs_;
     Model & model_;
     LogFile logFile_;
-    TextDisplay * text_;
+    TextDisplay2 * text_;
     ChatInput * input_;
 
     int handle(int event);

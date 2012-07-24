@@ -1,6 +1,6 @@
 #include "BattleChat.h"
 #include "StringTable.h"
-#include "TextDisplay.h"
+#include "TextDisplay2.h"
 #include "ChatInput.h"
 #include "VoteLine.h"
 
@@ -25,7 +25,7 @@ BattleChat::BattleChat(int x, int y, int w, int h, Model & model):
     voteLine_->deactivate();
 
     int const m = 0; // margin
-    textDisplay_ = new TextDisplay(x+m, y+ih+m, w-2*m, h-2*ih-2*m);
+    textDisplay_ = new TextDisplay2(x+m, y+ih+m, w-2*m, h-2*ih-2*m);
 
     input_ = new ChatInput(x, y+h-ih, w, ih);
     input_->connectText( boost::bind(&BattleChat::onText, this, _1) );
@@ -47,6 +47,8 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
 
     std::ostringstream oss;
 
+    bool interesting = true;
+
     // handle messages from host
     if (userName == battleHost_)
     {
@@ -62,14 +64,15 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
         }
         else
         {
-            oss << "@C" << FL_DARK2 << "@." << userName << ": " << msg;
+            oss << userName << ": " << msg;
+            interesting = false;
         }
     }
     else
     {
         oss << userName << ": " << msg;
     }
-    textDisplay_->append(oss.str());
+    textDisplay_->append(oss.str(), interesting);
 
 }
 
@@ -122,10 +125,9 @@ void BattleChat::addInfo(std::string const & msg)
     if (!msg.empty())
     {
         logFile_.log(msg);
-        oss << "@C" << FL_DARK2 << "@." << msg;
     }
 
-    textDisplay_->append(oss.str());
+    textDisplay_->append(msg, false);
 }
 
 void BattleChat::battleJoined(Battle const & battle)

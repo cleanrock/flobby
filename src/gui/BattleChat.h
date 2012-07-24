@@ -8,7 +8,7 @@ class User;
 class Battle;
 class Model;
 class VoteLine;
-class TextDisplay;
+class TextDisplay2;
 class ChatInput;
 
 class BattleChat: public Fl_Group
@@ -24,7 +24,7 @@ public:
 private:
     Model & model_;
     VoteLine * voteLine_;
-    TextDisplay * textDisplay_;
+    TextDisplay2 * textDisplay_;
     ChatInput * input_;
     std::string battleHost_;
     LogFile logFile_;

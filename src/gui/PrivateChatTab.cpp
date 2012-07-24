@@ -1,5 +1,5 @@
 #include "PrivateChatTab.h"
-#include "TextDisplay.h"
+#include "TextDisplay2.h"
 #include "ChatInput.h"
 #include "ITabs.h"
 #include "Sound.h"
@@ -25,7 +25,7 @@ PrivateChatTab::PrivateChatTab(int x, int y, int w, int h, std::string const & u
 
     int const m = 0; // margin
     int const ih = 24; // input height
-    text_ = new TextDisplay(x+m, y+m, w-2*m, h-ih-2*m);
+    text_ = new TextDisplay2(x+m, y+m, w-2*m, h-ih-2*m);
 
     input_ = new ChatInput(x, y+h-ih, w, ih);
     input_->connectText( boost::bind(&PrivateChatTab::onInput, this, _1) );
@@ -101,13 +101,7 @@ void PrivateChatTab::append(std::string const & msg, bool interesting)
 {
     logFile_.log(msg);
 
-    std::ostringstream oss;
-    if (!interesting)
-    {
-        oss << "@C" << FL_DARK2 << "@.";
-    }
-    oss << msg;
-    text_->append(oss.str());
+    text_->append(msg, interesting);
 
     // make Tabs redraw header
     if (interesting && !visible() && labelcolor() != FL_RED)

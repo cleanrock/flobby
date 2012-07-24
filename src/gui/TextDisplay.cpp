@@ -22,7 +22,7 @@ TextDisplay::~TextDisplay()
 {
 }
 
-void TextDisplay::append(std::string const & text)
+void TextDisplay::append(std::string const & text, bool interesting)
 {
     char buf[16];
 
@@ -40,8 +40,12 @@ void TextDisplay::append(std::string const & text)
         strcpy(buf, " ");
     }
     std::ostringstream oss;
-    oss << "@C" << FL_GRAY << "@." << buf << '\t' // time in gray in first column
-        << text;
+    oss << "@C" << FL_GRAY << "@." << buf << '\t'; // time in gray in first column
+    if (!interesting)
+    {
+        oss << "@C" << FL_DARK2 << "@.";
+    }
+    oss << text;
 
     // make sure we scroll to bottom when last line is visible
     if (scrollToBottom_ == false && size() > 0 && displayed(size()))

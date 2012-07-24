@@ -9,7 +9,7 @@
 class Model;
 class ITabs;
 class User;
-class TextDisplay;
+class TextDisplay2;
 class UserList;
 class ChatInput;
 
@@ -26,7 +26,7 @@ public:
 private:
     ITabs & iTabs_;
     Model & model_;
-    TextDisplay * text_;
+    TextDisplay2 * text_;
     ChatInput * input_;
     UserList * userList_;
     std::string channelName_;

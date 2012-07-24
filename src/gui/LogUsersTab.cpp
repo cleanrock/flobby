@@ -1,5 +1,5 @@
 #include "LogUsersTab.h"
-#include "TextDisplay.h"
+#include "TextDisplay2.h"
 #include "UserList.h"
 #include "Prefs.h"
 #include "ITabs.h"
@@ -20,7 +20,7 @@ LogUsersTab::LogUsersTab(int x, int y, int w, int h,
     model_(model),
     logFile_("messages")
 {
-    text_ = new TextDisplay(x, y, w/2, h);
+    text_ = new TextDisplay2(x, y, w/2, h);
     userList_ = new UserList(x+w/2, y, w/2, h, model_, iTabs_, true); // we save the prefs for UserList
     end();
 

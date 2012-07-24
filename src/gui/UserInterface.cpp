@@ -75,7 +75,7 @@ UserInterface::UserInterface(Model & model) :
             { "Re&name account...", 0, (Fl_Callback *)&menuRenameAccount, this },
             { "&Join channel...", FL_COMMAND +'j', (Fl_Callback *)&menuJoinChannel, this, FL_MENU_INACTIVE },
             { "&Channels...", FL_COMMAND +'h', (Fl_Callback *)&menuChannels, this, FL_MENU_INACTIVE },
-//            { "&Test", FL_COMMAND +'t', (Fl_Callback *)&onTest, this }, // TODO remove
+//            { "&Test", FL_COMMAND +'t', (Fl_Callback *)&onTest, this }, // TODO disable before checkin
             { "E&xit", FL_COMMAND +'q', (Fl_Callback *)&onQuit, this },
             { 0 },
         { "Se&ttings",              0, 0, 0, FL_SUBMENU },
@@ -338,7 +338,12 @@ void UserInterface::onTest(Fl_Widget *w, void* d)
 //    ui->channelsWindow_->show();
 
 //    IControllerEvent & iControllerEvent = ui->model_;
-//    iControllerEvent.message("SAIDPRIVATE cavity hej hopp http://archlinux.org AAA");
+//    iControllerEvent.message("SERVERMSG "
+//            "line1 http://www.archlinux.org bla bla \n"
+//            "line2 http://www.google.se\n"
+//            "line3 bla bla ..."
+//            );
+//    iControllerEvent.message("SERVERMSG  ");
 //    iControllerEvent.message("SAIDPRIVATE cavity hej hopp http://archlinux.org BBB");
 //    iControllerEvent.message("SAIDPRIVATE cavity hej hopp http://archlinux.org CCC");
 

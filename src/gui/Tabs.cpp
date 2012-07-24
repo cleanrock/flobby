@@ -1,7 +1,5 @@
 #include "Tabs.h"
 #include "Prefs.h"
-#include "StringTable.h"
-#include "TextDisplay.h"
 #include "LogUsersTab.h"
 #include "ChannelChatTab.h"
 #include "PrivateChatTab.h"
@@ -16,6 +14,7 @@
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Input.H>
 #include <FL/fl_ask.H>
+#include <FL/Fl.H>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>

@@ -1,6 +1,6 @@
 #include "ChannelChatTab.h"
 #include "UserList.h"
-#include "TextDisplay.h"
+#include "TextDisplay2.h"
 #include "ChatInput.h"
 #include "ITabs.h"
 #include "Prefs.h"
@@ -32,7 +32,7 @@ ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & c
     int const leftW = 0.75*w;
     Fl_Group * left = new Fl_Group(x, y, leftW, h);
     int const ih = 24; // input height
-    text_ = new TextDisplay(x, y, leftW, h-ih);
+    text_ = new TextDisplay2(x, y, leftW, h-ih);
     input_ = new ChatInput(x, y+h-ih, leftW, ih);
     input_->connectText( boost::bind(&ChannelChatTab::onInput, this, _1) );
     left->resizable(text_);
@@ -165,19 +165,13 @@ void ChannelChatTab::append(std::string const & msg, bool interesting)
 {
     if (msg.empty())
     {
-        text_->append(msg);
+        text_->append(msg, false);
         return;
     }
 
     logFile_.log(msg);
 
-    std::ostringstream oss;
-    if (!interesting)
-    {
-        oss << "@C" << FL_DARK2 << "@.";
-    }
-    oss << msg;
-    text_->append(oss.str());
+    text_->append(msg, interesting);
 
     // make ChatTabs redraw header
     if (interesting && !visible() && labelcolor() != FL_RED)

@@ -8,7 +8,7 @@ class Model;
 class ITabs;
 class User;
 class Fl_Tile;
-class TextDisplay;
+class TextDisplay2;
 class UserList;
 class ServerInfo;
 
@@ -24,7 +24,7 @@ public:
 private:
     ITabs & iTabs_;
     Model & model_;
-    TextDisplay * text_;
+    TextDisplay2 * text_;
     UserList * userList_;
     LogFile logFile_;
 
