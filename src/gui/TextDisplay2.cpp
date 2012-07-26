@@ -111,7 +111,10 @@ int TextDisplay2::handle(int event)
                 {
                     int posSpace;
                     int posNewline;
-                    if (text_->findchar_forward(posStart, ' ', &posSpace) || text_->findchar_forward(posStart, '\n', &posNewline))
+                    int found = 0;
+                    found += text_->findchar_forward(posStart, ' ', &posSpace);
+                    found += text_->findchar_forward(posStart, '\n', &posNewline);
+                    if (found > 0)
                     {
                         int const posEnd = std::min(posSpace, posNewline);
                         text_->select(posStart, posEnd);
