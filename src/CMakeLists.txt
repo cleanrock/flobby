@@ -28,3 +28,5 @@ add_subdirectory (controller)
 add_subdirectory (model)
 add_subdirectory (gui)
 add_subdirectory (test)
+
+install (TARGETS flobby DESTINATION bin)

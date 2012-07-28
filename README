@@ -5,13 +5,39 @@ Dependencies worth noting:
 FLTK 1.3
 boost
 C++11 (gcc 4.6 should be ok)
-pr-downloader (runtime optional)
-
-To be able to download maps from within flobby you need pr-downloader installed.
-Get pr-downloader at https://github.com/abma/pr-downloader. 
+pr-downloader (runtime optional, https://github.com/abma/pr-downloader)
 
 Build and run:
 cmake .
 make flobby
 src/flobby
 
+Build and install in ~/opt:
+cmake -DCMAKE_INSTALL_PREFIX=/home/<username>/opt .
+make flobby
+make install
+
+
+Files and directories:
+
+~/.fltk/cleanrock/flobby.prefs
+    flobby settings, delete this file to reset all settings to default 
+
+~/.spring/flobby/cache/
+    map cache files (images and map info)
+
+~/.spring/flobby/log/
+    logs of all chats, logging to files can be disabled in flobby
+
+~/.spring/flobby_script.txt
+    spring script file, written on spring launch
+
+~/.spring/flobby_process_spring.log
+    spring output
+
+~/.spring/flobby_process_pr-downloader.log
+    pr-downloader output
+
+/tmp/flobby.log
+    flobby debug log, path can be changed in flobby
+        
