@@ -1,6 +1,5 @@
 select current config in spring dialog is selected on enter
 battle info pane in battle room gets too small on small screen 
-make vote Yes/No buttons fix size
 extractSentence shall accept "" ?
 try to fix TinySkirmish map image
 show ai info in add ai dialog

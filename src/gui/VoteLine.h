@@ -4,9 +4,8 @@
 #include <string>
 
 class Model;
-class Fl_Label;
+class Fl_Box;
 class Fl_Button;
-class Fl_Widget;
 
 class VoteLine: public Fl_Group
 {
@@ -18,6 +17,7 @@ public:
 
 private:
     Model & model_;
+    Fl_Box * text_;
     Fl_Button * yes_;
     Fl_Button * no_;
 

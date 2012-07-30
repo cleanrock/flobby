@@ -3,6 +3,7 @@
 #include "log/Log.h"
 #include "model/Model.h"
 
+#include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
@@ -18,17 +19,20 @@ VoteLine::VoteLine(int x, int y, int w, int h, Model & model):
 //    votesTotal_(0)
 {
     box(FL_FLAT_BOX);
-    align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 
-    int const btnWidth = 20;
+    int const btnWidth = 30;
+
+    text_ = new Fl_Box(x, y, w-2*btnWidth, h);
+    text_->box(FL_FLAT_BOX);
+    text_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 
     yes_ = new Fl_Button(x + w - 2*btnWidth, y, btnWidth, h, "Yes");
     no_ = new Fl_Button(x + w - 1*btnWidth, y, btnWidth, h, "No");
 
-
     yes_->callback(VoteLine::onYes, this);
     no_->callback(VoteLine::onNo, this);
 
+    resizable(text_);
     end();
 
 //    makeVotesString();
@@ -59,7 +63,7 @@ void VoteLine::processHostMessage(std::string const & msg)
     if ((pos = msg.find("Poll: ")) == 0)
     {
         // Poll line
-        copy_label(msg.substr(6).c_str());
+        text_->copy_label(msg.substr(6).c_str());
         if (msg.find("[END:") == std::string::npos)
         {
             activate();
