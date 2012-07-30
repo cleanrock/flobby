@@ -69,7 +69,7 @@ void RegisterDialog::callback(Fl_Widget*, void *data)
 void RegisterDialog::show()
 {
     char str[128];
-    prefs_.get(PrefLoginHost, str, "springrts.com", sizeof(str));
+    prefs_.get(PrefLoginHost, str, "lobby.springrts.com", sizeof(str));
     host_->value(str);
 
     prefs_.get(PrefLoginPort, str, "8200", sizeof(str));
