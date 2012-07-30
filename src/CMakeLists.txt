@@ -29,4 +29,4 @@ add_subdirectory (model)
 add_subdirectory (gui)
 add_subdirectory (test)
 
-install (TARGETS flobby DESTINATION bin)
+install (TARGETS flobby RUNTIME DESTINATION bin)

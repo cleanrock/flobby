@@ -1,4 +1,4 @@
-add_executable (unittest
+add_executable (unittest EXCLUDE_FROM_ALL
     test_main.cpp
     Test.cpp
 )

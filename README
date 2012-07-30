@@ -9,13 +9,12 @@ pr-downloader (runtime optional, https://github.com/abma/pr-downloader)
 
 Build and run:
 cmake .
-make flobby
+make
 src/flobby
 
 Build and install in ~/opt:
 cmake -DCMAKE_INSTALL_PREFIX=/home/<username>/opt .
-make flobby
-make install
+make && make install
 
 
 Files and directories:
