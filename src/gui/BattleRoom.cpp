@@ -37,27 +37,32 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
     int const topH = h/2;
     top_ = new Fl_Group(x, y, w, topH);
 
-    // header (text and buttons)
+    // header (info text)
     //
     int const headerH = 48;
     int const rightW = 256; // 2 times image width
-    topHeader_ = new Fl_Group(x, y, w-rightW, headerH);
-    topHeader_ ->box(FL_FLAT_BOX);
-    int headerX = x;
 
-    int const headerTextW = w-rightW-250; // 250 pixels for buttons on right side of headerText
-    headerText_ = new Fl_Multiline_Output(headerX, y, headerTextW, headerH);
+    int const headerTextW = w-rightW;
+    headerText_ = new Fl_Multiline_Output(x, y, headerTextW, headerH);
     headerText_->box(FL_FLAT_BOX);
 
-    headerX += headerTextW;
-    specBtn_ = new Fl_Check_Button(headerX, y, 70, headerH/2, "Spec");
-    readyBtn_ = new Fl_Check_Button(headerX, y+24, 70, headerH/2, "Ready");
+    // right side (buttons, map image and info, settings)
+    //
+    int const rightX = x + w - rightW;
+    topRight_ = new Fl_Group(rightX, y, rightW, topH);
+    topRight_->box(FL_FLAT_BOX); // needed to make right side redraw nicely when changing tiling
+
+    // buttons (2 rows)
+    int buttonX = x + headerTextW;
+    int const buttonH = 24;
+    // Spec and Ready
+    specBtn_ = new Fl_Check_Button(buttonX, y, 70, buttonH, "Spec");
+    readyBtn_ = new Fl_Check_Button(buttonX, y+buttonH, 70, buttonH, "Ready");
     specBtn_->callback(BattleRoom::onSpec, this);
     readyBtn_->callback(BattleRoom::onReady, this);
-    headerX += 70;
-
+    buttonX += 70;
     // ally team choice
-    teamBtn_ = new Fl_Choice(headerX+30, y, 50, headerH/2, "Ally");
+    teamBtn_ = new Fl_Choice(buttonX+30, y, 54, buttonH, "Ally");
     teamBtn_->align(FL_ALIGN_LEFT);
     teamBtn_->callback(BattleRoom::onAllyTeam, this);
     for (int i=0; i<16; ++i)
@@ -65,38 +70,29 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
         std::string str(boost::lexical_cast<std::string>(i+1));
         teamBtn_->add(str.c_str());
     }
-
     // add bot
-    addBotBtn_ = new Fl_Button(headerX, y+24, 80, headerH/2, "Add AI...");
+    addBotBtn_ = new Fl_Button(buttonX, y+buttonH, 86, buttonH, "Add AI...");
     addBotBtn_->callback(BattleRoom::onAddBot, this);
-
-    headerX += 80;
-
-    startBtn_ = new Fl_Button(headerX, y, 100, headerH/2, "Start Spring");
+    buttonX += 86;
+    startBtn_ = new Fl_Button(buttonX, y, 100, buttonH, "Start Spring");
     startBtn_->callback(BattleRoom::onStart, this);
     startBtn_->deactivate();
-
     Fl_Button * btn;
-    btn = new Fl_Button(headerX, y+24, 100, headerH/2, "Leave");
+    btn = new Fl_Button(buttonX, y+buttonH, 100, buttonH, "Leave");
     btn->callback(BattleRoom::onLeave, this);
 
-    topHeader_->resizable(headerText_);
-    topHeader_->end();
-
-    // map and info on right side
-    //
-    int const rightX = x + w - rightW;
-    topRight_ = new Fl_Group(rightX, y, rightW, topH);
-
-    mapImageBox_ = new MapImage(rightX, y, rightW/2, rightW/2);
+    // map image
+    mapImageBox_ = new MapImage(rightX, y+2*buttonH, rightW/2, rightW/2);
     mapImageBox_->box(FL_FLAT_BOX);
     mapImageBox_->callback(BattleRoom::onMapImage, this);
 
-    mapInfo_  = new Fl_Multiline_Output(rightX+rightW/2, y, rightW/2, rightW/2);
+    // map info
+    mapInfo_  = new Fl_Multiline_Output(rightX+rightW/2, y+2*buttonH, rightW/2, rightW/2);
     mapInfo_->box(FL_FLAT_BOX);
     mapInfo_->color(FL_BACKGROUND2_COLOR);
 
-    settings_  = new GameSettings(rightX, y+rightW/2, rightW, topH-rightW/2, model );
+    // settings
+    settings_  = new GameSettings(rightX, y+2*buttonH+rightW/2, rightW, topH-2*buttonH-rightW/2, model );
 
     topRight_->resizable(settings_);
     topRight_->end();

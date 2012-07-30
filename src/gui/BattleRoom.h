@@ -63,7 +63,6 @@ private:
 
     Fl_Group * top_;
 
-    Fl_Group * topHeader_;
     Fl_Multiline_Output * headerText_;
     Fl_Check_Button * specBtn_;
     Fl_Check_Button * readyBtn_;
