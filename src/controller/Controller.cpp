@@ -65,7 +65,8 @@ void Controller::runProcess(std::string const cmd, unsigned int id)
     // redirect stdout and stderr to log file
     std::string cmd2 = cmd + " >> " + log + " 2>&1";
     LOG(DEBUG) << "runProcess system(): '" << cmd2 << "'";
-    std::system(cmd2.c_str());
+    int const ret = std::system(cmd2.c_str());
+    // TODO add ret to processDoneCallback
 
 //    FILE * f = ::popen(cmd.c_str(), "re"); // e = close-on-exec
 //    if (f != NULL)

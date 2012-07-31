@@ -83,7 +83,7 @@ void SpringDialog::initList(bool selectCurrent)
         std::string const profile(str);
         ::free(str);
 
-        for (int i = 1; i < list_->size(); ++i)
+        for (int i = 1; i <= list_->size(); ++i)
         {
             if (profile == list_->text(i))
             {

@@ -89,7 +89,7 @@ void LoggingDialog::callbackApply(Fl_Widget*, void *data)
 
 void LoggingDialog::badFilePath(std::string const & msg)
 {
-    fl_alert(msg.c_str());
+    fl_alert("%s", msg.c_str());
 
     // restore text field
     logFilePath_->value(Log::logFile().c_str());

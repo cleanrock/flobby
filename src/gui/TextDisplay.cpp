@@ -88,7 +88,7 @@ int TextDisplay::handle(int event)
                     LOG(DEBUG) << "link: '" << link << "'";
 
                     std::string const cmd = "xdg-open " + link;
-                    std::system(cmd.c_str());
+                    int const ret = std::system(cmd.c_str());
                 }
             }
             return 1;

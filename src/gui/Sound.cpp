@@ -14,7 +14,7 @@ void Sound::beep()
 
     if (duration_cast<seconds>(diff).count() > 0)
     {
-        std::system("xkbbell -v 100");
+        int const ret = std::system("xkbbell -v 100");
         timeLast_ = now;
     }
 
