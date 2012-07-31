@@ -48,11 +48,11 @@ add_library (gui STATIC
 target_link_libraries (gui
     ${FLTK_LIBRARIES}
     boost_regex
-    fontconfig
-    Xft
-    Xinerama
+#    fontconfig
+#    Xft
+#    Xinerama
     Xpm
-    png
+#    png
 #    SDL
 #    SDL_mixer
 #    alut
