@@ -37,7 +37,6 @@ private:
     Fl_File_Input * unitSyncPath_;
     Fl_Button * save_;
     Fl_Button * delete_;
-    Fl_Button * remove_;
     Fl_Return_Button * select_;
 
     static void callbackList(Fl_Widget*, void*);
@@ -47,7 +46,7 @@ private:
     static void callbackBrowseSpring(Fl_Widget*, void*);
     static void callbackBrowseUnitSync(Fl_Widget*, void*);
 
-    void initList();
+    void initList(bool selectCurrent = false);
     void clearInputFields();
     void populate(char const * name);
     void onList();

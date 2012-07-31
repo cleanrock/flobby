@@ -52,15 +52,13 @@ SpringDialog::SpringDialog(Model & model) :
     select_->deactivate();
 
     end();
-
-    initList();
 }
 
 SpringDialog::~SpringDialog()
 {
 }
 
-void SpringDialog::initList()
+void SpringDialog::initList(bool selectCurrent)
 {
     list_->clear();
     // setup default if no entries exist
@@ -77,6 +75,23 @@ void SpringDialog::initList()
         list_->add(prefs_.group(i));
     }
     list_->sort(FL_SORT_ASCENDING);
+
+    if (selectCurrent)
+    {
+        char * str;
+        prefs_.get(PrefSpringProfile, str, "UNKNOWN");
+        std::string const profile(str);
+        ::free(str);
+
+        for (int i = 1; i < list_->size(); ++i)
+        {
+            if (profile == list_->text(i))
+            {
+                list_->select(i);
+                populate(profile.c_str());
+            }
+        }
+    }
 }
 
 void SpringDialog::clearInputFields()
@@ -152,16 +167,12 @@ void SpringDialog::onList()
     }
     select_->activate();
 
-    if (Fl::event_button() == FL_LEFT_MOUSE)
+    populate(list_->text(line));
+
+    // select if double click
+    if (Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks() != 0)
     {
-        if (Fl::event_clicks() == 0) // single click
-        {
-            populate(list_->text(line));
-        }
-        else // double click
-        {
-            onSelect();
-        }
+        onSelect();
     }
 }
 
@@ -289,8 +300,8 @@ bool SpringDialog::setPaths()
 
 void SpringDialog::show()
 {
-    initList();
     clearInputFields();
+    initList(true);
     Fl_Window::show();
 }
 
