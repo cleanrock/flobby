@@ -1,3 +1,4 @@
+make it possible to skip sound for Nightwatch private chat messages
 process done callback should include at least process return code
 extractSentence shall accept "" ?
 try to fix TinySkirmish map image

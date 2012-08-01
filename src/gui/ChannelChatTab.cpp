@@ -119,30 +119,37 @@ void ChannelChatTab::clients(std::string const & channelName, std::vector<std::s
 
 void ChannelChatTab::userJoined(std::string const & channelName, std::string const & userName)
 {
-    if (showJoinLeave_ && channelName == channelName_)
+    if (channelName == channelName_)
     {
         userList_->add(userName);
-        std::ostringstream oss;
-        oss << userName << " joined";
 
-        append(oss.str());
+        if (showJoinLeave_)
+        {
+            std::ostringstream oss;
+            oss << userName << " joined";
+
+            append(oss.str());
+        }
     }
 }
 
 void ChannelChatTab::userLeft(std::string const & channelName, std::string const & userName, std::string const & reason)
 {
-    if (showJoinLeave_ && channelName == channelName_)
+    if (channelName == channelName_)
     {
         userList_->remove(userName);
 
-        std::ostringstream oss;
-        oss << userName << " left";
-
-        if (!reason.empty())
+        if (showJoinLeave_)
         {
-            oss << " (" << reason << ")";
+            std::ostringstream oss;
+            oss << userName << " left";
+
+            if (!reason.empty())
+            {
+                oss << " (" << reason << ")";
+            }
+            append(oss.str());
         }
-        append(oss.str());
     }
 }
 
