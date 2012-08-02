@@ -2,6 +2,7 @@
 
 #include "log/Log.h"
 
+#include <FL/filename.H>
 #include <FL/Fl.H>
 #include <sstream>
 #include <cstring>
@@ -123,8 +124,16 @@ int TextDisplay2::handle(int event)
                         ::free(sel);
                         LOG(DEBUG) << "link: '" << link << "'";
 
-                        std::string const cmd = "xdg-open " + link;
-                        int const ret = std::system(cmd.c_str());
+                        char msg[512];
+                        int const res = fl_open_uri(link.c_str(), msg, sizeof(msg));
+                        if (res == 1)
+                        {
+                            LOG(DEBUG)<< "fl_open_uri success: " << msg;
+                        }
+                        else // 0
+                        {
+                            LOG(WARNING)<< "fl_open_uri failed: " << msg;
+                        }
 
                         return 1;
                     }
