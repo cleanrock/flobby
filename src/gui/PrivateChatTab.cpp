@@ -3,6 +3,7 @@
 #include "ChatInput.h"
 #include "ITabs.h"
 #include "Sound.h"
+#include "ChatSettingsDialog.h"
 
 #include "model/Model.h"
 
@@ -12,11 +13,12 @@
 #include <boost/algorithm/string.hpp>
 
 PrivateChatTab::PrivateChatTab(int x, int y, int w, int h, std::string const & userName,
-                         ITabs& iTabs, Model & model):
+                         ITabs& iTabs, Model & model, ChatSettingsDialog & chatSettingsDialog):
     Fl_Group(x,y,w,h),
     userName_(userName),
     iTabs_(iTabs),
     model_(model),
+    chatSettingsDialog_(chatSettingsDialog),
     logFile_("chat_" + userName)
 {
     // make tab name unique
@@ -33,6 +35,9 @@ PrivateChatTab::PrivateChatTab(int x, int y, int w, int h, std::string const & u
     resizable(text_);
 
     end();
+
+    chatSettingsDialog_.connectChatSettingsChanged( boost::bind(&PrivateChatTab::initChatSettings, this) );
+    initChatSettings();
 
     // model signals
     model_.connectSayPrivate( boost::bind(&PrivateChatTab::say, this, _1, _2) );
@@ -77,7 +82,6 @@ void PrivateChatTab::said(std::string const & userName, std::string const & msg)
     if (userName == userName_)
     {
         append(userName + ": " + msg, true);
-        Sound::beep();
     }
 }
 
@@ -86,6 +90,27 @@ void PrivateChatTab::userJoined(User const & user)
     if (user.name() == userName_)
     {
         append(userName_ + " joined server");
+    }
+}
+
+void PrivateChatTab::initChatSettings()
+{
+    PrivateChatSettings const & settings = chatSettingsDialog_.getPrivateChatSettings();
+
+    // compare case insensitive
+    bool const isException = std::find_if(
+            settings.beepExceptions.begin(), settings.beepExceptions.end(),
+            [this](std::string const & val) { return boost::iequals(val, this->userName_); } ) // using lambda
+//            boost::bind(&boost::iequals<std::string,std::string>, _1, userName_, std::locale())) // using bind
+                != settings.beepExceptions.end();
+
+    if ( (settings.beep && !isException) || (!settings.beep && isException) )
+    {
+        beep_ = true;
+    }
+    else
+    {
+        beep_ = false;
     }
 }
 
@@ -110,4 +135,8 @@ void PrivateChatTab::append(std::string const & msg, bool interesting)
         iTabs_.redrawTabs();
     }
 
+    if (interesting && beep_)
+    {
+        Sound::beep();
+    }
 }

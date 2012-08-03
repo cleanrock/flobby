@@ -119,9 +119,10 @@ UserInterface::UserInterface(Model & model) :
     agreementDialog_ = new AgreementDialog(model_, *loginDialog_);
     loggingDialog_ = new LoggingDialog();
     progressDialog_ = new ProgressDialog();
-    chatSettingsDialog_ = new ChatSettingsDialog();
     autoJoinChannelsDialog_ = new TextDialog("Channels to auto-join", "One channel per line");
     autoJoinChannelsDialog_->connectTextSave(boost::bind(&UserInterface::autoJoinChannels, this, _1));
+    chatSettingsDialog_ = new ChatSettingsDialog();
+    tabs_->setChatSettingsDialog(chatSettingsDialog_); // ugly dependency injection
 
     // model signal handlers
     model.connectConnected( boost::bind(&UserInterface::connected, this, _1) );

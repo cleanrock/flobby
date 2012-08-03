@@ -4,6 +4,8 @@
 #include "ChatInput.h"
 #include "ITabs.h"
 #include "Prefs.h"
+#include "ChatSettingsDialog.h"
+#include "Sound.h"
 
 #include "model/Model.h"
 
@@ -14,13 +16,12 @@
 // we use the split setting of the ServerMessages tab in all channel tabs
 static char const * PrefServerMessagesSplitH = "ServerMessagesSplitH";
 
-bool ChannelChatTab::showJoinLeave_ = false;
-
 ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & channelName,
-                         ITabs& iTabs, Model & model):
+                         ITabs& iTabs, Model & model, ChatSettingsDialog & chatSettingsDialog):
     Fl_Tile(x,y,w,h),
     iTabs_(iTabs),
     model_(model),
+    chatSettingsDialog_(chatSettingsDialog),
     channelName_(channelName),
     logFile_("channel_" + channelName)
 {
@@ -54,6 +55,9 @@ ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & c
 
     end();
 
+    chatSettingsDialog_.connectChatSettingsChanged( boost::bind(&ChannelChatTab::initChatSettings, this) );
+    initChatSettings();
+
     // model signals
     model_.connectChannelTopicSignal( boost::bind(&ChannelChatTab::topic, this, _1, _2, _3, _4) );
     model_.connectChannelMessageSignal( boost::bind(&ChannelChatTab::message, this, _1, _2) );
@@ -61,7 +65,6 @@ ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & c
     model_.connectUserJoinedChannel( boost::bind(&ChannelChatTab::userJoined, this, _1, _2) );
     model_.connectUserLeftChannel( boost::bind(&ChannelChatTab::userLeft, this, _1, _2, _3) );
     model_.connectSaidChannel( boost::bind(&ChannelChatTab::said, this, _1, _2, _3) );
-
 }
 
 ChannelChatTab::~ChannelChatTab()
@@ -187,4 +190,32 @@ void ChannelChatTab::append(std::string const & msg, bool interesting)
         iTabs_.redrawTabs();
     }
 
+    if (interesting && beep_)
+    {
+        Sound::beep();
+    }
+
+}
+
+void ChannelChatTab::initChatSettings()
+{
+    ChannelChatSettings const & settings = chatSettingsDialog_.getChannelChatSettings();
+
+    showJoinLeave_ = settings.showJoinLeave;
+
+    // compare case insensitive
+    bool const isException = std::find_if(
+            settings.beepExceptions.begin(), settings.beepExceptions.end(),
+            [this](std::string const & val) { return boost::iequals(val, this->channelName_); } ) // using lambda
+//            boost::bind(&boost::iequals<std::string,std::string>, _1, channelName_, std::locale())) // using bind
+                != settings.beepExceptions.end();
+
+    if ( (settings.beep && !isException) || (!settings.beep && isException) )
+    {
+        beep_ = true;
+    }
+    else
+    {
+        beep_ = false;
+    }
 }

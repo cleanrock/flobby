@@ -4,6 +4,7 @@
 #include "ChannelChatTab.h"
 #include "PrivateChatTab.h"
 #include "PopupMenu.h"
+#include "ChatSettingsDialog.h"
 
 #include "model/Model.h"
 
@@ -22,7 +23,8 @@
 
 Tabs::Tabs(int x, int y, int w, int h, Model & model):
     Fl_Tabs(x,y,w,h),
-    model_(model)
+    model_(model),
+    chatSettingsDialog_(0)
 {
     selection_color(FL_LIGHT2);
 
@@ -58,7 +60,8 @@ typename M::mapped_type Tabs::createChat(std::string const & name, M & map)
     int x, y, w, h;
     client_area(x,y,w,h);
     typedef typename std::remove_pointer<typename M::mapped_type>::type Type;
-    Type * chat = new Type(x,y,w,h, name, *this, model_);
+    assert(chatSettingsDialog_ != 0);
+    Type * chat = new Type(x,y,w,h, name, *this, model_, *chatSettingsDialog_);
     add(chat);
     chat->hide();
     map[name] = chat;

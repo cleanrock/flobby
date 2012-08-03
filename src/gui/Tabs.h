@@ -9,6 +9,7 @@
 class LogUsersTab;
 class ChannelChatTab;
 class PrivateChatTab;
+class ChatSettingsDialog;
 class Model;
 class Fl_Tabs;
 
@@ -19,9 +20,11 @@ public:
     virtual ~Tabs();
 
     void initTiles();
+    void setChatSettingsDialog(ChatSettingsDialog * chatSettingsDialog) { chatSettingsDialog_ = chatSettingsDialog; } // ugly dependency injection
 
 private:
     Model & model_;
+    ChatSettingsDialog * chatSettingsDialog_;
 
     LogUsersTab * logUsersTab_;
 

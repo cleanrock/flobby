@@ -12,29 +12,33 @@ class User;
 class TextDisplay2;
 class UserList;
 class ChatInput;
+class ChatSettingsDialog;
 
 class ChannelChatTab: public Fl_Tile
 {
 public:
     ChannelChatTab(int x, int y, int w, int h, std::string const & channelName,
-                ITabs& iTabs, Model & model);
+                ITabs& iTabs, Model & model, ChatSettingsDialog & chatSettingsDialog);
     virtual ~ChannelChatTab();
     void leave();
-
-    static bool showJoinLeave_;
 
 private:
     ITabs & iTabs_;
     Model & model_;
+    ChatSettingsDialog & chatSettingsDialog_;
     TextDisplay2 * text_;
     ChatInput * input_;
     UserList * userList_;
     std::string channelName_;
     LogFile logFile_;
+    bool showJoinLeave_;
+    bool beep_;
 
     void onInput(std::string const & text);
     int handle(int event);
     void append(std::string const & msg, bool interesting = false);
+
+    void initChatSettings();
 
     // model signals
     void topic(std::string const & channelName, std::string const & author, time_t epochSeconds, std::string const & topic);
