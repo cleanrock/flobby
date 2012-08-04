@@ -20,7 +20,7 @@ void Sound::beep(char const * command)
         std::string const cmd = command ? command : command_.c_str();
         if (command || duration_cast<seconds>(diff).count() > 0)
         {
-            std::string const cmd2(cmd + " >/dev/null &");
+            std::string const cmd2(cmd + " > /dev/null 2>&1 &");
             int const ret = std::system(cmd2.c_str());
             timeLast_ = now;
         }
