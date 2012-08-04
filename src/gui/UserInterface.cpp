@@ -15,6 +15,7 @@
 #include "TextDialog.h"
 #include "SpringDialog.h"
 #include "ChatSettingsDialog.h"
+#include "SoundSettingsDialog.h"
 
 #include "log/Log.h"
 #include "model/Model.h"
@@ -82,6 +83,7 @@ UserInterface::UserInterface(Model & model) :
                 { "&Spring...", 0, (Fl_Callback *)&menuSpring, this },
                 { "&Battle list filter...", 0, (Fl_Callback *)&menuBattleListFilter, this },
                 { "Channels to &auto-join...", 0, (Fl_Callback *)&menuChannelsAutoJoin, this },
+                { "Soun&d...", 0, (Fl_Callback *)&menuSoundSettings, this },
                 { "&Chat...", 0, (Fl_Callback *)&menuChatSettings, this },
                 { "&Logging...", 0, (Fl_Callback *)&menuLogging, this },
                 { 0 },
@@ -121,6 +123,7 @@ UserInterface::UserInterface(Model & model) :
     progressDialog_ = new ProgressDialog();
     autoJoinChannelsDialog_ = new TextDialog("Channels to auto-join", "One channel per line");
     autoJoinChannelsDialog_->connectTextSave(boost::bind(&UserInterface::autoJoinChannels, this, _1));
+    soundSettingsDialog_ = new SoundSettingsDialog();
     chatSettingsDialog_ = new ChatSettingsDialog();
     tabs_->setChatSettingsDialog(chatSettingsDialog_); // ugly dependency injection
 
@@ -465,6 +468,13 @@ void UserInterface::menuChannelsAutoJoin(Fl_Widget *w, void* d)
     boost::replace_all(text, " ", "\n");
 
     ui->autoJoinChannelsDialog_->show(text.c_str());
+}
+
+void UserInterface::menuSoundSettings(Fl_Widget *w, void* d)
+{
+    UserInterface * ui = static_cast<UserInterface*>(d);
+
+    ui->soundSettingsDialog_->show();
 }
 
 void UserInterface::menuChatSettings(Fl_Widget *w, void* d)

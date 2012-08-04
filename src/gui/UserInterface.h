@@ -21,6 +21,7 @@ class BattleList;
 class BattleRoom;
 class Tabs;
 class ChatSettingsDialog;
+class SoundSettingsDialog;
 
 class Fl_Double_Window;
 class Fl_Browser;
@@ -55,6 +56,7 @@ private:
     ProgressDialog * progressDialog_;
     TextDialog * autoJoinChannelsDialog_;
     ChatSettingsDialog * chatSettingsDialog_;
+    SoundSettingsDialog * soundSettingsDialog_;
 
     Fl_Tile * tile_; // whole app window client area
     Fl_Tile * tileLeft_; // chat and battle list
@@ -94,6 +96,7 @@ private:
     static void mainWindowCallback(Fl_Widget * w, void * p); // used to stop Escape key from exiting the program
     static void menuChannelsAutoJoin(Fl_Widget *w, void* d);
     static void menuChatSettings(Fl_Widget *w, void* d);
+    static void menuSoundSettings(Fl_Widget *w, void* d);
 
     void enableMenuItem(void(*cb)(Fl_Widget*, void*), bool enable);
 

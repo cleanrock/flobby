@@ -43,6 +43,7 @@ add_library (gui STATIC
     ChatSettingsDialog.cpp
     GameSettings.cpp
     ChatInput.cpp
+    SoundSettingsDialog.cpp
 )
 
 target_link_libraries (gui
