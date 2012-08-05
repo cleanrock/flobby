@@ -47,8 +47,8 @@ Fl_Shared_Image * Cache::getMapImage(std::string const & mapName)
 
     if (image == 0)
     {
-        // setup for 128x128
-        int const mipLevel = 3;
+        // get 1024x1024 since higher mip levels can result in broken image, e.g. TinySkirmish
+        int const mipLevel = 0;
         int const imageSize = 1024 >> mipLevel;
 
         auto imageData = model_.getMapImage(mapName, mipLevel);
