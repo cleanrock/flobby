@@ -3,6 +3,7 @@
 #include "PopupMenu.h"
 
 #include "model/Model.h"
+#include "log/Log.h"
 
 #include "FL/fl_ask.H"
 #include <boost/bind.hpp>
@@ -70,12 +71,27 @@ void UserList::userClicked(int rowIndex, int button)
     {
         StringTableRow const & row = getRow(static_cast<std::size_t>(rowIndex));
 
-        User const & user = model_.getUser(row.id_);
+        std::string const userName = row.id_;
+        User const * user = 0;
+        int battleId;
         PopupMenu menu;
-        menu.add("Open chat", 1);
-        Battle const * battle = user.joinedBattle();
-        if (battle != 0)
+
+        try
         {
+            user = &model_.getUser(row.id_);
+        }
+        catch (std::invalid_argument const & e)
+        {
+            LOG(ERROR)<< e.what();
+            return;
+        }
+
+        menu.add("Open chat", 1);
+
+        if (user->joinedBattle())
+        {
+            Battle const * battle = user->joinedBattle();
+            battleId = battle->id();
             std::string joinText = "Join " + battle->title();
             menu.add(joinText, 2);
         }
@@ -86,20 +102,38 @@ void UserList::userClicked(int rowIndex, int button)
             switch (id)
             {
             case 1:
-                iTabs_.openPrivateChat(user.name());
+                try
+                {
+                    User const & user = model_.getUser(userName);
+                    iTabs_.openPrivateChat(userName);
+                }
+                catch (std::invalid_argument const & e)
+                {
+                    LOG(WARNING)<< e.what();
+                    return;
+                }
                 break;
             case 2:
-                if (battle->passworded())
+                try
                 {
-                    char const * password = fl_input("Enter battle password");
-                    if (password != NULL)
+                    Battle const & battle = model_.getBattle(battleId);
+                    if (battle.passworded())
                     {
-                        model_.joinBattle(battle->id(), password);
+                        char const * password = fl_input("Enter battle password");
+                        if (password != NULL)
+                        {
+                            model_.joinBattle(battleId, password);
+                        }
+                    }
+                    else
+                    {
+                        model_.joinBattle(battleId);
                     }
                 }
-                else
+                catch (std::runtime_error const & e)
                 {
-                    model_.joinBattle(battle->id());
+                    LOG(WARNING)<< e.what();
+                    return;
                 }
                 break;
             }
