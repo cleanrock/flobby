@@ -58,7 +58,7 @@ void TextDisplay2::append(std::string const & text, bool interesting)
         char buf[16];
         std::time_t t = std::time(0);
         std::tm tm = *std::localtime(&t);
-        std::strftime(buf, 16, "%H:%M:%S ", &tm);
+        std::strftime(buf, 16, "%H:%M ", &tm);
 
         std::ostringstream oss;
         oss << buf << text << '\n';
