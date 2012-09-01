@@ -188,6 +188,8 @@ void BattleRoom::setMapImage(Battle const & battle)
 void BattleRoom::joined(Battle const & battle)
 {
     battleId_ = battle.id();
+    founder_ = battle.founder();
+
     playerList_->clear();
     activate();
 
@@ -199,6 +201,9 @@ void BattleRoom::joined(Battle const & battle)
     {
         startBtn_->activate();
     }
+
+    User const & founder = model_.getUser(battle.founder());
+    playerList_->addRow(makeRow(founder));
 
     for (Battle::BattleUsers::value_type pair : battle.users())
     {
@@ -284,7 +289,7 @@ void BattleRoom::userLeftBattle(User const & user, const Battle & battle)
 void BattleRoom::userChanged(User const & user)
 {
     Battle const * b = user.joinedBattle();
-    if ( b &&  b->id() == battleId_)
+    if (b &&  b->id() == battleId_)
     {
         playerList_->updateRow(makeRow(user));
         User const & me = model_.me();
@@ -334,7 +339,8 @@ std::string BattleRoom::statusString(User const & user)
     std::ostringstream oss;
     oss << (user.battleStatus().spectator() ? "S" : "")
         << (user.status().inGame() ? "G" : "")
-        << (user.battleStatus().ready() ? "R" : "");
+        << (user.battleStatus().ready() ? "R" : "")
+        << (user.name() == founder_ ? "H" : "");
     return oss.str();
 }
 

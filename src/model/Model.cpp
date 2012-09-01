@@ -733,7 +733,7 @@ int Model::calcSync(Battle const & battle)
     {
         // not synced, log checksum mismatches
         LOG_IF(WARNING, battle.modHash() != modChecksum)<< "mod checksum mismatch: "
-                << battle.modHash() << "!= " << modChecksum;
+                << battle.modHash() << " != " << modChecksum;
         LOG_IF(WARNING, battle.mapHash() != mapChecksum)<< "map checksum mismatch: "
                 << battle.mapHash() << " != " << mapChecksum;
         return 2;
@@ -821,8 +821,10 @@ void Model::handle_BATTLEOPENED(std::istream & is)
     battles_[b->id()] = b;
 
     // set running status
-    User const & founder = getUser(b->founder());
+    User & founder = user(b->founder());
     b->running(founder.status().inGame());
+
+    founder.joinedBattle(*b);
 
     if (loggedIn_)
     {
@@ -837,6 +839,9 @@ void Model::handle_BATTLECLOSED(std::istream & is) // battleId
     extractWord(is, ex);
     int const battleId = boost::lexical_cast<int>(ex);
     Battle const & battle = getBattle(battleId);
+    User & founder = user(battle.founder());
+    founder.leftBattle(battle);
+
     battleClosedSignal_(battle);
     if (joinedBattleId_ == battleId)
     {

@@ -59,6 +59,7 @@ private:
     Cache & cache_;
     ITabs & iTabs_;
     int battleId_;
+    std::string founder_;
     bool lastRunning_;
 
     Fl_Group * top_;
