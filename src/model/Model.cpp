@@ -1501,20 +1501,21 @@ std::vector<AI> Model::getModAIs(std::string const & modName)
     std::vector<AI> ais;
 
     int modIndex = unitSync_->GetPrimaryModIndex(modName.c_str());
-//    std::cout << "modIndex " << modIndex << std::endl; // TODO remove
+    LOG(DEBUG) << "modIndex " << modIndex;
 
     if (modIndex >= 0)
     {
         const char* archiveName = unitSync_->GetPrimaryModArchive(modIndex);
-//        std::cout << "archiveName " << archiveName << std::endl; // TODO remove
+        LOG(DEBUG) << "archiveName " << archiveName;
         unitSync_->AddAllArchives(archiveName);
         int aiCount = unitSync_->GetSkirmishAICount();
-//        std::cout << "aiCount " << aiCount << std::endl; // TODO remove
+        LOG(DEBUG) << "aiCount " << aiCount;
 
-        for (int ai=0; ai<aiCount; ++ai)
+        for (int i=0; i<aiCount; ++i)
         {
-//            std::cout << "\tai " << ai << std::endl; // TODO remove
-            int infoKeyCount = unitSync_->GetSkirmishAIInfoCount(ai);
+            LOG(DEBUG) << "\tai " << i;
+            int infoKeyCount = unitSync_->GetSkirmishAIInfoCount(i);
+            AI ai;
             for (int infoKeyIndex=0; infoKeyIndex<infoKeyCount; ++infoKeyIndex)
             {
                 std::string infoKeyName = unitSync_->GetInfoKey(infoKeyIndex);
@@ -1522,14 +1523,19 @@ std::vector<AI> Model::getModAIs(std::string const & modName)
                 if (infoKeyType == "string")
                 {
                     std::string infoKeyValue = unitSync_->GetInfoValueString(infoKeyIndex);
-//                    std::cout << "\t\t" << infoKeyName << "=" << infoKeyValue << std::endl; // TODO remove
-                    if (infoKeyName == "shortName")
-                    {
-                        AI ai;
-                        ai.shortName_ = infoKeyValue;
-                        ais.push_back(ai);
-                    }
+                    LOG(DEBUG) << "\t\t" << infoKeyName << "=" << infoKeyValue;
+                    ai.info_[infoKeyName] = infoKeyValue;
                 }
+            }
+
+            if (ai.info_.count("shortName") == 0)
+            {
+                LOG(WARNING)<< "AI missing shortName";
+            }
+            else
+            {
+                ai.name_ = ai.info_["shortName"];
+                ais.push_back(ai);
             }
         }
     }

@@ -313,6 +313,8 @@ void BattleRoom::userChanged(User const & user)
 
 void BattleRoom::close()
 {
+    addBotDialog_->hide();
+
     battleChat_->close();
 
     battleId_ = -1;
@@ -426,7 +428,22 @@ void BattleRoom::onAddBot(Fl_Widget* w, void* data)
     static_cast<void>(w);
     BattleRoom * br = static_cast<BattleRoom*>(data);
 
-    br->addBotDialog_->show(br->model_.getBattle(br->battleId_).modName());
+    std::string const modName = br->model_.getBattle(br->battleId_).modName();
+
+    // try to find a unique bot name
+    Model::Bots const & bots = br->model_.getBots();
+    std::string botName = "AI_";
+    for (int i=0; i<10; ++i)
+    {
+        std::string const botNameCandidate = botName + boost::lexical_cast<std::string>(i);
+        if (bots.count(botNameCandidate) == 0)
+        {
+            botName = botNameCandidate;
+            break;
+        }
+    }
+
+    br->addBotDialog_->show(modName, botName);
 }
 
 void BattleRoom::onStart(Fl_Widget* w, void* data)

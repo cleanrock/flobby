@@ -1,8 +1,8 @@
 #pragma once
 
+#include <map>
 #include <string>
 
-// TODO add more ai info
 
 class AI
 {
@@ -10,6 +10,7 @@ public:
     AI();
     ~AI();
 
-    std::string shortName_;
+    std::string name_; // shortName
+    std::map<std::string, std::string> info_;
 
 };
