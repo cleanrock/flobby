@@ -104,7 +104,7 @@ void UserList::userClicked(int rowIndex, int button)
             case 1:
                 try
                 {
-                    User const & user = model_.getUser(userName);
+                    model_.getUser(userName); // to make sure user still exist
                     iTabs_.openPrivateChat(userName);
                 }
                 catch (std::invalid_argument const & e)

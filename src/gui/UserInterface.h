@@ -72,7 +72,7 @@ private:
     void connected(bool connected);
     void loginResult(bool success, std::string const & info);
     void joinBattleFailed(std::string const & reason);
-    void downloadDone(std::string const & name);
+    void downloadDone(std::string const & name, bool success);
 
     // other signal handlers
     void autoJoinChannels(std::string const & text);

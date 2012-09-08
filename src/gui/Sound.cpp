@@ -22,6 +22,7 @@ void Sound::beep(char const * command)
         {
             std::string const cmd2(cmd + " > /dev/null 2>&1 &");
             int const ret = std::system(cmd2.c_str());
+            static_cast<void>(ret);
             timeLast_ = now;
         }
     }

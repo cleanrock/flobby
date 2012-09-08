@@ -26,6 +26,7 @@ Bot::Bot(std::istream & is)
 
 Bot::Bot(std::string const & name, std::string const & aiDll):
         name_(name),
+        color_(0),
         aiDll_(aiDll)
 {
     battleStatus_.spectator(false);

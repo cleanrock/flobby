@@ -173,7 +173,7 @@ public:
     boost::signals::connection connectSpringExit(SpringExitSignal::slot_type subscriber)
     { return springExitSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & name)> DownloadDoneSignal;
+    typedef boost::signal<void (std::string const & name, bool success)> DownloadDoneSignal;
     boost::signals::connection connectDownloadDone(DownloadDoneSignal::slot_type subscriber)
     { return downloadDoneSignal_.connect(subscriber); }
 
@@ -269,7 +269,7 @@ private:
     //
     void connected(bool connected);
     void message(std::string const & msg);
-    void processDone(unsigned int id);
+    void processDone(std::pair<unsigned int, int> idRetPair);
 
     ConnectedSignal connectedSignal_;
     ServerInfoSignal serverInfoSignal_;
@@ -312,9 +312,9 @@ private:
     void attemptLogin();
     void processServerMsg(const std::string & msg);
 
-    std::map<std::string, std::shared_ptr<User> > users_;
+    std::map<std::string, std::shared_ptr<User>> users_;
 
-    std::map<int, std::shared_ptr<Battle> > battles_;
+    std::map<int, std::shared_ptr<Battle>> battles_;
 
     std::ostringstream agreementStream_;
 

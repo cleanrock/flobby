@@ -58,9 +58,9 @@ void VoteLine::onNo(Fl_Widget * w, void * data)
 
 void VoteLine::processHostMessage(std::string const & msg)
 {
-    size_t pos;
+    size_t const pos = msg.find("Poll: ");
 
-    if ((pos = msg.find("Poll: ")) == 0)
+    if (pos == 0)
     {
         // Poll line
         text_->copy_label(msg.substr(6).c_str());

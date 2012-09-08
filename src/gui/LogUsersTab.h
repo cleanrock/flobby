@@ -40,5 +40,5 @@ private:
     void userJoined(User const & user);
     void userLeft(User const & user);
     void ring(std::string const & userName);
-    void downloadDone(std::string const & name);
+    void downloadDone(std::string const & name, bool success);
 };

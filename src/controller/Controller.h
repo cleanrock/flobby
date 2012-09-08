@@ -6,7 +6,6 @@
 
 #include <boost/thread.hpp>
 #include <map>
-#include <set>
 #include <string>
 #include <memory>
 
@@ -35,7 +34,7 @@ public:
     void connect(std::string const & host, std::string const & service);
     void disconnect();
     void send(std::string const msg);
-    unsigned int startProcess(std::string const & cmd); // e.g. "/usr/bin/spring script.txt"
+    unsigned int startProcess(std::string const & cmd, bool logToFile = false); // e.g. "/usr/bin/spring script.txt"
 
 
 private:
@@ -66,8 +65,8 @@ private:
     static void messageCallback(void * data);
 
     unsigned int processId_;
-    void runProcess(std::string const cmd, unsigned int id);
+    void runProcess(std::string const & cmd, bool logToFile, unsigned int id);
     static void processDoneCallback(void * data);
     std::map<unsigned int, std::thread*> procs_;
-    std::set<unsigned int> procsDone_;
+    std::vector<std::pair<unsigned int,int>> procsDone_; // procId, process (system) return value
 };

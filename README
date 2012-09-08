@@ -31,9 +31,6 @@ Files and directories:
 ~/.spring/flobby_script.txt
     spring script file, written on spring launch
 
-~/.spring/flobby_process_spring.log
-    spring output
-
 ~/.spring/flobby_process_pr-downloader.log
     pr-downloader output
 

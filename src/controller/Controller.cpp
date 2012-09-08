@@ -41,32 +41,47 @@ void Controller::send(const std::string msg)
     server_->send(msg);
 }
 
-unsigned int Controller::startProcess(std::string const & cmd)
+unsigned int Controller::startProcess(std::string const & cmd, bool logToFile)
 {
     ++processId_;
     processId_ = std::max(processId_, 1U); // make sure it doesn't wrap to zero (not very likely though)
 
-    std::thread * t = new std::thread(boost::bind(&Controller::runProcess, this, cmd, processId_));
+    std::thread * t = new std::thread(boost::bind(&Controller::runProcess, this, cmd, logToFile, processId_));
     procs_[processId_] = t;
 
     return processId_;
 }
 
-void Controller::runProcess(std::string const cmd, unsigned int id)
+void Controller::runProcess(std::string const & cmd, bool logToFile, unsigned int id)
 {
     LOG(DEBUG) << "runProcess: '" << cmd << "'";
 
-    // create log filename
-    std::string const first = cmd.substr(0, cmd.find(' '));
-    boost::filesystem::path const path(first);
-    std::string const log = "flobby_process_" + path.stem().string() + ".log";
-    LOG(DEBUG) << "runProcess logFile: '" << log << "'";
+    int ret;
+    if (logToFile)
+    {
+        // create log filename
+        std::string const first = cmd.substr(0, cmd.find(' '));
+        boost::filesystem::path const path(first);
+        std::string const log = "flobby_process_" + path.stem().string() + ".log";
+        LOG(DEBUG) << "runProcess logFile: '" << log << "'";
 
-    // redirect stdout and stderr to log file
-    std::string cmd2 = cmd + " >> " + log + " 2>&1";
-    LOG(DEBUG) << "runProcess system(): '" << cmd2 << "'";
-    int const ret = std::system(cmd2.c_str());
-    // TODO add ret to processDoneCallback
+        // redirect stdout and stderr to log file
+        std::string cmdLine = cmd + " >> " + log + " 2>&1";
+
+        LOG(DEBUG) << "runProcess system(): '" << cmdLine << "'";
+        ret = std::system(cmdLine.c_str());
+
+        // TODO remove this when i know pr-downloader returns sane value
+        std::ostringstream oss;
+        oss << "echo \"system returned " << ret << "\" >> " << log;
+        std::system(oss.str().c_str());
+    }
+    else
+    {
+        std::string cmdLine = cmd + " >> /dev/null" + " 2>&1";
+        LOG(DEBUG) << "runProcess system(): '" << cmdLine << "'";
+        ret = std::system(cmdLine.c_str());
+    }
 
 //    FILE * f = ::popen(cmd.c_str(), "re"); // e = close-on-exec
 //    if (f != NULL)
@@ -82,7 +97,7 @@ void Controller::runProcess(std::string const cmd, unsigned int id)
 
     {
         boost::lock_guard<boost::mutex> lock(mutexProcess_);
-        procsDone_.insert(id);
+        procsDone_.push_back(std::make_pair(id, ret));
     }
     ui_->addCallbackEvent(&processDoneCallback, this);
 }
@@ -92,10 +107,10 @@ void Controller::processDoneCallback(void * data)
     Controller* c = static_cast<Controller*>(data);
 
     boost::lock_guard<boost::mutex> lock(c->mutexProcess_);
-    for (unsigned int id : c->procsDone_)
+    for (std::pair<unsigned int, int> const & idRetPair : c->procsDone_)
     {
-        c->client_->processDone(id);
-        std::map<unsigned int, std::thread*>::iterator it = c->procs_.find(id);
+        c->client_->processDone(idRetPair);
+        std::map<unsigned int, std::thread*>::iterator it = c->procs_.find(idRetPair.first);
         if (it != c->procs_.end())
         {
             it->second->join();
@@ -104,7 +119,7 @@ void Controller::processDoneCallback(void * data)
         }
         else
         {
-            LOG(WARNING) << "thread not found:" << id;
+            LOG(WARNING) << "thread not found:" << idRetPair.first;
         }
     }
     c->procsDone_.clear();

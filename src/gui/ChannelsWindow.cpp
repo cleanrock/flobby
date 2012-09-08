@@ -48,8 +48,8 @@ ChannelsWindow::~ChannelsWindow()
 
 void ChannelsWindow::callback(Fl_Widget*, void *data)
 {
-    ChannelsWindow * o = static_cast<ChannelsWindow*>(data);
-    //o->onLogin(); TODO
+    // TODO not needed atm, remove
+    // ChannelsWindow * o = static_cast<ChannelsWindow*>(data);
 }
 
 void ChannelsWindow::onChannels(Channels const & channels)

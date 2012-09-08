@@ -32,7 +32,7 @@ LogUsersTab::LogUsersTab(int x, int y, int w, int h,
     model_.connectUserJoined( boost::bind(&LogUsersTab::userJoined, this, _1) );
     model_.connectUserLeft( boost::bind(&LogUsersTab::userLeft, this, _1) );
     model_.connectRing( boost::bind(&LogUsersTab::ring, this, _1) );
-    model_.connectDownloadDone( boost::bind(&LogUsersTab::downloadDone, this, _1) );
+    model_.connectDownloadDone( boost::bind(&LogUsersTab::downloadDone, this, _1, _2) );
 }
 
 LogUsersTab::~LogUsersTab()
@@ -131,7 +131,14 @@ void LogUsersTab::append(std::string const & msg, bool interesting)
 
 }
 
-void LogUsersTab::downloadDone(std::string const & name)
+void LogUsersTab::downloadDone(std::string const & name, bool success)
 {
-    append("download attempt done: " + name, true);
+    if (success)
+    {
+        append("download done: " + name, false);
+    }
+    else
+    {
+        append("download failed: " + name, true);
+    }
 }

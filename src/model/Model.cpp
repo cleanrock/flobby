@@ -161,18 +161,18 @@ void Model::message(std::string const & msg)
     processServerMsg(msg);
 }
 
-void Model::processDone(unsigned int id)
+void Model::processDone(std::pair<unsigned int, int> idRetPair)
 {
-    LOG(DEBUG) << "processDone:" << id;
-    if (id == springId_)
+    LOG(DEBUG) << "processDone:" << idRetPair.first << ", " << idRetPair.second;
+    if (idRetPair.first == springId_)
     {
         springExitSignal_();
         springId_ = 0;
         meInGame(false);
     }
-    else if (id == downloaderId_)
+    else if (idRetPair.first == downloaderId_)
     {
-        downloadDoneSignal_(downloadName_);
+        downloadDoneSignal_(downloadName_, idRetPair.second == 0 ? true : false);
         downloaderId_ = 0;
     }
 
@@ -790,7 +790,7 @@ void Model::handle_DENIED(std::istream & is) // {reason}
 void Model::handle_ADDUSER(std::istream & is) // userName country cpu [accountID]
 {
     using namespace LobbyProtocol;
-    std::string ex;
+
     std::shared_ptr<User> u(new User(is));
     users_[u->name()] = u;
     if (me_ == 0 && u->name() == userName_)
@@ -1578,7 +1578,7 @@ bool Model::downloadMap(std::string const & mapName)
         downloadName_ = mapName;
         std::ostringstream oss;
         oss << "pr-downloader --download-map \"" << mapName << "\"";
-        downloaderId_ = controller_.startProcess(oss.str());
+        downloaderId_ = controller_.startProcess(oss.str(), true);
         return true;
     }
     return false;

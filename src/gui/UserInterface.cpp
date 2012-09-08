@@ -131,7 +131,7 @@ UserInterface::UserInterface(Model & model) :
     model.connectConnected( boost::bind(&UserInterface::connected, this, _1) );
     model.connectLoginResult( boost::bind(&UserInterface::loginResult, this, _1, _2) );
     model.connectJoinBattleFailed( boost::bind(&UserInterface::joinBattleFailed, this, _1) );
-    model.connectDownloadDone( boost::bind(&UserInterface::downloadDone, this, _1) );
+    model.connectDownloadDone( boost::bind(&UserInterface::downloadDone, this, _1, _2) );
 
     MyImage::registerHandler();
 
@@ -251,9 +251,8 @@ void UserInterface::menuChannels(Fl_Widget *w, void* d)
 // TODO remove
 void UserInterface::onTest(Fl_Widget *w, void* d)
 {
-    UserInterface * ui = static_cast<UserInterface*>(d);
-
-    Model & m = ui->model_;
+    //UserInterface * ui = static_cast<UserInterface*>(d);
+    //Model & m = ui->model_;
 
     // Sound::beep();
     // ui->sound_->play();
@@ -517,9 +516,12 @@ void UserInterface::reloadMapsMods()
     battleRoom_->refresh();
 }
 
-void UserInterface::downloadDone(std::string const & name)
+void UserInterface::downloadDone(std::string const & name, bool success)
 {
-    reloadMapsMods();
+    if (success)
+    {
+        reloadMapsMods();
+    }
 }
 
 void UserInterface::autoJoinChannels(std::string const & text)

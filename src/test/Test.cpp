@@ -195,11 +195,14 @@ void Test::testUser()
         std::stringstream ss1("name1 SE 0");
         User u1(ss1);
 
-        std::stringstream ss2("name2 SE 0");
-        User u2(ss2);
+        std::stringstream ss2("name1 SE 0");
+        User u2(ss1);
 
-        CPPUNIT_ASSERT(u1 == u1);
-        CPPUNIT_ASSERT(u1 != u2);
+        std::stringstream ss3("name2 SE 0");
+        User u3(ss2);
+
+        CPPUNIT_ASSERT(u1 == u2);
+        CPPUNIT_ASSERT(u1 != u3);
     }
 
 }
@@ -389,7 +392,7 @@ void Test::testLog()
     // 10 threads write 100 lines each, output is analyzed manually
 
     int const cnt = 10;
-    std::vector< std::unique_ptr<std::thread> > threads(cnt);
+    std::vector< std::unique_ptr<std::thread>> threads(cnt);
 
     for (int i=0; i<cnt; ++i)
     {
