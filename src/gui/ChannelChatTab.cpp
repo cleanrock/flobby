@@ -85,7 +85,13 @@ int ChannelChatTab::handle(int event)
 
 void ChannelChatTab::onInput(std::string const & text)
 {
-    model_.sayChannel(channelName_, text);
+    std::vector<std::string> lines;
+    boost::algorithm::split(lines, text, boost::is_any_of("\n"));
+
+    for (auto const & line : lines)
+    {
+        model_.sayChannel(channelName_, line);
+    }
 }
 
 void ChannelChatTab::topic(std::string const & channelName, std::string const & author, time_t epochSeconds, std::string const & topic)

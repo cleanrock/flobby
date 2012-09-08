@@ -428,16 +428,24 @@ void Model::leaveBattle()
 
 void Model::sayBattle(std::string const & msg)
 {
-    std::ostringstream oss;
-    oss << "SAYBATTLE " << msg;
-    controller_.send(oss.str());
+    if (!msg.empty())
+    {
+        std::ostringstream oss;
+        oss << "SAYBATTLE " << msg;
+        controller_.send(oss.str());
+    }
 }
 
 void Model::sayPrivate(std::string const & userName, std::string const & msg)
 {
-    if (userName.empty() || msg.empty())
+    if (userName.empty())
     {
-        LOG(WARNING)<< "userName.empty():"<< userName.empty() << " msg.empty():"<< msg.empty();
+        LOG(WARNING)<< "userName.empty()";
+        return;
+    }
+    if (msg.empty())
+    {
+        // ignore empty messages
         return;
     }
     std::ostringstream oss;

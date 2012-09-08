@@ -66,7 +66,13 @@ int PrivateChatTab::handle(int event)
 
 void PrivateChatTab::onInput(std::string const & text)
 {
-    model_.sayPrivate(userName_, text);
+    std::vector<std::string> lines;
+    boost::algorithm::split(lines, text, boost::is_any_of("\n"));
+
+    for (auto const & line : lines)
+    {
+        model_.sayPrivate(userName_, line);
+    }
 }
 
 void PrivateChatTab::say(std::string const & userName, std::string const & msg)
