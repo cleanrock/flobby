@@ -85,7 +85,12 @@ public:
     std::unique_ptr<uint8_t[]> getMapImage(std::string const & mapName, int mipLevel); // returns RGB data, mipLevel: 0->1024x1024, 1->512x512 ...
     std::unique_ptr<uint8_t[]> getMetalMap(std::string const & mapName, int & w, int & h); // returns single component data
     std::unique_ptr<uint8_t[]> getHeightMap(std::string const & mapName, int & w, int & h); // returns single component data
-    bool downloadMap(std::string const & mapName); // returns true if download attempt is done
+
+    enum DownloadType { DT_MAP, DT_GAME };
+    bool download(std::string const & name, DownloadType type); // returns true if download attempt is done
+
+    // mod
+    bool gameExist(std::string const & gameName);
 
     void refresh(); // to find new mods and maps
 

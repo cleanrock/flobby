@@ -63,8 +63,9 @@ private:
     bool lastRunning_;
 
     Fl_Group * top_;
-
+    Fl_Group * header_;
     Fl_Multiline_Output * headerText_;
+    Fl_Button * downloadGameBtn_;
     Fl_Check_Button * specBtn_;
     Fl_Check_Button * readyBtn_;
     Fl_Choice * teamBtn_;
@@ -89,6 +90,7 @@ private:
     static void onStart(Fl_Widget* w, void* data);
     static void onLeave(Fl_Widget* w, void* data);
     static void onMapImage(Fl_Widget* w, void* data);
+    static void onDownloadGame(Fl_Widget* w, void* data);
 
     void close(); // call when user (me) left the battle
 
@@ -99,6 +101,9 @@ private:
     StringTableRow makeRow(User const & user);
     StringTableRow makeRow(Bot const & bot);
     void handleOnMapImage();
+    void handleOnDownloadGame();
+    void hideDownloadGameButton();
+    void showDownloadGameButton();
 
     void playerClicked(int rowIndex, int button);
     void playerDoubleClicked(int rowIndex, int button);

@@ -196,10 +196,10 @@ void Test::testUser()
         User u1(ss1);
 
         std::stringstream ss2("name1 SE 0");
-        User u2(ss1);
+        User u2(ss2);
 
         std::stringstream ss3("name2 SE 0");
-        User u3(ss2);
+        User u3(ss3);
 
         CPPUNIT_ASSERT(u1 == u2);
         CPPUNIT_ASSERT(u1 != u3);

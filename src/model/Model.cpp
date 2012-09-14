@@ -721,6 +721,11 @@ void Model::sendMyInitialBattleStatus(Battle const & battle)
     sendMyBattleStatus();
 }
 
+bool Model::gameExist(std::string const & gameName)
+{
+    return (unitSync_->GetPrimaryModChecksumFromName( gameName.c_str()) != 0 );
+}
+
 int Model::calcSync(Battle const & battle)
 {
     int const modChecksum = unitSync_->GetPrimaryModChecksumFromName( battle.modName().c_str() );
@@ -1578,16 +1583,39 @@ void Model::ring(std::string const & userName)
 
 }
 
-bool Model::downloadMap(std::string const & mapName)
+bool Model::download(std::string const & name, DownloadType type)
 {
-    // start pr-downloader if its not running
-    if (downloaderId_ == 0)
+    if (name.empty())
     {
-        downloadName_ = mapName;
-        std::ostringstream oss;
-        oss << "pr-downloader --download-map \"" << mapName << "\"";
-        downloaderId_ = controller_.startProcess(oss.str(), true);
-        return true;
+        LOG(ERROR)<< "download name empty";
+        return false;
     }
-    return false;
+
+    // only start pr-downloader if its not running
+    if (downloaderId_ != 0)
+    {
+        LOG(WARNING)<< "downloader already running (" << downloadName_ << ")";
+        return false;
+    }
+
+    downloadName_ = name;
+    std::ostringstream oss;
+    oss << "pr-downloader ";
+    switch (type)
+    {
+    case DT_MAP:
+        oss << "--download-map ";
+        break;
+
+    case DT_GAME:
+        oss << "--download-game ";
+        break;
+
+    default:
+        LOG(ERROR)<< "unknown DownloadType:"<< type;
+        return false;
+    }
+    oss << "\"" << name << "\"";
+    downloaderId_ = controller_.startProcess(oss.str(), true);
+    return true;
 }

@@ -1,6 +1,4 @@
-process done callback should include at least process return code
+handle FORCEQUITBATTLE
 extractSentence shall accept "" ?
-try to fix TinySkirmish map image
-show ai info in add ai dialog
 alt+# shortcuts for tabs ?
 quick find in StringTable, e.g. press C key to show first entry beginning with a C

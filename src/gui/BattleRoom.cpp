@@ -43,8 +43,16 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
     int const rightW = 256; // 2 times image width
 
     int const headerTextW = w-rightW;
+    header_ = new Fl_Group(x, y, headerTextW, headerH);
+
     headerText_ = new Fl_Multiline_Output(x, y, headerTextW, headerH);
     headerText_->box(FL_FLAT_BOX);
+
+    downloadGameBtn_ = new Fl_Button(0, 0, 2*headerH, headerH);
+    downloadGameBtn_->callback(BattleRoom::onDownloadGame, this);
+    header_->resizable(headerText_);
+    header_->end();
+    hideDownloadGameButton();
 
     // right side (buttons, map image and info, settings)
     //
@@ -194,6 +202,11 @@ void BattleRoom::joined(Battle const & battle)
     activate();
 
     setHeaderText(battle);
+    if ( !model_.gameExist(battle.modName()) )
+    {
+        showDownloadGameButton();
+    }
+
     setMapImage(battle);
 
     lastRunning_ = battle.running();
@@ -325,6 +338,7 @@ void BattleRoom::close()
     mapInfo_->value(0);
 
     headerText_->value("");
+    hideDownloadGameButton();
 
     playerList_->clear();
     startBtn_->deactivate();
@@ -466,6 +480,12 @@ void BattleRoom::onMapImage(Fl_Widget* w, void* data)
     o->handleOnMapImage();
 }
 
+void BattleRoom::onDownloadGame(Fl_Widget* w, void* data)
+{
+    BattleRoom * o = static_cast<BattleRoom*>(data);
+    o->handleOnDownloadGame();
+}
+
 void BattleRoom::botAdded(Bot const & bot)
 {
     playerList_->addRow(makeRow(bot));
@@ -491,7 +511,7 @@ void BattleRoom::setHeaderText(Battle const & battle)
     std::ostringstream oss;
     oss << battle.title() << " / " << battle.founder() << "\n"
         << battle.mapName() << "\n"
-        << battle.modName() << "\n";
+        << battle.modName();
     headerText_->value(oss.str().c_str());
 }
 
@@ -500,6 +520,16 @@ void BattleRoom::refresh()
     if (battleId_ != -1)
     {
         Battle const & b = model_.getBattle(battleId_);
+
+        if (model_.gameExist(b.modName()))
+        {
+            hideDownloadGameButton();
+        }
+        else
+        {
+            showDownloadGameButton();
+        }
+
         setMapImage(b);
     }
 }
@@ -620,7 +650,7 @@ void BattleRoom::handleOnMapImage()
             {
                 case FL_LEFT_MOUSE: // start download or display minimap
                 {
-                    if (mapImageBox_->image() == 0 && model_.downloadMap(mapName))
+                    if (mapImageBox_->image() == 0 && model_.download(mapName, Model::DT_MAP))
                     {
                         mapImageBox_->label("downloading...");
                         mapImageBox_->deactivate();
@@ -676,4 +706,47 @@ void BattleRoom::handleOnMapImage()
             }
             break;
     }
+}
+
+void BattleRoom::handleOnDownloadGame()
+{
+    if (battleId_ == -1)
+    {
+        LOG(WARNING)<< "battleId_ == -1";
+        return;
+    }
+
+    std::string const gameName = model_.getBattle(battleId_).modName();
+    if (gameName.empty())
+    {
+        LOG(WARNING)<< "gameName empty";
+        return;
+    }
+
+    if (model_.download(gameName, Model::DT_GAME))
+    {
+        downloadGameBtn_->label("Downloading\nGame...");
+        downloadGameBtn_->deactivate();
+        if (mapImageBox_->image() == 0)
+        {
+            mapImageBox_->deactivate();
+        }
+    }
+}
+
+void BattleRoom::hideDownloadGameButton()
+{
+    headerText_->size(header_->w(), header_->h());
+    downloadGameBtn_->hide();
+    header_->init_sizes();
+}
+
+void BattleRoom::showDownloadGameButton()
+{
+    headerText_->size(header_->w() - 2*header_->h(), header_->h());
+    downloadGameBtn_->resize(header_->x() + headerText_->w(), header_->y(), 2*header_->h(), header_->h());
+    downloadGameBtn_->label("Download\nGame");
+    downloadGameBtn_->show();
+    downloadGameBtn_->activate();
+    header_->init_sizes();
 }

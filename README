@@ -5,35 +5,28 @@ Dependencies worth noting:
 FLTK 1.3
 boost
 C++11 (gcc 4.6 should be ok)
-pr-downloader (runtime optional, https://github.com/abma/pr-downloader)
+spring (http://springrts.com)
 
 Build and run:
-cmake .
-make
-src/flobby
+$ cmake .
+$ make -j4
+$ src/flobby
 
-Build and install in ~/opt:
-cmake -DCMAKE_INSTALL_PREFIX=/home/<username>/opt .
-make && make install
-
+Build and install stripped binary in home directory:
+$ cmake -DCMAKE_INSTALL_PREFIX=/home/<username>/opt . 
+$ make -j4 install/strip
 
 Files and directories:
-
 ~/.fltk/cleanrock/flobby.prefs
     flobby settings, delete this file to reset all settings to default 
-
 ~/.spring/flobby/cache/
     map cache files (images and map info)
-
 ~/.spring/flobby/log/
     logs of all chats, logging to files can be disabled in flobby
-
 ~/.spring/flobby_script.txt
     spring script file, written on spring launch
-
 ~/.spring/flobby_process_pr-downloader.log
     pr-downloader output
-
 /tmp/flobby.log
     flobby debug log, path can be changed in flobby
         
