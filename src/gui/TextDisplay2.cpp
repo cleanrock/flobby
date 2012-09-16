@@ -4,6 +4,7 @@
 
 #include <FL/filename.H>
 #include <FL/Fl.H>
+#include <boost/algorithm/string.hpp>
 #include <sstream>
 #include <cstring>
 #include <ctime>
@@ -54,6 +55,11 @@ void TextDisplay2::append(std::string const & text, bool interesting)
     }
     else
     {
+        // copy text and transform newlines
+        std::string text2 = text;
+        boost::replace_all(text2, "\r", ""); //  remove CR first
+        boost::replace_all(text2, "\\n", "\n");
+
         // time stamp
         char buf[16];
         std::time_t t = std::time(0);
@@ -61,7 +67,7 @@ void TextDisplay2::append(std::string const & text, bool interesting)
         std::strftime(buf, 16, "%H:%M ", &tm);
 
         std::ostringstream oss;
-        oss << buf << text << '\n';
+        oss << buf << text2 << '\n';
         std::string const line = oss.str();
 
         text_->append(line.c_str());
@@ -71,7 +77,7 @@ void TextDisplay2::append(std::string const & text, bool interesting)
         style_->append(styleTime.c_str());
 
         // style for rest (text + newline)
-        std::string const styleText(text.size(), interesting ? 'B' : 'C');
+        std::string const styleText(text2.size(), interesting ? 'B' : 'C');
         style_->append(styleText.c_str());
         style_->append("\n");
     }
