@@ -82,8 +82,9 @@ void TextDisplay2::append(std::string const & text, bool interesting)
         style_->append("\n");
     }
 
-    // limit text buffer size
-    while (text_->length() > 10000)
+    // limit text buffer size, raise limit if we are scrolled up
+    int const maxLength = 20000*(scrollToBottom ? 1 : 10);
+    while (text_->length() > maxLength)
     {
         int const posNewline = text_->line_end(0);
         text_->remove(0, posNewline+1);

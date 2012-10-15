@@ -1,3 +1,4 @@
+popup menu on private chat tab shall show "join battle" 
 handle FORCEQUITBATTLE
 extractSentence shall accept "" ?
 alt+# shortcuts for tabs ?
