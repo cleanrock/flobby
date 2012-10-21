@@ -38,14 +38,7 @@ TextDisplay2::~TextDisplay2()
 void TextDisplay2::append(std::string const & text, bool interesting)
 {
     // scroll to bottom if last line is visible
-    bool scrollToBottom = false;
-    {
-        int line;
-        if (position_to_line(insert_position(), &line) != 0)
-        {
-            scrollToBottom = true;
-        }
-    }
+    bool const scrollToBottom = !(mLastChar < text_->length());
 
     // if string is empty we just add one empty line
     if (text.empty())
@@ -91,10 +84,9 @@ void TextDisplay2::append(std::string const & text, bool interesting)
         style_->remove(0, posNewline+1);
     }
 
-    insert_position(text_->length());
     if (scrollToBottom)
     {
-        show_insert_position();
+        scroll(text_->length(), 0);
     }
 }
 
