@@ -712,6 +712,7 @@ void Model::sendMyInitialBattleStatus(Battle const & battle)
     }
     ubs.allyTeam(allyTeam);
 
+    ubs.ready(true);
     ubs.sync(calcSync(battle));
 
     // update myself

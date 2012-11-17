@@ -1,20 +1,16 @@
 flobby is a spring (http://springrts.com) lobby client written in C++.
-It is developed and tested on archlinux.
+flobby is developed and tested on archlinux.
 
 Dependencies worth noting:
 FLTK 1.3
 boost
-C++11 (gcc 4.6 should be ok)
+C++11 (gcc 4.6 should be enough)
 spring (http://springrts.com)
 
 Build and run:
 $ cmake .
 $ make -j4
 $ src/flobby
-
-Build and install stripped binary in home directory:
-$ cmake -DCMAKE_INSTALL_PREFIX=/home/<username>/opt . 
-$ make -j4 install/strip
 
 Files and directories:
 ~/.fltk/cleanrock/flobby.prefs

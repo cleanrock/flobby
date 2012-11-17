@@ -1,5 +1,10 @@
+don't disable battle room side completely
+auto-complete user in battle/channel chat
+highlight lines of interest in battle/channel chat
 popup menu on private chat tab shall show "join battle" 
 handle FORCEQUITBATTLE
-extractSentence shall accept "" ?
-alt+# shortcuts for tabs ?
 quick find in StringTable, e.g. press C key to show first entry beginning with a C
+? adjust wheel scoll lines
+? battle preview (lower left) do not show host in player list, count host as a player
+? extractSentence shall accept ""
+? alt+# shortcuts for tabs

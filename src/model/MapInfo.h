@@ -9,7 +9,17 @@ class UnitSync;
 class MapInfo
 {
 public:
-    MapInfo() {};
+    MapInfo():
+        checksum_(0),
+        width_(0),
+        height_(0),
+        tidalStrength_(0),
+        windMin_(0),
+        windMax_(0),
+        gravity_(0),
+        resourceCount_(0),
+        startPosCount_(0)
+    {};
 
     std::string name_;
     std::string fileName_;

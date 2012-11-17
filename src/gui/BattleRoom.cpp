@@ -245,17 +245,22 @@ void BattleRoom::battleChanged(const Battle & battle)
         }
         setHeaderText(battle);
 
-        User const & me = model_.me();
-        if (battle.running() && me.battleStatus().sync() == 1 && !me.status().inGame())
+        if (battle.running())
         {
-            if (lastRunning_ == false)
+            User const & me = model_.me();
+            UserBattleStatus const& ubs = me.battleStatus();
+            if (ubs.sync() == 1 && !me.status().inGame())
             {
-                model_.startSpring();
-                startBtn_->deactivate();
-            }
-            else
-            {
-                startBtn_->activate();
+                // start spring if game started, except if we are spectator and not ready
+                if ( lastRunning_ == false && ( !ubs.spectator() || (ubs.spectator() && ubs.ready()) ) )
+                {
+                    model_.startSpring();
+                    startBtn_->deactivate();
+                }
+                else
+                {
+                    startBtn_->activate();
+                }
             }
         }
         else
