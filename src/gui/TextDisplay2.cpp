@@ -92,10 +92,10 @@ void TextDisplay2::append(std::string const & text, bool interesting)
 
 int TextDisplay2::handle(int event)
 {
-    // make mouse wheel scroll in bigger steps
-    if (event == FL_MOUSEWHEEL)
+    // make mouse wheel scroll in bigger steps if shift is down
+    if (event == FL_MOUSEWHEEL && Fl::event_shift())
     {
-        Fl::e_dy *= 5;
+        Fl::e_dy *= 3;
     }
 
     switch (event)

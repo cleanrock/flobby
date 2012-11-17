@@ -48,6 +48,9 @@ StringTable::StringTable(int x, int y, int w, int h, std::string const & name, s
     // setup sorting
     prefs_.get(PrefSortCol, sort_lastcol_, 0);
     prefs_.get(PrefSortReverse, sort_reverse_, 0);
+
+    // adjust linesize
+    vscrollbar->linesize(col_header_height()+2);
 }
 
 StringTable::~StringTable()
@@ -261,10 +264,14 @@ int StringTable::handle(int event)
     // calc rows per page, a bit ugly but good enough
     int const rowsPerPage = (h() - col_header_height()) / col_header_height();
 
-    // make mousewheel scroll half a page
+    // make mousewheel scroll 3 lines, 9 lines if shift is down
     if (event == FL_MOUSEWHEEL)
     {
-        Fl::e_dy *= std::max(1, rowsPerPage/2);
+        Fl::e_dy *= 3;
+        if (Fl::event_shift())
+        {
+            Fl::e_dy *= 3;
+        }
     }
 
     switch (event)
