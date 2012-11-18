@@ -29,6 +29,7 @@ BattleChat::BattleChat(int x, int y, int w, int h, Model & model):
 
     input_ = new ChatInput(x, y+h-ih, w, ih);
     input_->connectText( boost::bind(&BattleChat::onText, this, _1) );
+    input_->deactivate();
 
     resizable(textDisplay_);
     end();
@@ -111,6 +112,8 @@ void BattleChat::close()
 
     // add empty line
     addInfo("");
+
+    input_->deactivate();
 }
 
 void BattleChat::onText(std::string const & text)
@@ -139,4 +142,6 @@ void BattleChat::addInfo(std::string const & msg)
 void BattleChat::battleJoined(Battle const & battle)
 {
     battleHost_ = battle.founder();
+
+    input_->activate();
 }

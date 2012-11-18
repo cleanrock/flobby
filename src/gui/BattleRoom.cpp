@@ -123,7 +123,7 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
 
 
     end();
-    deactivate();
+    top_->deactivate();
 
     addBotDialog_ = new AddBotDialog(model);
 
@@ -199,7 +199,7 @@ void BattleRoom::joined(Battle const & battle)
     founder_ = battle.founder();
 
     playerList_->clear();
-    activate();
+    top_->activate();
 
     setHeaderText(battle);
     if ( !model_.gameExist(battle.modName()) )
@@ -352,7 +352,7 @@ void BattleRoom::close()
 
     settings_->clear();
 
-    deactivate();
+    top_->deactivate();
 }
 
 std::string BattleRoom::statusString(User const & user)
