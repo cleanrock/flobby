@@ -7,6 +7,7 @@
 #include "ChatSettingsDialog.h"
 
 #include "model/Model.h"
+#include "log/Log.h"
 
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Tile.H>
@@ -154,33 +155,116 @@ int Tabs::handle(int event)
 
         if (chat != 0 && chat != logUsersTab_)
         {
-            if (Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks())
+            // private chat
+            for (auto & pair : privateChatTabs_)
             {
-                if (closeChat(chat))
+                if (pair.second == chat && handlePrivateChatClick(pair.second))
                 {
                     return 1;
                 }
             }
-            else if (Fl::event_button() == FL_RIGHT_MOUSE && Fl::event_clicks() == 0)
-            {
-                PopupMenu menu;
-                menu.add("Close (Leave)", 1);
-                int const id = menu.show();
-                switch (id)
-                {
-                case 1:
-                    if (closeChat(chat))
-                    {
-                        return 1;
-                    }
-                    break;
-                }
 
+            // channel chat
+            for (auto & pair : channelChatTabs_)
+            {
+                if (pair.second == chat && handleChannelChatClick(pair.second))
+                {
+                    return 1;
+                }
             }
+
         }
     }
 
     return Fl_Tabs::handle(event);
+}
+
+int Tabs::handlePrivateChatClick(PrivateChatTab* pc)
+{
+    int handled = 0;
+    if (Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks())
+    {
+        closeTab(pc);
+        handled = 1;
+    }
+    else if (Fl::event_button() == FL_RIGHT_MOUSE && Fl::event_clicks() == 0)
+    {
+        PopupMenu menu;
+        menu.add("Close", 1);
+
+        // add join battle
+        int battleId;
+        try {
+            User const& user = model_.getUser(pc->userName()); // throws if user not online
+
+            Battle const * battle = user.joinedBattle();
+            if (battle) {
+                battleId = battle->id();
+                std::string joinText = "Join " + battle->title();
+                menu.add(joinText, 2);
+            }
+        }
+        catch (std::invalid_argument const & e) {
+            LOG(DEBUG)<< e.what();
+        }
+
+        int const id = menu.show();
+        switch (id)
+        {
+        case 1:
+            closeTab(pc);
+            handled = 1;
+            break;
+
+        case 2:
+            try {
+                Battle const & battle = model_.getBattle(battleId); // throws if battle do not exist
+                if (battle.passworded()) {
+                    char const * password = fl_input("Enter battle password");
+                    if (password != NULL) {
+                        model_.joinBattle(battleId, password);
+                    }
+                }
+                else {
+                    model_.joinBattle(battleId);
+                }
+            }
+            catch (std::invalid_argument const & e) {
+                LOG(WARNING)<< e.what();
+            }
+            handled = 1;
+            break;
+        }
+    }
+
+    return handled;
+}
+
+int Tabs::handleChannelChatClick(ChannelChatTab* cc)
+{
+    int handled = 0;
+    if (Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks())
+    {
+        cc->leave();
+        closeTab(cc);
+        handled = 1;
+    }
+    else if (Fl::event_button() == FL_RIGHT_MOUSE && Fl::event_clicks() == 0)
+    {
+        PopupMenu menu;
+        menu.add("Leave", 1);
+        int const id = menu.show();
+        switch (id)
+        {
+        case 1:
+            cc->leave();
+            closeTab(cc);
+            handled = 1;
+            break;
+        }
+    }
+
+    return handled;
 }
 
 void Tabs::draw()
@@ -190,6 +274,13 @@ void Tabs::draw()
     fl_rectf(x(), y(), w(), logUsersTab_->y() - y());
 
     Fl_Tabs::draw();
+}
+
+void Tabs::closeTab(Fl_Widget* w)
+{
+    remove(w);
+    w->hide();
+    redraw();
 }
 
 bool Tabs::closeChat(Fl_Widget* w)

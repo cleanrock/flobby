@@ -49,5 +49,8 @@ private:
     void redrawTabs();
 
     int handle(int event);
+    int handlePrivateChatClick(PrivateChatTab* pc);
+    int handleChannelChatClick(ChannelChatTab* cc);
+    void closeTab(Fl_Widget* w);
     void draw();
 };

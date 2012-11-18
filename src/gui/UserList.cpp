@@ -130,7 +130,7 @@ void UserList::userClicked(int rowIndex, int button)
                         model_.joinBattle(battleId);
                     }
                 }
-                catch (std::runtime_error const & e)
+                catch (std::invalid_argument const & e)
                 {
                     LOG(WARNING)<< e.what();
                     return;

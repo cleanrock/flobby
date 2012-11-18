@@ -265,7 +265,7 @@ const Battle & Model::getBattle(int battleId)
     auto it = battles_.find(battleId);
     if (it == battles_.end())
     {
-        throw std::runtime_error("battle not found:" + boost::lexical_cast<std::string>(battleId));
+        throw std::invalid_argument("battle not found:" + boost::lexical_cast<std::string>(battleId));
     }
     return *it->second;
 }

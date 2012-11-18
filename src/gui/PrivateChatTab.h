@@ -20,6 +20,8 @@ public:
                 ITabs& iTabs, Model & model, ChatSettingsDialog & chatSettingsDialog);
     virtual ~PrivateChatTab();
 
+    std::string const& userName() const { return userName_; }
+
 private:
     std::string userName_;
     ITabs & iTabs_;
