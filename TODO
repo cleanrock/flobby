@@ -1,4 +1,3 @@
-show user joined/left battle in private chat
 auto-complete user in battle/channel chat, also match name after [.*]
 improve text highlighting in battle/channel chat, e.g. message to user 
 popup menu on private chat tab shall show "join battle" 

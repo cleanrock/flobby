@@ -8,6 +8,7 @@
 class Model;
 class ITabs;
 class User;
+class Battle;
 class TextDisplay2;
 class ChatInput;
 class ChatSettingsDialog;
@@ -40,4 +41,6 @@ private:
     void said(std::string const & userName, std::string const & msg); // msg from other
     void userJoined(User const & user);
     void userLeft(User const & user);
+    void userJoinedBattle(User const & user, Battle const & battle);
+    void userLeftBattle(User const & user, Battle const & battle);
 };

@@ -45,6 +45,9 @@ PrivateChatTab::PrivateChatTab(int x, int y, int w, int h, std::string const & u
     model_.connectUserJoined( boost::bind(&PrivateChatTab::userJoined, this, _1) );
     model_.connectUserLeft( boost::bind(&PrivateChatTab::userLeft, this, _1) );
 
+    model_.connectUserJoinedBattle( boost::bind(&PrivateChatTab::userJoinedBattle, this, _1, _2) );
+    model_.connectUserLeftBattle( boost::bind(&PrivateChatTab::userLeftBattle, this, _1, _2) );
+
     Fl::focus(input_);
 }
 
@@ -125,6 +128,22 @@ void PrivateChatTab::userLeft(User const & user)
     if (user.name() == userName_)
     {
         append(userName_ + " left server");
+    }
+}
+
+void PrivateChatTab::userJoinedBattle(User const & user, Battle const & battle)
+{
+    if (user.name() == userName_)
+    {
+        append(userName_ + " joined " + battle.title());
+    }
+}
+
+void PrivateChatTab::userLeftBattle(User const & user, Battle const & battle)
+{
+    if (user.name() == userName_)
+    {
+        append(userName_ + " left " + battle.title());
     }
 }
 
