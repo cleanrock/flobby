@@ -3,6 +3,7 @@ flobby is developed and tested on archlinux.
 
 Dependencies worth noting:
 FLTK 1.3
+libxpm (libxpm-dev when building on ubuntu)
 boost
 C++11 (gcc 4.6 should be enough)
 spring (http://springrts.com)
