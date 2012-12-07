@@ -166,7 +166,8 @@ void ChannelChatTab::said(std::string const & channelName, std::string const & u
 {
     if (channelName == channelName_)
     {
-        append(userName + ": " + message, true);
+        bool const interesting = ( userName != model_.me().name() );
+        append(userName + ": " + message, interesting);
     }
 }
 
