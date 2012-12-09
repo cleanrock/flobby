@@ -1,4 +1,5 @@
 implement away status
+single player game
 make sure popup-menu can handle invalid chars (e.g / to avoid extra sub-menu)
 auto-complete user in battle/channel chat, also match name after ^[.*]
 improve text highlighting in battle/channel chat, e.g. message to "me" 

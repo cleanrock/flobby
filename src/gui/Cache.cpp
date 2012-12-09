@@ -1,8 +1,9 @@
 #include "Cache.h"
-#include "MyImage.h"
 
 #include "log/Log.h"
 #include "model/Model.h"
+
+#include <Magick++.h>
 
 #include <sstream> // ostringstream
 #include <fstream>
@@ -40,7 +41,7 @@ Fl_Shared_Image * Cache::getMapImage(std::string const & mapName)
     }
 
     std::ostringstream oss;
-    oss << basePath() << mapName << "_" << chksum << "_minimap_128.bin";
+    oss << basePath() << mapName << "_" << chksum << "_minimap_128.png";
     std::string const path = oss.str();
 
     Fl_Shared_Image * image = Fl_Shared_Image::get(path.c_str());
@@ -79,7 +80,7 @@ Fl_Shared_Image * Cache::getMetalImage(std::string const & mapName)
     }
 
     std::ostringstream oss;
-    oss << basePath() << mapName << "_" << chksum << "_metal_128.bin";
+    oss << basePath() << mapName << "_" << chksum << "_metal_128.png";
     std::string const path = oss.str();
 
     Fl_Shared_Image * image = Fl_Shared_Image::get(path.c_str());
@@ -120,7 +121,7 @@ Fl_Shared_Image * Cache::getHeightImage(std::string const & mapName)
     }
 
     std::ostringstream oss;
-    oss << basePath() << mapName << "_" << chksum << "_height_128.bin";
+    oss << basePath() << mapName << "_" << chksum << "_height_128.png";
     std::string const path = oss.str();
 
     Fl_Shared_Image * image = Fl_Shared_Image::get(path.c_str());
@@ -145,10 +146,11 @@ Fl_Shared_Image * Cache::getHeightImage(std::string const & mapName)
 
 void Cache::createImageFile(uint8_t const * data, int w, int h, int d, std::string const & path, double r /* w/h */)
 {
-    assert(w > 0 && h > 0 && d > 0 && d <= 3 && r > 0);
+    assert(w > 0 && h > 0 && (d == 1 || d == 3) && r > 0);
 
-    // create first image, we will resize it below
-    Fl_RGB_Image * im1 = new Fl_RGB_Image(data, w, h, d);
+    // create image, we will resize it below
+    Magick::Image image;
+    image.read(w, h, d == 1 ? "I" : "RGB", MagickCore::CharPixel, data);
 
     double const r2 = static_cast<double>(w)/h * r;
 
@@ -166,13 +168,13 @@ void Cache::createImageFile(uint8_t const * data, int w, int h, int d, std::stri
     }
     assert(w2 > 0 && h2 > 0);
 
-    // create a copy with correct dimensions
-    Fl_RGB_Image * im2 = static_cast<Fl_RGB_Image *>(im1->copy(w2, h2));
-
-    MyImage::write(path, im2->array, w2, h2, d);
-
-    delete im1;
-    delete im2;
+    // resize and write
+    Magick::Geometry geom(w2, h2);
+    geom.aspect(true);
+    // TODO remove ? default filter seem good
+    // image.filterType(Magick::BoxFilter);
+    image.resize(geom);
+    image.write(path);
 }
 
 MapInfo const & Cache::getMapInfo(std::string const & mapName)

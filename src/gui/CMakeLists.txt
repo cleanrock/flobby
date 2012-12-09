@@ -4,9 +4,11 @@ set(FLTK_SKIP_FORMS true)
 set(FLTK_SKIP_FLUID true)
 find_package(FLTK REQUIRED)
 
+find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
 
 include_directories (
     ${FLTK_INCLUDE_DIR}
+    ${ImageMagick_Magick++_INCLUDE_DIR}
 )
 
 add_library (gui STATIC
@@ -20,7 +22,6 @@ add_library (gui STATIC
     ChannelChatTab.cpp
     Cache.cpp
     LoginDialog.cpp
-    MyImage.cpp
     Prefs.cpp
     StringTable.cpp
     TextDisplay2.cpp
@@ -48,6 +49,7 @@ add_library (gui STATIC
 
 target_link_libraries (gui
     ${FLTK_LIBRARIES}
+    ${ImageMagick_Magick++_LIBRARY}
     boost_regex
 #    fontconfig
 #    Xft

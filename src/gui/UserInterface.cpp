@@ -9,7 +9,6 @@
 #include "BattleInfo.h"
 #include "BattleRoom.h"
 #include "Prefs.h"
-#include "MyImage.h"
 #include "Cache.h"
 #include "Tabs.h"
 #include "TextDialog.h"
@@ -132,10 +131,6 @@ UserInterface::UserInterface(Model & model) :
     model.connectLoginResult( boost::bind(&UserInterface::loginResult, this, _1, _2) );
     model.connectJoinBattleFailed( boost::bind(&UserInterface::joinBattleFailed, this, _1) );
     model.connectDownloadDone( boost::bind(&UserInterface::downloadDone, this, _1, _2) );
-
-    MyImage::registerHandler();
-
-// TODO   sound_.reset(new Sound());
 }
 
 UserInterface::~UserInterface()
