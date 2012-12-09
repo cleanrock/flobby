@@ -151,6 +151,7 @@ void Cache::createImageFile(uint8_t const * data, int w, int h, int d, std::stri
     // create image, we will resize it below
     Magick::Image image;
     image.read(w, h, d == 1 ? "I" : "RGB", MagickCore::CharPixel, data);
+    image.depth(8);
 
     double const r2 = static_cast<double>(w)/h * r;
 
