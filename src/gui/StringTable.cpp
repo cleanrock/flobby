@@ -264,20 +264,20 @@ int StringTable::handle(int event)
     // calc rows per page, a bit ugly but good enough
     int const rowsPerPage = (h() - col_header_height()) / col_header_height();
 
-    // make mousewheel scroll 3 lines, 9 lines if shift is down
-    if (event == FL_MOUSEWHEEL)
-    {
-        Fl::e_dy *= 3;
-        if (Fl::event_shift())
-        {
-            Fl::e_dy *= 3;
-        }
-    }
-
     switch (event)
     {
-        case FL_FOCUS:
+        case FL_MOUSEWHEEL:
+        {
+            // make mouse wheel scroll 3 lines, 9 lines if shift is down
+            Fl::e_dy *= 3;
+            if (Fl::event_shift())
+            {
+                Fl::e_dy *= 3;
+            }
+            // avoid sending wheel event to other widgets
+            Fl_Table_Row::handle(event);
             return 1;
+        }
 
         case FL_KEYDOWN:
         {
@@ -356,6 +356,8 @@ void StringTable::event_callback2()
     int row = callback_row();
     int col = callback_col();
     TableContext context = callback_context();
+
+    take_focus();
 
     switch (context)
     {
