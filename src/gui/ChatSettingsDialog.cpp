@@ -127,7 +127,7 @@ void ChatSettingsDialog::setCurrentSettings()
         std::vector<std::string> words;
         std::string const text = channelChatBeepExceptions_->value();
         ba::split( words, text, ba::is_any_of("\n "), ba::token_compress_on );
-        std::remove_if(words.begin(), words.end(), std::mem_fun_ref(&std::string::empty));
+        words.erase( std::remove_if(words.begin(), words.end(), std::mem_fun_ref(&std::string::empty)), words.end() );
         channelChatSettings_.beepExceptions = words;
 
     }
@@ -139,7 +139,7 @@ void ChatSettingsDialog::setCurrentSettings()
         std::vector<std::string> words;
         std::string const text = privateChatBeepExceptions_->value();
         ba::split( words, text, ba::is_any_of("\n "), ba::token_compress_on );
-        std::remove_if(words.begin(), words.end(), std::mem_fun_ref(&std::string::empty));
+        words.erase( std::remove_if(words.begin(), words.end(), std::mem_fun_ref(&std::string::empty)), words.end() );
         privateChatSettings_.beepExceptions = words;
     }
 

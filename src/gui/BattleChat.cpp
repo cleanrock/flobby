@@ -118,19 +118,11 @@ void BattleChat::close()
 
 void BattleChat::onText(std::string const & text)
 {
-    std::vector<std::string> lines;
-    boost::algorithm::split(lines, text, boost::is_any_of("\n"));
-
-    for (auto const & line : lines)
-    {
-        model_.sayBattle(line);
-    }
+    model_.sayBattle(text);
 }
 
 void BattleChat::addInfo(std::string const & msg)
 {
-    std::ostringstream oss;
-
     if (!msg.empty())
     {
         logFile_.log(msg);

@@ -25,7 +25,6 @@ void ChatInput::callbackText(Fl_Widget * w, void * data)
 void ChatInput::onText()
 {
     std::string msg(value());
-    boost::trim(msg);
     if (!msg.empty())
     {
         if (history_.empty() || msg != history_.front()) // avoid adding duplicates
@@ -37,7 +36,19 @@ void ChatInput::onText()
             }
         }
         pos_ = -1;
-        textSignal_(msg);
+
+        // split into multiple messages if newlines
+        std::vector<std::string> lines;
+        boost::algorithm::split(lines, msg, boost::is_any_of("\n"));
+        for (auto& line : lines)
+        {
+            boost::replace_all(line, "\r", ""); //  remove all '\r'
+            boost::replace_all(line, "\t", "    "); // replace tabs with four spaces
+            if (!line.empty())
+            {
+                textSignal_(line);
+            }
+        }
     }
 
     value(0);

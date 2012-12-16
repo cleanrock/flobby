@@ -183,7 +183,6 @@ void BattleRoom::setMapImage(Battle const & battle)
     else
     {
         mapImageBox_->image(0);
-        std::ostringstream oss;
         mapImageBox_->label("click to\ndownload map");
         mapImageBox_->activate();
 
