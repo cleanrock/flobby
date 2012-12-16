@@ -1,3 +1,4 @@
+fix pasting TABs in chat
 implement away status
 single player game
 make sure popup-menu can handle invalid chars (e.g / to avoid extra sub-menu)

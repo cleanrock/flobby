@@ -273,7 +273,31 @@ bool BattleList::passesFilter(Battle const & battle)
 {
     if (battle.players() < filterPlayers_) return false;
 
-    if (!filterGame_.empty() && boost::algorithm::ifind_first(battle.modName(), filterGame_).empty()) return false;
+    if (!filterGame_.empty())
+    {
+        std::vector<std::string> games;
+        boost::algorithm::split(games, filterGame_, boost::is_any_of(","));
+
+        int matches = 0;
+        for (auto& game : games)
+        {
+            boost::trim(game);
+
+            if (game.empty())
+            {
+                // ignore empty game filters
+                matches += 1;
+            }
+            else if ( !boost::algorithm::ifind_first(battle.modName(), game).empty() )
+            {
+                matches += 1;
+            }
+        }
+        if (matches == 0)
+        {
+            return false;
+        }
+    }
 
     return true;
 }
