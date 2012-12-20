@@ -1,4 +1,6 @@
 #include "PopupMenu.h"
+
+#include <boost/algorithm/string.hpp>
 #include <cassert>
 #include <cstdint>
 
@@ -15,7 +17,17 @@ PopupMenu::~PopupMenu()
 void PopupMenu::add(std::string const & text, int id)
 {
     assert(id > 0);
-    menu_.add(text.c_str(), 0, 0, reinterpret_cast<void*>(static_cast<intptr_t>(id)) );
+
+    // escape label special chars
+    std::string text2(text);
+    if (!text2.empty() && text2[0] == '_')
+    {
+        text2.insert(0, "\\");
+    }
+    boost::replace_all(text2, "&", "\\&");
+    boost::replace_all(text2, "/", "\\/");
+
+    menu_.add(text2.c_str(), 0, 0, reinterpret_cast<void*>(static_cast<intptr_t>(id)) );
 }
 
 int PopupMenu::show()
