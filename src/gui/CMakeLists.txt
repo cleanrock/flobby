@@ -51,7 +51,6 @@ add_library (gui STATIC
 target_link_libraries (gui
     ${FLTK_LIBRARIES}
     ${ImageMagick_Magick++_LIBRARY}
-    boost_regex
 #    fontconfig
 #    Xft
 #    Xinerama

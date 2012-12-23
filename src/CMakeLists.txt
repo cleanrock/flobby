@@ -15,10 +15,12 @@ target_link_libraries (flobby
     gui
     model
     log
+    boost_regex
+    boost_chrono
     boost_signals
     boost_thread
-    boost_system
     boost_filesystem
+    boost_system
     pthread
 ) 
 

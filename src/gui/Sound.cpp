@@ -1,15 +1,16 @@
 #include "Sound.h"
 
+#include <boost/chrono.hpp>
 #include <cstdlib>
 
 bool Sound::enable_ = true;
 std::string Sound::command_;
 
-std::chrono::time_point<std::chrono::steady_clock> Sound::timeLast_ = std::chrono::steady_clock::now();
+static boost::chrono::time_point<boost::chrono::steady_clock> timeLast_ = boost::chrono::steady_clock::now();
 
 void Sound::beep(char const * command)
 {
-    using namespace std::chrono;
+    using namespace boost::chrono;
 
     if (enable_ || command)
     {
