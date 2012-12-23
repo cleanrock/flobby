@@ -20,6 +20,7 @@
 #include "model/Model.h"
 
 #include <X11/xpm.h>
+#include <X11/extensions/scrnsaver.h>
 #include <FL/x.H>
 #include "icon.xpm.h"
 
@@ -46,6 +47,9 @@ static char const * PrefAppWindowSplitH = "AppWindowSplitH";
 static char const * PrefLeftSplitV = "LeftSplitV";
 static char const * PrefAutoJoinChannels = "AutoJoinChannels";
 
+
+static XScreenSaverInfo* xScreenSaverInfo = 0;
+
 UserInterface::UserInterface(Model & model) :
     model_(model),
     cache_(model_)
@@ -66,6 +70,7 @@ UserInterface::UserInterface(Model & model) :
     mainWindow_->callback(UserInterface::mainWindowCallback);
 
     loadAppIcon();
+    xScreenSaverInfo = XScreenSaverAllocInfo();
 
     Fl_Menu_Item menuitems[] = {
         { "&Server",              0, 0, 0, FL_SUBMENU },
@@ -366,6 +371,7 @@ void UserInterface::connected(bool connected)
         enableMenuItem(UserInterface::menuChannels, false);
         enableMenuItem(UserInterface::menuRenameAccount, false);
         channelsWindow_->hide();
+        Fl::remove_timeout(checkAway);
     }
 }
 
@@ -382,6 +388,8 @@ void UserInterface::loginResult(bool success, std::string const & info)
         prefs.get(PrefAutoJoinChannels, val, "");
         autoJoinChannels(val);
         ::free(val);
+
+        checkAway(this);
     }
 }
 
@@ -577,4 +585,24 @@ void UserInterface::quit()
 {
     channelsWindow_->hide();
     mainWindow_->hide();
+}
+
+void UserInterface::checkAway(void* d)
+{
+    if (fl_display && xScreenSaverInfo)
+    {
+        XScreenSaverQueryInfo(fl_display, DefaultRootWindow(fl_display), xScreenSaverInfo);
+        UserInterface* ui = static_cast<UserInterface*>(d);
+
+        if (xScreenSaverInfo->idle > 5*60*1000)
+        {
+            Fl::add_timeout(2.0, checkAway, d);
+            ui->model_.meAway(true);
+        }
+        else
+        {
+            Fl::add_timeout(10.0, checkAway, d);
+            ui->model_.meAway(false);
+        }
+    }
 }

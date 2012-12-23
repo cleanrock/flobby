@@ -6,6 +6,8 @@ find_package(FLTK REQUIRED)
 
 find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
 
+find_package(X11 COMPONENTS X11_Xpm_LIB X11_Xscreensaver_LIB REQUIRED)
+
 include_directories (
     ${FLTK_INCLUDE_DIR}
     ${ImageMagick_Magick++_INCLUDE_DIR}
@@ -51,13 +53,6 @@ add_library (gui STATIC
 target_link_libraries (gui
     ${FLTK_LIBRARIES}
     ${ImageMagick_Magick++_LIBRARY}
-#    fontconfig
-#    Xft
-#    Xinerama
-    Xpm
-#    png
-#    SDL
-#    SDL_mixer
-#    alut
-#    openal
+    ${X11_Xpm_LIB}
+    ${X11_Xscreensaver_LIB}
 )

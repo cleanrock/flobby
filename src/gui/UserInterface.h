@@ -97,6 +97,7 @@ private:
     static void menuChannelsAutoJoin(Fl_Widget *w, void* d);
     static void menuChatSettings(Fl_Widget *w, void* d);
     static void menuSoundSettings(Fl_Widget *w, void* d);
+    static void checkAway(void* d);
 
     void enableMenuItem(void(*cb)(Fl_Widget*, void*), bool enable);
 

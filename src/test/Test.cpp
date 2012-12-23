@@ -66,6 +66,17 @@ void Test::testUserStatus()
         CPPUNIT_ASSERT(!us.bot());
     }
 
+    // test set away
+    {
+        UserStatus us;
+        us.away(true);
+        CPPUNIT_ASSERT(!us.inGame());
+        CPPUNIT_ASSERT(us.away());
+        CPPUNIT_ASSERT(us.rank() == 0);
+        CPPUNIT_ASSERT(!us.moderator());
+        CPPUNIT_ASSERT(!us.bot());
+    }
+
     // test exception is thrown on bad input to ctor
     {
         CPPUNIT_ASSERT_THROW(UserStatus us(""), boost::bad_lexical_cast);

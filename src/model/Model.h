@@ -74,6 +74,7 @@ public:
     void meSpec(bool spec);
     void meReady(bool ready);
     void meAllyTeam(int allyTeam);
+    void meAway(bool away);
 
     std::string const & getWriteableDataDir() const;
 

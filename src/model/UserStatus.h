@@ -12,6 +12,7 @@ public:
     bool inGame() const;
     void inGame(bool inGame);
     bool away() const;
+    void away(bool away);
     int rank() const;
     bool moderator() const;
     bool bot() const;

@@ -29,7 +29,17 @@ bool UserStatus::away() const
     return (val_ & 0x2); // bit 1
 }
 
-
+void UserStatus::away(bool away)
+{
+    if (away)
+    {
+        val_ |= 0x2;
+    }
+    else
+    {
+        val_ &= ~0x2;
+    }
+}
 
 int UserStatus::rank() const
 {

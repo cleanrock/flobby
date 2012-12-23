@@ -363,6 +363,21 @@ void Model::meInGame(bool inGame)
     controller_.send(oss.str());
 }
 
+void Model::meAway(bool away)
+{
+    User & u = me();
+    UserStatus us = u.status();
+    if (us.away() != away)
+    {
+        us.away(away);
+        u.status(us);
+
+        std::ostringstream oss;
+        oss << "MYSTATUS " << us;
+        controller_.send(oss.str());
+    }
+}
+
 void Model::processServerMsg(const std::string & msg)
 {
     std::istringstream iss(msg);
