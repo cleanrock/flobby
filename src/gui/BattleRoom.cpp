@@ -360,6 +360,7 @@ std::string BattleRoom::statusString(User const & user)
     oss << (user.battleStatus().spectator() ? "S" : "")
         << (user.status().inGame() ? "G" : "")
         << (user.battleStatus().ready() ? "R" : "")
+        << (user.status().away() ? "A" : "")
         << (user.name() == founder_ ? "H" : "");
     return oss.str();
 }

@@ -50,6 +50,7 @@ std::string UserList::statusString(User const & user)
     oss << (user.status().bot() ? "B" : "");
     oss << (user.joinedBattle() != 0 ? "J" : "");
     oss << (user.status().inGame() ? "G" : "");
+    oss << (user.status().away() ? "A" : "");
     return oss.str();
 }
 
