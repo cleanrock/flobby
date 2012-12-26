@@ -526,10 +526,7 @@ void UserInterface::reloadMapsMods()
 
 void UserInterface::downloadDone(std::string const & name, bool success)
 {
-    if (success)
-    {
-        reloadMapsMods();
-    }
+    reloadMapsMods();
 }
 
 void UserInterface::autoJoinChannels(std::string const & text)
