@@ -110,7 +110,6 @@ int LogUsersTab::handle(int event)
     switch (event)
     {
     case FL_SHOW:
-        labelcolor(FL_BLACK);
         Fl::focus(userList_);
         break;
     }

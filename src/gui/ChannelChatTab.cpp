@@ -76,7 +76,6 @@ int ChannelChatTab::handle(int event)
     switch (event)
     {
     case FL_SHOW:
-        labelcolor(FL_BLACK);
         Fl::focus(input_);
         break;
     }

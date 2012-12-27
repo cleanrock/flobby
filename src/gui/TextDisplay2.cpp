@@ -11,9 +11,9 @@
 
 static Fl_Text_Display::Style_Table_Entry styles[] =
 {
-    {  FL_DARK2, FL_COURIER, 10 }, // A - time
-    {  FL_FOREGROUND_COLOR, FL_HELVETICA, 12 }, // B - normal
-    {  FL_DARK2, FL_HELVETICA, 12 }, // C - grey
+    {  FL_FOREGROUND_COLOR, FL_COURIER, 10 }, // A - time
+    {  FL_FOREGROUND_COLOR, FL_HELVETICA_BOLD, 12 }, // B - normal
+    {  FL_FOREGROUND_COLOR, FL_HELVETICA, 12 }, // C - less interesting
 };
 
 TextDisplay2::TextDisplay2(int x, int y, int w, int h, char const * label):

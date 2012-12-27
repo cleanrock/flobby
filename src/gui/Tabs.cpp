@@ -27,7 +27,7 @@ Tabs::Tabs(int x, int y, int w, int h, Model & model):
     model_(model),
     chatSettingsDialog_(0)
 {
-    selection_color(FL_LIGHT2);
+    selection_color(FL_BACKGROUND2_COLOR);
 
     client_area(x,y,w,h);
     logUsersTab_ = new LogUsersTab(x,y,w,h, *this, model_);

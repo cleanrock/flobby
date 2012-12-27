@@ -27,8 +27,7 @@ StringTable::StringTable(int x, int y, int w, int h, std::string const & name, s
 
     cols((int)headers_.size());
 
-    color(FL_WHITE);
-    selection_color(FL_YELLOW);
+    color(FL_BACKGROUND2_COLOR);
     col_header(1);
     col_resize(1);
     col_resize_min(10);
@@ -104,19 +103,13 @@ void StringTable::draw_sort_arrow(int X,int Y,int W,int H,int sort) {
     int ytop = Y+(H/2)-4;
     int ybot = Y+(H/2)+4;
     if ( sort_reverse_ ) {
-        // Engraved down arrow
-        fl_color(FL_WHITE);
-        fl_line(xrit, ytop, xctr, ybot);
-        fl_color(41);                   // dark gray
-        fl_line(xlft, ytop, xrit, ytop);
-        fl_line(xlft, ytop, xctr, ybot);
+        // down arrow
+        fl_color(active_r() ? FL_FOREGROUND_COLOR : FL_INACTIVE_COLOR);
+        fl_polygon(xlft, ytop, xctr, ybot, xrit, ytop);
     } else {
-        // Engraved up arrow
-        fl_color(FL_WHITE);
-        fl_line(xrit, ybot, xctr, ytop);
-        fl_line(xrit, ybot, xlft, ybot);
-        fl_color(41);                   // dark gray
-        fl_line(xlft, ybot, xctr, ytop);
+        // up arrow
+        fl_color(active_r() ? FL_FOREGROUND_COLOR : FL_INACTIVE_COLOR);
+        fl_polygon(xlft, ybot, xrit, ybot, xctr, ytop);
     }
 }
 
@@ -130,8 +123,7 @@ void StringTable::draw_cell(TableContext context, int R, int C, int X, int Y, in
             fl_push_clip(X,Y,W,H); {
                 fl_draw_box(FL_THIN_UP_BOX, X,Y,W,H, FL_BACKGROUND_COLOR);
                 if ( C < 9 ) {
-                    fl_font(FL_HELVETICA_BOLD, 12);
-                    fl_color(active_r() ? FL_BLACK : FL_INACTIVE_COLOR);
+                    fl_color(active_r() ? FL_FOREGROUND_COLOR : FL_INACTIVE_COLOR);
                     fl_draw(headers_[C].c_str(), X+2,Y,W,H, FL_ALIGN_LEFT, 0, 0);         // +2=pad left
                     // Draw sort arrow
                     if ( C == sort_lastcol_ ) {
@@ -144,12 +136,13 @@ void StringTable::draw_cell(TableContext context, int R, int C, int X, int Y, in
         case CONTEXT_CELL: {
             fl_push_clip(X,Y,W,H); {
                 // Bg color
-                Fl_Color bgcolor = (selectedRow_ == R) ? selection_color() : FL_WHITE;
+                Fl_Color bgcolor = (selectedRow_ == R) ? selection_color() : FL_BACKGROUND2_COLOR;
                 fl_color(bgcolor); fl_rectf(X,Y,W,H); 
-                fl_font(FL_HELVETICA, 12);
-                fl_color(FL_BLACK); fl_draw(s, X+2,Y,W,H, FL_ALIGN_LEFT);     // +2=pad left
-                // Border
-                fl_color(FL_LIGHT2); fl_line(X,Y+H-1, X+W, Y+H-1); // fl_rect(X,Y,W,H);
+                fl_color(active_r() ? FL_FOREGROUND_COLOR : FL_INACTIVE_COLOR);
+                fl_draw(s, X+2,Y,W,H, FL_ALIGN_LEFT);     // +2=pad left
+                // line below text
+                fl_color(FL_BACKGROUND_COLOR);
+                fl_line(X,Y+H-1, X+W, Y+H-1); // fl_rect(X,Y,W,H);
             }
             fl_pop_clip();
             return;
