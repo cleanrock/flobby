@@ -124,6 +124,7 @@ void StringTable::draw_cell(TableContext context, int R, int C, int X, int Y, in
             fl_push_clip(X,Y,W,H); {
                 fl_draw_box(FL_THIN_UP_BOX, X,Y,W,H, FL_BACKGROUND_COLOR);
                 if ( C < 9 ) {
+                    fl_font(FL_HELVETICA, FL_NORMAL_SIZE);
                     fl_color(active_r() ? FL_FOREGROUND_COLOR : FL_INACTIVE_COLOR);
                     fl_draw(headers_[C].c_str(), X+2,Y,W,H, FL_ALIGN_LEFT, 0, 0);         // +2=pad left
                     // Draw sort arrow
@@ -139,6 +140,7 @@ void StringTable::draw_cell(TableContext context, int R, int C, int X, int Y, in
                 // Bg color
                 Fl_Color bgcolor = (selectedRow_ == R) ? selection_color() : FL_BACKGROUND2_COLOR;
                 fl_color(bgcolor); fl_rectf(X,Y,W,H); 
+                fl_font(FL_HELVETICA, FL_NORMAL_SIZE);
                 fl_color(active_r() ? FL_FOREGROUND_COLOR : FL_INACTIVE_COLOR);
                 fl_draw(s, X+2,Y,W,H, FL_ALIGN_LEFT);     // +2=pad left
                 // line below text
