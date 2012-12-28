@@ -21,6 +21,7 @@ TextDisplay2::TextDisplay2(int x, int y, int w, int h, char const * label):
 {
     textsize(12);
 
+    box(FL_THIN_DOWN_BOX);
     text_ = new Fl_Text_Buffer();
     buffer(text_);
 

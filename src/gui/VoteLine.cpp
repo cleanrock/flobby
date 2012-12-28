@@ -18,12 +18,12 @@ VoteLine::VoteLine(int x, int y, int w, int h, Model & model):
 //    votesNo_(0),
 //    votesTotal_(0)
 {
-    box(FL_FLAT_BOX);
+    box(FL_NO_BOX);
 
     int const btnWidth = 30;
 
     text_ = new Fl_Box(x, y, w-2*btnWidth, h);
-    text_->box(FL_FLAT_BOX);
+    text_->box(FL_THIN_DOWN_BOX);
     text_->align(FL_ALIGN_INSIDE | FL_ALIGN_LEFT);
 
     yes_ = new Fl_Button(x + w - 2*btnWidth, y, btnWidth, h, "Yes");

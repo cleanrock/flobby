@@ -62,7 +62,7 @@ UserInterface::UserInterface(Model & model) :
     int const W = 1000;
     int const leftW = 400;
     int const rightW = 600; // hack to avoid problem with headertext in battle room
-    int const mH = 24;
+    int const mH = 20;
     int const cH = H-mH;
 
     mainWindow_ = new Fl_Double_Window(W, H, "flobby");
@@ -100,6 +100,7 @@ UserInterface::UserInterface(Model & model) :
     };
 
     menuBar_ = new Fl_Menu_Bar(0, 0, W, mH);
+    menuBar_->box(FL_FLAT_BOX);
     menuBar_->copy(menuitems);
 
     tile_ = new Fl_Tile(0, mH, W, cH);

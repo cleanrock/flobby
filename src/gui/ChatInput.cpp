@@ -10,10 +10,9 @@ ChatInput::ChatInput(int x, int y, int w, int h, size_t historySize):
     historySize_(historySize),
     pos_(-1)
 {
-
+    box(FL_THIN_DOWN_BOX);
     callback(ChatInput::callbackText, this);
     when(FL_WHEN_ENTER_KEY);
-
 }
 
 void ChatInput::callbackText(Fl_Widget * w, void * data)

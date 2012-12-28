@@ -22,6 +22,7 @@ StringTable::StringTable(int x, int y, int w, int h, std::string const & name, s
     savePrefs_(savePrefs)
 {
     labeltype(FL_NO_LABEL);
+    box(FL_THIN_DOWN_FRAME);
     end();
     callback(event_callback, (void*)this);
 

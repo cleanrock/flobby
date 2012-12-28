@@ -46,7 +46,7 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
     header_ = new Fl_Group(x, y, headerTextW, headerH);
 
     headerText_ = new Fl_Multiline_Output(x, y, headerTextW, headerH);
-    headerText_->box(FL_FLAT_BOX);
+    headerText_->box(FL_THIN_DOWN_BOX);
 
     downloadGameBtn_ = new Fl_Button(0, 0, 2*headerH, headerH);
     downloadGameBtn_->callback(BattleRoom::onDownloadGame, this);

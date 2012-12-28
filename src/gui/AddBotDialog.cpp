@@ -17,7 +17,6 @@ AddBotDialog::AddBotDialog(Model & model):
     set_modal();
 
     list_ = new Fl_Hold_Browser(0, 0, 200, 340);
-    list_->selection_color(FL_YELLOW);
     list_->callback(AddBotDialog::callbackList, this);
 
     buf_ = new Fl_Text_Buffer();

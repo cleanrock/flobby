@@ -29,7 +29,7 @@ BattleInfo::BattleInfo(int x, int y, int w, int h, Model & model, Cache & cache)
 
     x += 128;
     headerText_ = new Fl_Multiline_Output(x, y, w-h, h);
-    headerText_->box(FL_FLAT_BOX);
+    headerText_->box(FL_THIN_DOWN_BOX);
     headerText_->wrap(1);
 
     resizable(headerText_);
