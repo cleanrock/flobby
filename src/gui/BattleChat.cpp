@@ -51,6 +51,13 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
 
     int interest = 0;
 
+    std::string const& myName = model_.me().name();
+
+    if (userName == myName)
+    {
+        interest = -1;
+    }
+
     // handle messages from host
     if (userName == battleHost_)
     {
@@ -63,6 +70,10 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
         if (inGameMessage(msg, inGameUserName, inGameMsg))
         {
             oss << inGameUserName << ": " << inGameMsg;
+            if (inGameUserName == myName)
+            {
+                interest = -1;
+            }
         }
         else
         {
@@ -77,7 +88,6 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
 
     if (interest == 0)
     {
-        std::string const& myName = model_.me().name();
         if (msg.find(myName) != std::string::npos)
         {
             interest = 1;

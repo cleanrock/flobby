@@ -1,3 +1,4 @@
+make it possible to configure font size (12 atm) 
 commands in all chat windows
 single player game
 auto-complete user in battle/channel chat, also match name after ^[.*]
