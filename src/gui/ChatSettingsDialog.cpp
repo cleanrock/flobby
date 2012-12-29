@@ -1,11 +1,15 @@
 #include "ChatSettingsDialog.h"
+#include "TextDisplay2.h"
 #include "Prefs.h"
 
 #include "log/Log.h"
 
+#include <FL/Fl_Box.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Multiline_Input.H>
+#include <FL/Fl_Color_Chooser.H>
 #include <FL/Fl_Return_Button.H>
+#include <FL/Fl.H>
 #include <boost/algorithm/string.hpp>
 
 // Prefs
@@ -15,8 +19,13 @@ static char const * const PrefChannelChatBeepExceptions = "ChannelChatBeepExcept
 static char const * const PrefPrivateChatBeep = "PrivateChatBeep";
 static char const * const PrefPrivateChatBeepExceptions = "PrivateChatBeepExceptions";
 
+static char const * const PrefTimeColor = "TimeColor";
+static char const * const PrefLowInterestColor = "LowInterestColor";
+static char const * const PrefNormalInterestColor = "NormalInterestColor";
+static char const * const PrefHighInterestColor = "HighInterestColor";
+
 ChatSettingsDialog::ChatSettingsDialog():
-    Fl_Window(400, 400, "Chat settings")
+    Fl_Window(800, 400, "Chat settings")
 {
     set_modal();
 
@@ -32,7 +41,42 @@ ChatSettingsDialog::ChatSettingsDialog():
     privateChatBeepExceptions_ = new Fl_Multiline_Input(10, 220, 380, 50, "Private chat beep exceptions (user names)");
     privateChatBeepExceptions_->align(FL_ALIGN_TOP_LEFT);
 
-    Fl_Return_Button * btn = new Fl_Return_Button(300, 360, 90, 30, "Apply");
+    {
+        int index;
+        int y = 30;
+
+        index = TextDisplay2::STYLE_TIME;
+        setTextColor_[index] = new Fl_Button(410, y, 200, 30, "Set Time color ...");
+        textColor_[index] = new Fl_Box(FL_BORDER_BOX, 620, y, 30, 30, 0);
+        setTextColor_[index]->callback(ChatSettingsDialog::callbackTimeColor, this);
+        y += 40;
+
+        index = TextDisplay2::STYLE_LOW;
+        setTextColor_[index] = new Fl_Button(410, y, 200, 30, "Set Low Interest color ...");
+        textColor_[index] = new Fl_Box(FL_BORDER_BOX, 620, y, 30, 30, 0);
+        setTextColor_[index]->callback(ChatSettingsDialog::callbackLowColor, this);
+        y += 40;
+
+        index = TextDisplay2::STYLE_NORMAL;
+        setTextColor_[index] = new Fl_Button(410, y, 200, 30, "Set Normal Interest color ...");
+        textColor_[index] = new Fl_Box(FL_BORDER_BOX, 620, y, 30, 30, 0);
+        setTextColor_[index]->callback(ChatSettingsDialog::callbackNormalColor, this);
+        y += 40;
+
+        index = TextDisplay2::STYLE_HIGH;
+        setTextColor_[index] = new Fl_Button(410, y, 200, 30, "Set High Interest color ...");
+        textColor_[index] = new Fl_Box(FL_BORDER_BOX, 620, y, 30, 30, 0);
+        setTextColor_[index]->callback(ChatSettingsDialog::callbackHighColor, this);
+        y += 40;
+
+        y += 20;
+        chatSample_ = new TextDisplay2(410, y, 380, 65, "Chat sample (FLTK will force black or white if contrast is low)");
+        chatSample_->append("Low Interest", -1);
+        chatSample_->append("Normal Interest", 0);
+        chatSample_->append("High Interest", 1);
+    }
+
+    Fl_Return_Button * btn = new Fl_Return_Button(700, 360, 90, 30, "Apply");
     btn->callback(ChatSettingsDialog::callbackApply, this);
 
     end();
@@ -80,6 +124,21 @@ void ChatSettingsDialog::loadPrefs()
         ::free(text);
     }
 
+    // chat text color
+    {
+        prefs.get(PrefTimeColor, val, FL_INACTIVE_COLOR);
+        textColor_[TextDisplay2::STYLE_TIME]->color(val);
+
+        prefs.get(PrefLowInterestColor, val, FL_INACTIVE_COLOR);
+        textColor_[TextDisplay2::STYLE_LOW]->color(val);
+
+        prefs.get(PrefNormalInterestColor, val, FL_FOREGROUND_COLOR);
+        textColor_[TextDisplay2::STYLE_NORMAL]->color(val);
+
+        prefs.get(PrefHighInterestColor, val, FL_FOREGROUND_COLOR);
+        textColor_[TextDisplay2::STYLE_HIGH]->color(val);
+    }
+
     setCurrentSettings();
 }
 
@@ -106,7 +165,14 @@ void ChatSettingsDialog::savePrefs()
 
         std::string const beepExceptions(privateChatBeepExceptions_->value());
         prefs.set(PrefPrivateChatBeepExceptions, beepExceptions.c_str());
+    }
 
+    // chat text color
+    {
+        prefs.set(PrefTimeColor, static_cast<int>(textColor_[TextDisplay2::STYLE_TIME]->color()) );
+        prefs.set(PrefLowInterestColor, static_cast<int>(textColor_[TextDisplay2::STYLE_LOW]->color()) );
+        prefs.set(PrefNormalInterestColor, static_cast<int>(textColor_[TextDisplay2::STYLE_NORMAL]->color()) );
+        prefs.set(PrefHighInterestColor, static_cast<int>(textColor_[TextDisplay2::STYLE_HIGH]->color()) );
     }
 
     setCurrentSettings();
@@ -143,6 +209,48 @@ void ChatSettingsDialog::setCurrentSettings()
         privateChatSettings_.beepExceptions = words;
     }
 
+    // chat text color
+    for (int i=0; i<TextDisplay2::STYLE_COUNT; ++i)
+    {
+        TextDisplay2::textStyles_[i].color = textColor_[i]->color();
+    }
+}
+
+void ChatSettingsDialog::selectColor(std::string const& title, int index)
+{
+    uchar r,g,b;
+    Fl::get_color(TextDisplay2::textStyles_[index].color, r,g,b);
+    if (fl_color_chooser(title.c_str(), r, g, b))
+    {
+        Fl_Color color = fl_rgb_color(r, g, b);
+        TextDisplay2::textStyles_[index].color = color;
+        textColor_[index]->color(color);
+        Fl::redraw();
+    }
+}
+
+void ChatSettingsDialog::callbackTimeColor(Fl_Widget* w, void *data)
+{
+    ChatSettingsDialog * o = static_cast<ChatSettingsDialog*>(data);
+    o->selectColor("Time", TextDisplay2::STYLE_TIME);
+}
+
+void ChatSettingsDialog::callbackLowColor(Fl_Widget* w, void *data)
+{
+    ChatSettingsDialog * o = static_cast<ChatSettingsDialog*>(data);
+    o->selectColor("Low", TextDisplay2::STYLE_LOW);
+}
+
+void ChatSettingsDialog::callbackNormalColor(Fl_Widget* w, void *data)
+{
+    ChatSettingsDialog * o = static_cast<ChatSettingsDialog*>(data);
+    o->selectColor("Normal", TextDisplay2::STYLE_NORMAL);
+}
+
+void ChatSettingsDialog::callbackHighColor(Fl_Widget* w, void *data)
+{
+    ChatSettingsDialog * o = static_cast<ChatSettingsDialog*>(data);
+    o->selectColor("High", TextDisplay2::STYLE_HIGH);
 }
 
 void ChatSettingsDialog::callbackApply(Fl_Widget*, void *data)

@@ -9,11 +9,12 @@
 #include <cstring>
 #include <ctime>
 
-static Fl_Text_Display::Style_Table_Entry styles[] =
+Fl_Text_Display::Style_Table_Entry TextDisplay2::textStyles_[] =
 {
-    {  FL_FOREGROUND_COLOR, FL_COURIER, 10 }, // A - time
-    {  FL_FOREGROUND_COLOR, FL_HELVETICA_BOLD, 12 }, // B - normal
-    {  FL_FOREGROUND_COLOR, FL_HELVETICA, 12 }, // C - less interesting
+    {  FL_FOREGROUND_COLOR, FL_COURIER, 10 },   // A - time
+    {  FL_FOREGROUND_COLOR, FL_HELVETICA, 12 }, // B - low interest
+    {  FL_FOREGROUND_COLOR, FL_HELVETICA, 12 }, // C - normal interest
+    {  FL_FOREGROUND_COLOR, FL_HELVETICA, 12 }, // D - high interest
 };
 
 TextDisplay2::TextDisplay2(int x, int y, int w, int h, char const * label):
@@ -21,13 +22,14 @@ TextDisplay2::TextDisplay2(int x, int y, int w, int h, char const * label):
 {
     textsize(12);
 
+    align(FL_ALIGN_TOP_LEFT);
     box(FL_THIN_DOWN_BOX);
     text_ = new Fl_Text_Buffer();
     buffer(text_);
 
     style_ = new Fl_Text_Buffer();
-    int style_size = sizeof(styles)/sizeof(styles[0]);
-    highlight_data(style_, styles, style_size, 'A', 0, 0);
+    int style_size = sizeof(textStyles_)/sizeof(textStyles_[0]);
+    highlight_data(style_, textStyles_, style_size, 'A', 0, 0);
 
     wrap_mode(WRAP_AT_BOUNDS, 0);
 }
@@ -36,7 +38,7 @@ TextDisplay2::~TextDisplay2()
 {
 }
 
-void TextDisplay2::append(std::string const & text, bool interesting)
+void TextDisplay2::append(std::string const & text, int interest)
 {
     // scroll to bottom if last line is visible
     bool const scrollToBottom = !(mLastChar < text_->length());
@@ -71,7 +73,7 @@ void TextDisplay2::append(std::string const & text, bool interesting)
         style_->append(styleTime.c_str());
 
         // style for rest (text + newline)
-        std::string const styleText(text2.size(), interesting ? 'B' : 'C');
+        std::string const styleText(text2.size(), interest < 0 ? 'B' : (interest > 0 ? 'D' : 'C') );
         style_->append(styleText.c_str());
         style_->append("\n");
     }

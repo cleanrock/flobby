@@ -3,6 +3,7 @@
 #include "TextDisplay2.h"
 #include "ChatInput.h"
 #include "VoteLine.h"
+#include "Sound.h"
 
 #include "model/Model.h"
 
@@ -48,7 +49,7 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
 
     std::ostringstream oss;
 
-    bool interesting = true;
+    int interest = 0;
 
     // handle messages from host
     if (userName == battleHost_)
@@ -66,15 +67,26 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
         else
         {
             oss << userName << ": " << msg;
-            interesting = false;
+            interest = -1;
         }
     }
     else
     {
         oss << userName << ": " << msg;
     }
-    textDisplay_->append(oss.str(), interesting);
 
+    if (interest == 0)
+    {
+        std::string const& myName = model_.me().name();
+        if (msg.find(myName) != std::string::npos)
+        {
+            interest = 1;
+            Sound::beep();
+        }
+
+    }
+
+    textDisplay_->append(oss.str(), interest);
 }
 
 bool BattleChat::inGameMessage(std::string const & msg, std::string & userNameOut, std::string & msgOut)
@@ -128,7 +140,7 @@ void BattleChat::addInfo(std::string const & msg)
         logFile_.log(msg);
     }
 
-    textDisplay_->append(msg, false);
+    textDisplay_->append(msg, -1);
 }
 
 void BattleChat::battleJoined(Battle const & battle)

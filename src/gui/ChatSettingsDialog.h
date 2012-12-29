@@ -1,12 +1,16 @@
 #pragma once
 
+#include "TextDisplay2.h"
+
 #include <FL/Fl_Window.H>
 #include <boost/signals2.hpp>
 #include <vector>
 #include <string>
 
+class Fl_Button;
 class Fl_Check_Button;
 class Fl_Multiline_Input;
+class Fl_Box;
 
 struct ChannelChatSettings
 {
@@ -47,6 +51,15 @@ private:
 
     ChannelChatSettings channelChatSettings_;
     PrivateChatSettings privateChatSettings_;
+
+    Fl_Button* setTextColor_[TextDisplay2::STYLE_COUNT];
+    Fl_Box* textColor_[TextDisplay2::STYLE_COUNT];
+    TextDisplay2* chatSample_;
+    void selectColor(std::string const& title, int index);
+    static void callbackTimeColor(Fl_Widget* w, void* d);
+    static void callbackLowColor(Fl_Widget* w, void* d);
+    static void callbackNormalColor(Fl_Widget* w, void* d);
+    static void callbackHighColor(Fl_Widget* w, void* d);
 
     static void callbackApply(Fl_Widget*, void*);
 

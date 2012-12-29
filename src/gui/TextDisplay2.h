@@ -11,7 +11,16 @@ public:
     TextDisplay2(int x, int y, int w, int h, char const * label = 0);
     virtual ~TextDisplay2();
 
-    void append(std::string const & text, bool interesting = true); // prepends with time stamp and adds newline at end
+    void append(std::string const & text, int interest = 0); // prepends with time stamp and adds newline at end
+
+    enum {
+        STYLE_TIME = 0,
+        STYLE_LOW,
+        STYLE_NORMAL,
+        STYLE_HIGH,
+        STYLE_COUNT
+    };
+    static Fl_Text_Display::Style_Table_Entry textStyles_[];
 
 private:
     Fl_Text_Buffer * text_;

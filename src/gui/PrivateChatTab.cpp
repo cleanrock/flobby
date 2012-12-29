@@ -145,7 +145,7 @@ void PrivateChatTab::append(std::string const & msg, bool interesting)
 {
     logFile_.log(msg);
 
-    text_->append(msg, interesting);
+    text_->append(msg, interesting ? 0 : -1);
 
     // make Tabs redraw header
     if (interesting && !visible() && labelcolor() != FL_RED)

@@ -105,7 +105,7 @@ void ChannelChatTab::message(std::string const & channelName, std::string const 
 {
     if (channelName == channelName_)
     {
-        append(message, true);
+        append(message, 0);
     }
 }
 
@@ -160,38 +160,48 @@ void ChannelChatTab::said(std::string const & channelName, std::string const & u
 {
     if (channelName == channelName_)
     {
-        bool const interesting = ( userName != model_.me().name() );
-        append(userName + ": " + message, interesting);
+        int interest = 0;
+        std::string const& myName = model_.me().name();
+        if (userName == myName)
+        {
+            interest = -1;
+        }
+        else if (message.find(myName) != std::string::npos)
+        {
+            interest = 1;
+        }
+
+        append(userName + ": " + message, interest);
     }
 }
 
 void ChannelChatTab::leave()
 {
     model_.leaveChannel(channelName_);
-    text_->append("", false); // add empty line when leaving
+    text_->append("", -1); // add empty line when leaving
     userList_->clear();
 }
 
-void ChannelChatTab::append(std::string const & msg, bool interesting)
+void ChannelChatTab::append(std::string const & msg, int interest)
 {
     if (msg.empty())
     {
-        text_->append(msg, false);
+        text_->append(msg, -1);
         return;
     }
 
     logFile_.log(msg);
 
-    text_->append(msg, interesting);
+    text_->append(msg, interest);
 
     // make ChatTabs redraw header
-    if (interesting && !visible() && labelcolor() != FL_RED)
+    if (interest >= 0 && !visible() && labelcolor() != FL_RED)
     {
         labelcolor(FL_RED);
         iTabs_.redrawTabs();
     }
 
-    if (interesting && beep_)
+    if ((interest == 0 && beep_) || interest > 0)
     {
         Sound::beep();
     }

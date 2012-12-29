@@ -36,7 +36,7 @@ private:
 
     void onInput(std::string const & text);
     int handle(int event);
-    void append(std::string const & msg, bool interesting = false);
+    void append(std::string const & msg, int interest = -1);
 
     void initChatSettings();
 

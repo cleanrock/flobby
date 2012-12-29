@@ -121,7 +121,7 @@ void LogUsersTab::append(std::string const & msg, bool interesting)
 {
     logFile_.log(msg);
 
-    text_->append(msg);
+    text_->append(msg, 0);
     // make ChatTabs redraw header
     if (interesting && !visible() && labelcolor() != FL_RED)
     {
