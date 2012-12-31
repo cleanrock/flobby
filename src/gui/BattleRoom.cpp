@@ -18,6 +18,7 @@
 #include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Tile.H>
+#include <FL/Fl_Shared_Image.H>
 #include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
 #include <boost/format.hpp>

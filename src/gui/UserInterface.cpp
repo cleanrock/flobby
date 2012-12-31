@@ -1,4 +1,5 @@
 #include "UserInterface.h"
+#include "LogFile.h"
 #include "LoginDialog.h"
 #include "RegisterDialog.h"
 #include "AgreementDialog.h"
@@ -31,6 +32,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/fl_ask.H>
 #include <FL/Fl_Native_File_Chooser.H>
+#include <FL/Fl_Shared_Image.H>
 
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
@@ -52,7 +54,7 @@ static XScreenSaverInfo* xScreenSaverInfo = 0;
 
 UserInterface::UserInterface(Model & model) :
     model_(model),
-    cache_(model_)
+    cache_(new Cache(model_))
 {
     FL_NORMAL_SIZE = 12; // TODO ??
 
@@ -107,10 +109,10 @@ UserInterface::UserInterface(Model & model) :
 
     tileLeft_ = new Fl_Tile(0, mH, leftW, cH);
     tabs_ = new Tabs(0, mH, leftW, cH/2, model_);
-    battleList_ = new BattleList(0, mH+cH/2, leftW, cH/2, model_, cache_);
+    battleList_ = new BattleList(0, mH+cH/2, leftW, cH/2, model_, *cache_);
     tileLeft_->end();
 
-    battleRoom_ = new BattleRoom(leftW, mH, rightW, cH, model_, cache_, *tabs_);
+    battleRoom_ = new BattleRoom(leftW, mH, rightW, cH, model_, *cache_, *tabs_);
 
     tile_->end();
 
@@ -154,6 +156,27 @@ UserInterface::~UserInterface()
     delete mainWindow_;
 
     model_.disconnect();
+}
+
+void UserInterface::setupLogging()
+{
+    int logDebug;
+    prefs.get(PrefLogDebug, logDebug, 0);
+
+    char * logFilePath; // freed below
+    prefs.get(PrefLogFilePath, logFilePath, "/tmp/flobby.log");
+
+    if (logDebug != 0)
+    {
+        Log::minSeverity(DEBUG);
+    }
+    Log::logFile(logFilePath);
+
+    ::free(logFilePath);
+
+    int logChats;
+    prefs.get(PrefLogChats, logChats, 1);
+    LogFile::enable(logChats == 1 ? true : false);
 }
 
 int UserInterface::run(int argc, char** argv)
@@ -429,16 +452,16 @@ void UserInterface::menuGenerateCacheFiles(Fl_Widget *w, void* d)
         {
             Fl_Shared_Image * img;
 
-            img = ui->cache_.getMapImage(map);
+            img = ui->cache_->getMapImage(map);
             if (img) img->release();
 
-            img = ui->cache_.getMetalImage(map);
+            img = ui->cache_->getMetalImage(map);
             if (img) img->release();
 
-            img = ui->cache_.getHeightImage(map);
+            img = ui->cache_->getHeightImage(map);
             if (img) img->release();
 
-            ui->cache_.getMapInfo(map);
+            ui->cache_->getMapInfo(map);
         }
         catch (std::exception const & e)
         {

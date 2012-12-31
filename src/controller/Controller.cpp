@@ -6,7 +6,6 @@
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
-#include <thread>
 #include <cstdlib>
 
 Controller::Controller():
@@ -46,7 +45,7 @@ unsigned int Controller::startProcess(std::string const & cmd, bool logToFile)
     ++processId_;
     processId_ = std::max(processId_, 1U); // make sure it doesn't wrap to zero (not very likely though)
 
-    std::thread * t = new std::thread(boost::bind(&Controller::runProcess, this, cmd, logToFile, processId_));
+    boost::thread * t = new boost::thread(boost::bind(&Controller::runProcess, this, cmd, logToFile, processId_));
     procs_[processId_] = t;
 
     return processId_;
@@ -110,7 +109,7 @@ void Controller::processDoneCallback(void * data)
     for (std::pair<unsigned int, int> const & idRetPair : c->procsDone_)
     {
         c->client_->processDone(idRetPair);
-        std::map<unsigned int, std::thread*>::iterator it = c->procs_.find(idRetPair.first);
+        std::map<unsigned int, boost::thread*>::iterator it = c->procs_.find(idRetPair.first);
         if (it != c->procs_.end())
         {
             it->second->join();

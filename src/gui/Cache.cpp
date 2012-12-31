@@ -4,6 +4,7 @@
 #include "model/Model.h"
 
 #include <Magick++.h>
+#include <FL/Fl_Shared_Image.H>
 
 #include <sstream> // ostringstream
 #include <fstream>

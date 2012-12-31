@@ -1,12 +1,11 @@
 #pragma once
 
-#include "Cache.h"
-
-#include <FL/Fl.H>
+#include <memory>
 #include <string>
 
 // forwards
 class Model;
+class Cache;
 class Battle;
 class User;
 class SpringDialog;
@@ -28,6 +27,7 @@ class Fl_Browser;
 class Fl_Group;
 class Fl_Menu_Bar;
 class Fl_Tile;
+class Fl_Widget;
 
 class UserInterface
 {
@@ -35,13 +35,15 @@ public:
     UserInterface(Model & model);
     virtual ~UserInterface();
 
+    static void setupLogging();
+
     int run(int argc, char** argv);
 
-    void addCallbackEvent(Fl_Awake_Handler handler, void *data);
+    void addCallbackEvent(void (*cb)(void*) /* Fl_Awake_Handler */, void *data);
 
 private:
     Model & model_;
-    Cache cache_;
+    std::unique_ptr<Cache> cache_;
 
     Fl_Double_Window * mainWindow_;
     Fl_Menu_Bar * menuBar_;

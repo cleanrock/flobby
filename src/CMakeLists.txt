@@ -2,15 +2,12 @@ project(FLOBBY)
 
 add_definitions(${CMAKE_CXX_FLAGS} "-std=c++0x" "-march=native")
 
-set(FLTK_SKIP_OPENGL true)
-set(FLTK_SKIP_FORMS true)
-# set(FLTK_SKIP_IMAGES true)
-set(FLTK_SKIP_FLUID true)
-find_package(FLTK REQUIRED)
+find_package(Boost COMPONENTS system filesystem regex chrono signals thread REQUIRED)
+
 
 include_directories (
     ${PROJECT_SOURCE_DIR}
-    ${FLTK_INCLUDE_DIR}
+    ${Boost_INCLUDE_DIRS}
 )
 
 add_executable (flobby
@@ -22,12 +19,7 @@ target_link_libraries (flobby
     gui
     model
     log
-    boost_regex
-    boost_chrono
-    boost_signals
-    boost_thread
-    boost_filesystem
-    boost_system
+    ${Boost_LIBRARIES}
     pthread
 ) 
 

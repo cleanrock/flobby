@@ -5,6 +5,7 @@
 #include "gui/UserInterface.h"
 
 #include <boost/thread.hpp>
+#include <deque>
 #include <map>
 #include <string>
 #include <memory>
@@ -13,11 +14,6 @@
 //
 class Model;
 class ServerConn;
-
-namespace std
-{
-    class thread;
-}
 
 class Controller : public IController, public IServerEvent
 {
@@ -29,13 +25,11 @@ public:
     void userInterface(UserInterface & ui) { ui_ = &ui; }
 
     // IController (called by model)
-    //
     void setIControllerEvent(IControllerEvent & iControllerEvent);
     void connect(std::string const & host, std::string const & service);
     void disconnect();
     void send(std::string const msg);
     unsigned int startProcess(std::string const & cmd, bool logToFile = false); // e.g. "/usr/bin/spring script.txt"
-
 
 private:
     IControllerEvent * client_;
@@ -67,6 +61,6 @@ private:
     unsigned int processId_;
     void runProcess(std::string const & cmd, bool logToFile, unsigned int id);
     static void processDoneCallback(void * data);
-    std::map<unsigned int, std::thread*> procs_;
+    std::map<unsigned int, boost::thread*> procs_;
     std::vector<std::pair<unsigned int,int>> procsDone_; // procId, process (system) return value
 };

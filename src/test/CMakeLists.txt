@@ -9,7 +9,7 @@ target_link_libraries (unittest
     gui
     log
     dl
-    boost_system
+    ${Boost_LIBRARIES}
 ) 
 
 add_custom_target(test

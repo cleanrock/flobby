@@ -2,11 +2,11 @@
 
 #include "model/MapInfo.h"
 
-#include <FL/Fl_Shared_Image.H> // included here so user can easily cast to Fl_Image
 #include <map>
 #include <string>
 
 class Model;
+class Fl_Shared_Image;
 
 class Cache
 {

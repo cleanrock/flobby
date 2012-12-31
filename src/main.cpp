@@ -1,40 +1,14 @@
-#include "log/Log.h"
-#include "model/Model.h"
 #include "controller/Controller.h"
+#include "model/Model.h"
 #include "gui/UserInterface.h"
-#include "gui/Prefs.h"
-#include "gui/LogFile.h"
 
 // TODO #include <boost/program_options.hpp>
 // #include <iostream>
-#include <cstdlib>
-
+//#include <cstdlib>
 // TODO std::vector<std::string> parseOptions(int argc, char * argv[]);
 
 int main(int argc, char * argv[])
 {
-    // setup logging
-    {
-        int logDebug;
-        prefs.get(PrefLogDebug, logDebug, 0);
-
-        char * logFilePath; // freed below
-        prefs.get(PrefLogFilePath, logFilePath, "/tmp/flobby.log");
-
-        if (logDebug != 0)
-        {
-            Log::minSeverity(DEBUG);
-        }
-        Log::logFile(logFilePath);
-
-        ::free(logFilePath);
-
-        int logChats;
-        prefs.get(PrefLogChats, logChats, 1);
-        LogFile::enable(logChats == 1 ? true : false);
-
-    }
-
     /* TODO using prefs instead of commandline for now
         std::vector<std::string> rest = parseOptions(argc, argv);
 
@@ -47,8 +21,12 @@ int main(int argc, char * argv[])
             argvRest[i+1] = (char*)rest[i].c_str();
         }
     */
+
+    // extra scope to be able to check destruction
     {
         // setup
+        UserInterface::setupLogging();
+
         Controller controller;
         Model model(controller);
         UserInterface ui(model);
@@ -59,7 +37,6 @@ int main(int argc, char * argv[])
         ui.run(argc, argv);
         // TODO ui.run(argcRest, argvRest);
     }
-
     return 0;
 }
 
