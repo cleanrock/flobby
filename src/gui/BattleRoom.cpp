@@ -546,24 +546,11 @@ void BattleRoom::playerClicked(int rowIndex, int button)
     {
         StringTableRow const & row = playerList_->getRow(static_cast<std::size_t>(rowIndex));
 
-        PopupMenu menu;
-
         // try block will handle players, catch block will handle bots
         try
         {
             User const & user = model_.getUser(row.id_);
-            menu.add("Open chat", 1);
-
-            if (menu.size() > 0)
-            {
-                int const id = menu.show();
-                switch (id)
-                {
-                case 1:
-                    iTabs_.openPrivateChat(user.name());
-                    break;
-                }
-            }
+            menuUser(user);
         }
         catch (std::invalid_argument const & e)
         {
@@ -571,21 +558,8 @@ void BattleRoom::playerClicked(int rowIndex, int button)
             std::vector<std::string> res;
             boost::algorithm::split(res, row.id_, boost::is_any_of(":"));
             assert(res.size() == 2);
-            if (res[1] == model_.me().name())
-            {
-                menu.add("Remove", 1);
-            }
 
-            if (menu.size() > 0)
-            {
-                int const id = menu.show();
-                switch (id)
-                {
-                case 1:
-                    model_.removeBot(res[0]);
-                    break;
-                }
-            }
+            menuBot(res[0], res[1]);
         }
     }
 }
@@ -608,12 +582,87 @@ void BattleRoom::playerDoubleClicked(int rowIndex, int button)
             std::vector<std::string> res;
             boost::algorithm::split(res, row.id_, boost::is_any_of(":"));
             assert(res.size() == 2);
+
             if (res[1] == model_.me().name())
             {
                 model_.removeBot(res[0]);
             }
         }
     }
+}
+
+void BattleRoom::menuUser(User const& user)
+{
+    PopupMenu menu;
+
+    menu.add("Open chat", 1);
+
+    if (user == model_.me())
+    {
+        for (int i=0; i<16; ++i)
+        {
+            std::ostringstream oss;
+            oss << "Ally team/" << i+1;
+            menu.add(oss.str(), 0x10+i, false);
+        }
+    }
+
+    if (menu.size() > 0)
+    {
+        int const id = menu.show();
+        switch (id)
+        {
+        case 1:
+            iTabs_.openPrivateChat(user.name());
+            break;
+
+        default:
+            if (id >= 0x10 && id < 0x20)
+            {
+                int allyTeam = id - 0x10;
+                model_.meAllyTeam(allyTeam);
+            }
+            break;
+        }
+
+    }
+}
+
+void BattleRoom::menuBot(std::string const& botName, std::string const& ownerName)
+{
+    PopupMenu menu;
+
+    if (ownerName == model_.me().name())
+    {
+        menu.add("Remove", 1);
+
+        for (int i=0; i<16; ++i)
+        {
+            std::ostringstream oss;
+            oss << "Ally team/" << i+1;
+            menu.add(oss.str(), 0x10+i, false);
+        }
+    }
+
+    if (menu.size() > 0)
+    {
+        int const id = menu.show();
+        switch (id)
+        {
+        case 1:
+            model_.removeBot(botName);
+            break;
+
+        default:
+            if (id >= 0x10 && id < 0x20)
+            {
+                int allyTeam = id - 0x10;
+                model_.botAllyTeam(botName, allyTeam);
+            }
+            break;
+        }
+    }
+
 }
 
 void BattleRoom::addStartRect(StartRect const & startRect)

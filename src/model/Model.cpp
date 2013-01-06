@@ -1583,6 +1583,32 @@ void Model::addBot(Bot const & bot)
     controller_.send(oss.str());
 }
 
+void Model::botAllyTeam(std::string const& name, int allyTeam)
+{
+    try
+    {
+        Bot const& bot = getBot(name); // throws if bot not found
+        UserBattleStatus ubs = bot.battleStatus();
+        ubs.allyTeam(allyTeam);
+
+        sendUpdateBot(name, ubs, bot.color());
+    }
+    catch (std::invalid_argument const& e)
+    {
+        // silently ignore non-existing bot
+    }
+}
+
+void Model::sendUpdateBot(std::string const& name, UserBattleStatus const& ubs, int color)
+{
+    std::ostringstream oss;
+    oss << "UPDATEBOT "
+        << name << " "
+        << ubs << " "
+        << color;
+    controller_.send(oss.str());
+}
+
 void Model::removeBot(std::string const & name)
 {
     std::ostringstream oss;

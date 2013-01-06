@@ -14,18 +14,22 @@ PopupMenu::~PopupMenu()
 {
 }
 
-void PopupMenu::add(std::string const & text, int id)
+void PopupMenu::add(std::string const & text, int id, bool escapeFltkChars /* true */)
 {
     assert(id > 0);
 
-    // escape label special chars
     std::string text2(text);
-    if (!text2.empty() && text2[0] == '_')
+
+    if (escapeFltkChars)
     {
-        text2.insert(0, "\\");
+        // escape label special chars
+        if (!text2.empty() && text2[0] == '_')
+        {
+            text2.insert(0, "\\");
+        }
+        boost::replace_all(text2, "&", "\\&");
+        boost::replace_all(text2, "/", "\\/");
     }
-    boost::replace_all(text2, "&", "\\&");
-    boost::replace_all(text2, "/", "\\/");
 
     menu_.add(text2.c_str(), 0, 0, reinterpret_cast<void*>(static_cast<intptr_t>(id)) );
 }

@@ -108,6 +108,9 @@ private:
     void playerClicked(int rowIndex, int button);
     void playerDoubleClicked(int rowIndex, int button);
 
+    void menuUser(User const & user);
+    void menuBot(std::string const& botName, std::string const& ownerName);
+
 };
 
 inline int BattleRoom::battleId() const

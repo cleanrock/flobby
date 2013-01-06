@@ -54,6 +54,7 @@ public:
     typedef std::map<std::string,Bot*> Bots;
     Bots const & getBots();
     void addBot(Bot const & bot);
+    void botAllyTeam(std::string const& name, int allyTeam);
     void removeBot(std::string const & name);
 
     void joinBattle(int battleId, std::string const & password = "_");
@@ -341,6 +342,8 @@ private:
     int calcSync(Battle const & battle);
 
     void meInGame(bool inGame);
+
+    void sendUpdateBot(std::string const& name, UserBattleStatus const& ubs, int color);
 
     typedef std::unordered_map<std::string, std::function<void (std::istream &)>> MessageHandlers;
     MessageHandlers messageHandlers_;
