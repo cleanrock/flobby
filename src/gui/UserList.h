@@ -17,6 +17,8 @@ public:
     void add(std::string const & userName);
     void remove(std::string const & userName);
 
+    std::string completeUserName(std::string const& text);
+
 private:
     Model & model_;
     ITabs & iTabs_;

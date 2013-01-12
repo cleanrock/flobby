@@ -9,6 +9,7 @@ class ITabs;
 class User;
 class Fl_Tile;
 class TextDisplay2;
+class ChatInput;
 class UserList;
 class ServerInfo;
 
@@ -25,10 +26,13 @@ private:
     ITabs & iTabs_;
     Model & model_;
     TextDisplay2 * text_;
+    ChatInput * input_;
     UserList * userList_;
     LogFile logFile_;
 
     int handle(int event);
+    void onInput(std::string const & text);
+    void onComplete(std::string const & text, std::string & result);
 
     void append(std::string const & msg, bool interesting = false);
 

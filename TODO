@@ -1,7 +1,7 @@
+map window showing big map image, 512x512
 make it possible to configure font size (12 atm) 
 commands in all chat windows
 single player game
-auto-complete user in battle/channel chat, also match name after ^[.*]
 handle FORCEQUITBATTLE
 quick find in StringTable, e.g. press C key to show first entry beginning with a C, ignore ^[.*] also maybe
 implement game hosting

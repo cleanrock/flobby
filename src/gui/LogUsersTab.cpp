@@ -1,5 +1,6 @@
 #include "LogUsersTab.h"
 #include "TextDisplay2.h"
+#include "ChatInput.h"
 #include "UserList.h"
 #include "Prefs.h"
 #include "ITabs.h"
@@ -20,8 +21,21 @@ LogUsersTab::LogUsersTab(int x, int y, int w, int h,
     model_(model),
     logFile_("messages")
 {
-    text_ = new TextDisplay2(x, y, w/2, h);
-    userList_ = new UserList(x+w/2, y, w/2, h, model_, iTabs_, true); // we save the prefs for UserList
+    // left side (text and input)
+    int const leftW = 0.75*w;
+    Fl_Group * left = new Fl_Group(x, y, leftW, h);
+    int const ih = 24; // input height
+    text_ = new TextDisplay2(x, y, leftW, h-ih);
+    input_ = new ChatInput(x, y+h-ih, leftW, ih);
+    input_->connectText( boost::bind(&LogUsersTab::onInput, this, _1) );
+    input_->connectComplete( boost::bind(&LogUsersTab::onComplete, this, _1, _2) );
+    left->resizable(text_);
+    left->end();
+
+    // right side (user list)
+    int const rightW = w - leftW;
+    userList_ = new UserList(x+leftW, y, rightW, h, model_, iTabs_, true); // we save the prefs for UserList
+
     end();
 
     // model signals
@@ -141,4 +155,14 @@ void LogUsersTab::downloadDone(std::string const & name, bool success)
     {
         append("download failed: " + name, true);
     }
+}
+
+void LogUsersTab::onInput(std::string const & text)
+{
+    // TODO
+}
+
+void LogUsersTab::onComplete(std::string const & text, std::string & result)
+{
+    // TODO
 }

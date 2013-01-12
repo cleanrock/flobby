@@ -6,6 +6,7 @@
 #include "Prefs.h"
 #include "ChatSettingsDialog.h"
 #include "Sound.h"
+#include "TextFunctions.h"
 
 #include "model/Model.h"
 
@@ -36,6 +37,7 @@ ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & c
     text_ = new TextDisplay2(x, y, leftW, h-ih);
     input_ = new ChatInput(x, y+h-ih, leftW, ih);
     input_->connectText( boost::bind(&ChannelChatTab::onInput, this, _1) );
+    input_->connectComplete( boost::bind(&ChannelChatTab::onComplete, this, _1, _2) );
     left->resizable(text_);
     left->end();
 
@@ -228,5 +230,17 @@ void ChannelChatTab::initChatSettings()
     else
     {
         beep_ = false;
+    }
+}
+
+void ChannelChatTab::onComplete(std::string const & text, std::string & result)
+{
+    auto const pairWordPos = getLastWord(text);
+
+    std::string const userName = userList_->completeUserName(pairWordPos.first);
+
+    if (!userName.empty())
+    {
+        result = text.substr(0, pairWordPos.second) + userName;
     }
 }

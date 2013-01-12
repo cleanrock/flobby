@@ -58,19 +58,43 @@ int ChatInput::handle(int event)
     switch (event)
     {
         case FL_KEYDOWN:
-            if (Fl::event_key() == FL_Down)
-            {
-                historyDown();
-                return 1;
-            }
-            else if (Fl::event_key() == FL_Up)
-            {
-                historyUp();
-                return 1;
-            }
+            return handleKeyDown();
             break;
     }
     return Fl_Input::handle(event);
+}
+
+int ChatInput::handleKeyDown()
+{
+    switch (Fl::event_key())
+    {
+        case FL_Down:
+            historyDown();
+            return 1;
+
+        case FL_Up:
+            historyUp();
+            return 1;
+
+        case FL_Tab:
+            // do tab completion if last char is not a space
+            if ( (Fl::event_state() & (FL_SHIFT | FL_CTRL | FL_ALT | FL_META)) == 0
+                 && size() > 0 && position() == size() && value()[size()-1] != ' ')
+            {
+                std::string result;
+                completeSignal_(value(), result);
+                if (!result.empty())
+                {
+                    value(result.c_str());
+                }
+                return 1;
+            }
+            break;
+
+        default:
+            break;
+    }
+    return Fl_Input::handle(FL_KEYDOWN);
 }
 
 void ChatInput::historyDown()

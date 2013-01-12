@@ -21,6 +21,8 @@ public:
     void addInfo(std::string const & msg);
     void close(); // call when "me" left battle
 
+    ChatInput& getChatInput() { return *input_; } // needed for name completion
+
 private:
     Model & model_;
     VoteLine * voteLine_;

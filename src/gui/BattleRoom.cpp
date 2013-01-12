@@ -1,6 +1,7 @@
 #include "BattleRoom.h"
 #include "StringTable.h"
 #include "BattleChat.h"
+#include "ChatInput.h"
 #include "Cache.h"
 #include "ITabs.h"
 #include "Prefs.h"
@@ -8,6 +9,7 @@
 #include "AddBotDialog.h"
 #include "PopupMenu.h"
 #include "GameSettings.h"
+#include "TextFunctions.h"
 
 #include "log/Log.h"
 #include "model/Model.h"
@@ -145,6 +147,8 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
 
     playerList_->connectRowClicked( boost::bind(&BattleRoom::playerClicked, this, _1, _2) );
     playerList_->connectRowDoubleClicked( boost::bind(&BattleRoom::playerDoubleClicked, this, _1, _2) );
+
+    battleChat_->getChatInput().connectComplete( boost::bind(&BattleRoom::onComplete, this, _1, _2) );
 
 }
 
@@ -804,4 +808,21 @@ void BattleRoom::showDownloadGameButton()
     downloadGameBtn_->show();
     downloadGameBtn_->activate();
     header_->init_sizes();
+}
+
+void BattleRoom::onComplete(std::string const& text, std::string& result)
+{
+    auto const pairWordPos = getLastWord(text);
+
+    for (int i=0; i<playerList_->rows(); ++i)
+    {
+        StringTableRow const & row = playerList_->getRow(static_cast<std::size_t>(i));
+        std::string const & name = row.data_[2];
+
+        if (containsI(name, pairWordPos.first))
+        {
+            result = text.substr(0, pairWordPos.second) + name;
+            return;
+        }
+    }
 }

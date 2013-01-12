@@ -1,6 +1,7 @@
 #include "UserList.h"
 #include "ITabs.h"
 #include "PopupMenu.h"
+#include "TextFunctions.h"
 
 #include "model/Model.h"
 #include "log/Log.h"
@@ -146,4 +147,23 @@ void UserList::userDoubleClicked(int rowIndex, int button)
 {
     StringTableRow const & row = getRow(static_cast<std::size_t>(rowIndex));
     iTabs_.openPrivateChat(row.id_);
+}
+
+std::string UserList::completeUserName(std::string const& text)
+{
+    std::string fullUserName;
+
+    for (int i=0; i<rows(); ++i)
+    {
+        StringTableRow const & row = getRow(static_cast<std::size_t>(i));
+        std::string const& name = row.data_[0];
+
+        if (containsI(name, text))
+        {
+            fullUserName = name;
+            break;
+        }
+    }
+
+    return fullUserName;
 }

@@ -48,6 +48,7 @@ add_library (gui STATIC
     ChatInput.cpp
     SoundSettingsDialog.cpp
     MyImage.cpp
+    TextFunctions.cpp
 )
 
 target_link_libraries (gui
