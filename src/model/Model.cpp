@@ -1050,7 +1050,10 @@ void Model::handle_CLIENTBATTLESTATUS(std::istream & is) // userName battleStatu
     User & u = user(ex);
     extractWord(is, ex);
     u.battleStatus(UserBattleStatus(ex));
-    // TODO color
+
+    extractWord(is, ex);
+    u.color(boost::lexical_cast<int>(ex));
+
     userChangedSignal_(u);
 }
 
@@ -1132,7 +1135,8 @@ void Model::handle_UPDATEBOT(std::istream & is) // battleId name battleStatus te
         Bot & b = getBot(ex);
         extractWord(is, ex);
         b.battleStatus(UserBattleStatus(ex));
-        // TODO color
+        extractWord(is, ex);
+        b.color(boost::lexical_cast<int>(ex));
         botChangedSignal_(b);
     }
 }

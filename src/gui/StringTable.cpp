@@ -115,44 +115,69 @@ void StringTable::draw_sort_arrow(int X,int Y,int W,int H,int sort) {
 }
 
 // Handle drawing all cells in table
-void StringTable::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H) {
-    const char *s = ""; 
-    if ( R < (int)rows_.size() && C < (int)rows_[R].data_.size() )
-        s = rows_[R].data_[C].c_str();
-    switch ( context ) {
+void StringTable::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
+{
+    if ( C >= headers_.size() || R >= (int)rows_.size() )
+        return;
+
+    switch ( context )
+    {
         case CONTEXT_COL_HEADER:
-            fl_push_clip(X,Y,W,H); {
-                fl_draw_box(FL_THIN_UP_BOX, X,Y,W,H, FL_BACKGROUND_COLOR);
-                if ( C < 9 ) {
-                    fl_font(FL_HELVETICA, FL_NORMAL_SIZE);
-                    fl_color(active_r() ? FL_FOREGROUND_COLOR : FL_INACTIVE_COLOR);
-                    fl_draw(headers_[C].c_str(), X+2,Y,W,H, FL_ALIGN_LEFT, 0, 0);         // +2=pad left
-                    // Draw sort arrow
-                    if ( C == sort_lastcol_ ) {
-                        draw_sort_arrow(X,Y,W,H, sort_reverse_);
-                    }
-                }
+        {
+            fl_push_clip(X,Y,W,H);
+            fl_draw_box(FL_THIN_UP_BOX, X,Y,W,H, FL_BACKGROUND_COLOR);
+            fl_font(FL_HELVETICA, FL_NORMAL_SIZE);
+            fl_color(active_r() ? FL_FOREGROUND_COLOR : FL_INACTIVE_COLOR);
+            fl_draw(headers_[C].c_str(), X+2,Y,W,H, FL_ALIGN_LEFT, 0, 0); // +2=pad left
+
+            // Draw sort arrow
+            if ( C == sort_lastcol_ ) {
+                draw_sort_arrow(X,Y,W,H, sort_reverse_);
             }
             fl_pop_clip();
-            return; 
-        case CONTEXT_CELL: {
-            fl_push_clip(X,Y,W,H); {
+        }
+        return;
+
+        case CONTEXT_CELL:
+        {
+            fl_push_clip(X,Y,W,H);
+            {
                 // Bg color
                 Fl_Color bgcolor = (selectedRow_ == R) ? selection_color() : FL_BACKGROUND2_COLOR;
                 fl_color(bgcolor); fl_rectf(X,Y,W,H); 
-                fl_font(FL_HELVETICA, FL_NORMAL_SIZE);
-                fl_color(active_r() ? FL_FOREGROUND_COLOR : FL_INACTIVE_COLOR);
-                fl_draw(s, X+2,Y,W,H, FL_ALIGN_LEFT);     // +2=pad left
-                // line below text
+
+                // text or color
+                if (headers_[C] == "color")
+                {
+                    fl_color(fltkColor(rows_[R].data_[C]));
+                    fl_rectf(X+2, Y+2, W-4, H-4);
+                }
+                else
+                {
+                    fl_font(FL_HELVETICA, FL_NORMAL_SIZE);
+                    fl_color(active_r() ? FL_FOREGROUND_COLOR : FL_INACTIVE_COLOR);
+                    fl_draw(rows_[R].data_[C].c_str(), X+2,Y,W,H, FL_ALIGN_LEFT); // +2=pad left
+                }
+
+                // line below
                 fl_color(FL_BACKGROUND_COLOR);
-                fl_line(X,Y+H-1, X+W, Y+H-1); // fl_rect(X,Y,W,H);
+                fl_line(X,Y+H-1, X+W, Y+H-1);
             }
             fl_pop_clip();
-            return;
         }
+        return;
+
         default:
             return;
     }
+}
+
+Fl_Color StringTable::fltkColor(std::string const& text)
+{
+    // val is 0xBBGGRR
+    int val = boost::lexical_cast<int>(text);
+
+    return fl_rgb_color(val, val>>8, val>>16);
 }
 
 StringTableRow const & StringTable::getRow(std::size_t rowIndex)

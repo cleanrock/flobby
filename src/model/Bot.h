@@ -22,6 +22,7 @@ public:
     void battleStatus(UserBattleStatus const & battleStatus);
 
     int color() const;
+    void color(int color);
 
     std::string const & aiDll() const;
 
@@ -61,6 +62,11 @@ inline void Bot::battleStatus(UserBattleStatus const & battleStatus)
 inline int Bot::color() const
 {
     return color_;
+}
+
+inline void Bot::color(int color)
+{
+    color_ = color;
 }
 
 inline const std::string & Bot::aiDll() const

@@ -114,7 +114,7 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
     int const playerH = topH - headerH;
 
     playerList_ = new StringTable(x, y, w - rightW, playerH, "PlayerList",
-            { "status", "sync", "name", "ally", "team", "rank", "country" });
+            { "status", "sync", "name", "ally", "team", "rank", "color", "country" });
 
     top_->resizable(playerList_);
     top_->end();
@@ -402,6 +402,7 @@ StringTableRow BattleRoom::makeRow(User const & user)
             allyTeam.str(),
             team.str(),
             boost::lexical_cast<std::string>( user.status().rank() ),
+            boost::lexical_cast<std::string>( user.color() ),
             user.country()
         } );
 }
@@ -422,6 +423,7 @@ StringTableRow BattleRoom::makeRow(Bot const & bot)
             allyTeam.str(),
             team.str(),
             "",
+            boost::lexical_cast<std::string>( bot.color() ),
             ""
         } );
 }

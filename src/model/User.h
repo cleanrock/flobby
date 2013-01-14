@@ -19,6 +19,9 @@ public:
     std::string const & country() const;
     std::string const & cpu() const;
 
+    int color() const;
+    void color(int color);
+
     UserStatus const & status() const;
     void status(UserStatus const & status);
 
@@ -39,6 +42,7 @@ private:
     std::string name_;
     std::string country_;
     std::string cpu_;
+    int color_; // 0x00BBGGRR
     UserStatus status_;
     UserBattleStatus battleStatus_;
 
@@ -61,6 +65,16 @@ inline const std::string & User::country() const
 inline const std::string & User::cpu() const
 {
     return cpu_;
+}
+
+inline int User::color() const
+{
+    return color_;
+}
+
+inline void User::color(int color)
+{
+    color_ = color;
 }
 
 inline UserStatus const & User::status() const
