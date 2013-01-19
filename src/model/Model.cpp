@@ -351,6 +351,16 @@ void Model::meAllyTeam(int allyTeam)
     sendMyBattleStatus();
 }
 
+void Model::meSide(int side)
+{
+    User & u = me();
+    UserBattleStatus ubs = u.battleStatus();
+    ubs.side(side);
+    u.battleStatus(ubs);
+
+    sendMyBattleStatus();
+}
+
 void Model::meInGame(bool inGame)
 {
     User & u = me();
@@ -1571,9 +1581,37 @@ std::vector<AI> Model::getModAIs(std::string const & modName)
                 ais.push_back(ai);
             }
         }
+        unitSync_->RemoveAllArchives();
     }
 
     return ais;
+}
+
+std::vector<std::string> Model::getModSideNames(std::string const & modName)
+{
+    std::vector<std::string> sideNames;
+
+    int modIndex = unitSync_->GetPrimaryModIndex(modName.c_str());
+    LOG(DEBUG) << "modIndex " << modIndex;
+
+    if (modIndex >= 0)
+    {
+        const char* archiveName = unitSync_->GetPrimaryModArchive(modIndex);
+        LOG(DEBUG) << "archiveName " << archiveName;
+        unitSync_->AddAllArchives(archiveName);
+        int sideCount = unitSync_->GetSideCount();
+        LOG(DEBUG) << "sideCount " << sideCount;
+
+        for (int i=0; i<sideCount; ++i)
+        {
+            char const* s = unitSync_->GetSideName(i);
+            LOG_IF(FATAL, s == 0)<< "side name null, " << modName << ", " << i;
+            sideNames.push_back(s);
+        }
+        unitSync_->RemoveAllArchives();
+    }
+
+    return sideNames;
 }
 
 void Model::addBot(Bot const & bot)
@@ -1594,6 +1632,22 @@ void Model::botAllyTeam(std::string const& name, int allyTeam)
         Bot const& bot = getBot(name); // throws if bot not found
         UserBattleStatus ubs = bot.battleStatus();
         ubs.allyTeam(allyTeam);
+
+        sendUpdateBot(name, ubs, bot.color());
+    }
+    catch (std::invalid_argument const& e)
+    {
+        // silently ignore non-existing bot
+    }
+}
+
+void Model::botSide(std::string const& name, int side)
+{
+    try
+    {
+        Bot const& bot = getBot(name); // throws if bot not found
+        UserBattleStatus ubs = bot.battleStatus();
+        ubs.side(side);
 
         sendUpdateBot(name, ubs, bot.color());
     }

@@ -90,3 +90,12 @@ int UserBattleStatus::side() const
 {
     return ((val_ & 0x0F000000) >> 24); // bit 24-27
 }
+
+void UserBattleStatus::side(int index)
+{
+    assert(index >= 0 && index < 16);
+    int const shifted = index << 24;
+    val_ &= ~0x0F000000;
+    val_ |= shifted;
+}
+

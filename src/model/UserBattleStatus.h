@@ -21,6 +21,7 @@ public:
     int sync() const;
     void sync(int sync); // 0 = unknown, 1 = synced, 2 = unsynced
     int side() const;
+    void side(int index);
 
     bool operator==(UserBattleStatus const & rh) const;
     bool operator!=(UserBattleStatus const & rh) const;

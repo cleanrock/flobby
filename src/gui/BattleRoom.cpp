@@ -114,7 +114,7 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
     int const playerH = topH - headerH;
 
     playerList_ = new StringTable(x, y, w - rightW, playerH, "PlayerList",
-            { "status", "sync", "name", "ally", "team", "rank", "color", "country" });
+            { "status", "sync", "name", "side", "ally", "team", "rank", "color", "country" });
 
     top_->resizable(playerList_);
     top_->end();
@@ -209,6 +209,11 @@ void BattleRoom::joined(Battle const & battle)
     if ( !model_.gameExist(battle.modName()) )
     {
         showDownloadGameButton();
+        sideNames_.clear();
+    }
+    else
+    {
+        sideNames_ = model_.getModSideNames(battle.modName());
     }
 
     setMapImage(battle);
@@ -394,11 +399,22 @@ StringTableRow BattleRoom::makeRow(User const & user)
     boost::format team(user.battleStatus().spectator() ? "s%2d" : "%2d");
     team % (user.battleStatus().team() + 1);
 
+    std::string side;
+    if (user.battleStatus().side() < sideNames_.size())
+    {
+        side = sideNames_[user.battleStatus().side()];
+    }
+    else
+    {
+        side = boost::lexical_cast<std::string>( user.battleStatus().side() );
+    }
+
     return StringTableRow( user.name(),
         {
             statusString(user),
             syncString(user),
             user.name(),
+            side,
             allyTeam.str(),
             team.str(),
             boost::lexical_cast<std::string>( user.status().rank() ),
@@ -415,11 +431,22 @@ StringTableRow BattleRoom::makeRow(Bot const & bot)
     boost::format team(bot.battleStatus().spectator() ? "s%2d" : "%2d");
     team % (bot.battleStatus().team() + 1);
 
+    std::string side;
+    if (bot.battleStatus().side() < sideNames_.size())
+    {
+        side = sideNames_[bot.battleStatus().side()];
+    }
+    else
+    {
+        side = boost::lexical_cast<std::string>( bot.battleStatus().side() );
+    }
+
     return StringTableRow( bot.name() + ":" + bot.owner(),
         {
             "B",
             "",
             bot.name() + "," + bot.owner() + "," + bot.aiDll(),
+            side,
             allyTeam.str(),
             team.str(),
             "",
@@ -531,18 +558,9 @@ void BattleRoom::refresh()
 {
     if (battleId_ != -1)
     {
-        Battle const & b = model_.getBattle(battleId_);
+        Battle const & battle = model_.getBattle(battleId_);
 
-        if (model_.gameExist(b.modName()))
-        {
-            hideDownloadGameButton();
-        }
-        else
-        {
-            showDownloadGameButton();
-        }
-
-        setMapImage(b);
+        joined(battle);
     }
 }
 
@@ -611,6 +629,12 @@ void BattleRoom::menuUser(User const& user)
             oss << "Ally team/" << i+1;
             menu.add(oss.str(), 0x10+i, false);
         }
+        for (int i=0; i<sideNames_.size(); ++i)
+        {
+            std::ostringstream oss;
+            oss << "Side/" << sideNames_[i];
+            menu.add(oss.str(), 0x20+i, false);
+        }
     }
 
     if (menu.size() > 0)
@@ -627,6 +651,11 @@ void BattleRoom::menuUser(User const& user)
             {
                 int allyTeam = id - 0x10;
                 model_.meAllyTeam(allyTeam);
+            }
+            else if (id >= 0x20 && id < 0x30)
+            {
+                int side = id - 0x20;
+                model_.meSide(side);
             }
             break;
         }
@@ -648,6 +677,12 @@ void BattleRoom::menuBot(std::string const& botName, std::string const& ownerNam
             oss << "Ally team/" << i+1;
             menu.add(oss.str(), 0x10+i, false);
         }
+        for (int i=0; i<sideNames_.size(); ++i)
+        {
+            std::ostringstream oss;
+            oss << "Side/" << sideNames_[i];
+            menu.add(oss.str(), 0x20+i, false);
+        }
     }
 
     if (menu.size() > 0)
@@ -664,6 +699,11 @@ void BattleRoom::menuBot(std::string const& botName, std::string const& ownerNam
             {
                 int allyTeam = id - 0x10;
                 model_.botAllyTeam(botName, allyTeam);
+            }
+            else if (id >= 0x20 && id < 0x30)
+            {
+                int side = id - 0x20;
+                model_.botSide(botName, side);
             }
             break;
         }

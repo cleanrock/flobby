@@ -2,6 +2,7 @@
 
 #include "StringTable.h"
 #include "FL/Fl_Tile.H"
+#include <vector>
 #include <string>
 #include <memory>
 
@@ -77,6 +78,7 @@ private:
     Fl_Multiline_Output * mapInfo_;
     GameSettings * settings_;
     std::string currentMapImage_; // optimization, indicates what map image is currently shown to avoid setting the same image
+    std::vector<std::string> sideNames_;
 
     StringTable * playerList_;
 

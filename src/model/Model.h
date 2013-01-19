@@ -55,6 +55,7 @@ public:
     Bots const & getBots();
     void addBot(Bot const & bot);
     void botAllyTeam(std::string const& name, int allyTeam);
+    void botSide(std::string const& name, int side);
     void removeBot(std::string const & name);
 
     void joinBattle(int battleId, std::string const & password = "_");
@@ -75,6 +76,7 @@ public:
     void meSpec(bool spec);
     void meReady(bool ready);
     void meAllyTeam(int allyTeam);
+    void meSide(int side);
     void meAway(bool away);
 
     std::string const & getWriteableDataDir() const;
@@ -97,6 +99,7 @@ public:
     void refresh(); // to find new mods and maps
 
     std::vector<AI> getModAIs(std::string const & modName);
+    std::vector<std::string> getModSideNames(std::string const & modName);
 
     // signals
     //
