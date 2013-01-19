@@ -99,6 +99,12 @@ void Model::setUnitSyncPath(std::string const & path)
     LOG(DEBUG) << "writeableDataDir_:" << writeableDataDir_;
 }
 
+void Model::setPrDownloaderCmd(std::string const & cmd)
+{
+    prDownloaderCmd_ = cmd;
+    LOG(DEBUG) << "prDownloaderCmd_:" << prDownloaderCmd_;
+}
+
 Battle & Model::getBattle(std::string const & str)
 {
     int battleId = boost::lexical_cast<int>(str);
@@ -1700,7 +1706,7 @@ bool Model::download(std::string const & name, DownloadType type)
 
     downloadName_ = name;
     std::ostringstream oss;
-    oss << "pr-downloader ";
+    oss << prDownloaderCmd_ << " ";
     switch (type)
     {
     case DT_MAP:

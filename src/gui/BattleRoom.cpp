@@ -213,6 +213,7 @@ void BattleRoom::joined(Battle const & battle)
     }
     else
     {
+        hideDownloadGameButton();
         sideNames_ = model_.getModSideNames(battle.modName());
     }
 

@@ -13,6 +13,7 @@
 char const * const PrefSpringProfile = "SpringProfile";
 char const * const PrefSpringPath = "SpringPath";
 char const * const PrefUnitSyncPath = "UnitSyncPath";
+char const * const PrefPrDownloaderCmd = "PrDownloaderCmd";
 
 SpringDialog::SpringDialog(Model & model) :
         model_(model), prefs_(prefs, "SpringProfiles"), Fl_Window(600, 400,
@@ -41,10 +42,16 @@ SpringDialog::SpringDialog(Model & model) :
     btn = new Fl_Button(570, 150, 20, 40, "...");
     btn->callback(SpringDialog::callbackBrowseUnitSync, this);
 
-    save_ = new Fl_Button(500, 200, 90, 30, "Save");
+    prDownloaderCmd_ = new Fl_File_Input(220, 210, 350, 40, "pr-downloader");
+    prDownloaderCmd_->align(FL_ALIGN_TOP_LEFT);
+
+    btn = new Fl_Button(570, 210, 20, 40, "...");
+    btn->callback(SpringDialog::callbackBrowsePrDownloader, this);
+
+    save_ = new Fl_Button(500, 260, 90, 30, "Save");
     save_->callback(SpringDialog::callbackSave, this);
 
-    delete_ = new Fl_Button(400, 200, 90, 30, "Delete");
+    delete_ = new Fl_Button(400, 260, 90, 30, "Delete");
     delete_->callback(SpringDialog::callbackDelete, this);
 
     select_ = new Fl_Return_Button(500, 350, 90, 30, "Select");
@@ -100,6 +107,7 @@ void SpringDialog::initList(bool selectCurrent)
         Fl_Preferences p(prefs_, "default");
         p.set(PrefSpringPath, springDefault.c_str());
         p.set(PrefUnitSyncPath, unitsyncDefault.c_str());
+        p.set(PrefPrDownloaderCmd, "pr-downloader");
         prefs_.set(PrefSpringProfile, p.name());
     }
 
@@ -150,6 +158,10 @@ void SpringDialog::populate(char const * name)
         p.get(PrefUnitSyncPath, str, "");
         unitSyncPath_->value(str);
         ::free(str);
+
+        p.get(PrefPrDownloaderCmd, str, "pr-downloader");
+        prDownloaderCmd_->value(str);
+        ::free(str);
     }
 }
 
@@ -189,6 +201,12 @@ void SpringDialog::callbackBrowseUnitSync(Fl_Widget*, void *data)
     o->onBrowseUnitSync();
 }
 
+void SpringDialog::callbackBrowsePrDownloader(Fl_Widget*, void *data)
+{
+    SpringDialog * o = static_cast<SpringDialog*>(data);
+    o->onBrowsePrDownloader();
+}
+
 void SpringDialog::onList()
 {
     int const line = list_->value();
@@ -225,6 +243,7 @@ void SpringDialog::onSave()
         Fl_Preferences p(prefs_, name);
         p.set(PrefSpringPath, springPath_->value());
         p.set(PrefUnitSyncPath, unitSyncPath_->value());
+        p.set(PrefPrDownloaderCmd, prDownloaderCmd_->value());
         initList();
     }
 
@@ -275,6 +294,15 @@ void SpringDialog::onBrowseUnitSync()
     }
 }
 
+void SpringDialog::onBrowsePrDownloader()
+{
+    std::string fileName;
+    if (openFileDialog("Select pr-downloader", prDownloaderCmd_->value(), fileName))
+    {
+        prDownloaderCmd_->value(fileName.c_str());
+    }
+}
+
 bool SpringDialog::setPaths()
 {
     char * str;
@@ -319,6 +347,12 @@ bool SpringDialog::setPaths()
             show();
             return false;
         }
+
+        // pr-downloader
+        p.get(PrefPrDownloaderCmd, str, "pr-downloader");
+        std::string prDownloaderCmd(str);
+        ::free(str);
+        model_.setPrDownloaderCmd(prDownloaderCmd);
 
         profileSetSignal_(profile);
         return true;

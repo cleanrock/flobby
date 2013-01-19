@@ -207,7 +207,7 @@ int UserInterface::run(int argc, char** argv)
 
     mainWindow_->show(argc, argv);
 
-    // set Spring and UnitSync paths
+    // set paths to spring, unitsync and pr-downloader
     bool const pathsOk = springDialog_->setPaths();
 
     if (!pathsOk)

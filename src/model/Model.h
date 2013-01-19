@@ -34,8 +34,10 @@ public:
 
     void setSpringPath(std::string const & path) { springPath_ = path; }
     void setUnitSyncPath(std::string const & path);
+    void setPrDownloaderCmd(std::string const & cmd);
     std::string const & getSpringPath() const { return springPath_; }
     std::string const & getUnitSyncPath() const { return unitSyncPath_; }
+    std::string const & getPrDownloaderCmd() const { return prDownloaderCmd_; }
 
     void connect(std::string const & host, std::string const & port);
     void login(std::string const & username, std::string const & passwordHash);
@@ -273,6 +275,7 @@ private:
 
     std::string springPath_;
     std::string unitSyncPath_;
+    std::string prDownloaderCmd_;
     Script script_;
 
     // IControllerEvent
