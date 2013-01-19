@@ -30,7 +30,6 @@ BattleList::BattleList(int x, int y, int w, int h, Model & model, Cache & cache)
     int const h1 = h-128;
     battleList_ = new StringTable(x, y, w, h1, "BattleList",
             { "status", "title", "game", "map", "players" });
-    battleList_->box(FL_NO_BOX);
 
     battleInfo_ = new BattleInfo(x, y+h1, w, h-h1, model_, cache);
 

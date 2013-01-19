@@ -1,4 +1,5 @@
 #include "StringTable.h"
+#include "log/Log.h"
 #include "Prefs.h"
 
 #include <FL/fl_draw.H>
@@ -117,22 +118,26 @@ void StringTable::draw_sort_arrow(int X,int Y,int W,int H,int sort) {
 // Handle drawing all cells in table
 void StringTable::draw_cell(TableContext context, int R, int C, int X, int Y, int W, int H)
 {
-    if ( C >= headers_.size() || R >= (int)rows_.size() )
-        return;
-
     switch ( context )
     {
         case CONTEXT_COL_HEADER:
         {
             fl_push_clip(X,Y,W,H);
-            fl_draw_box(FL_THIN_UP_BOX, X,Y,W,H, FL_BACKGROUND_COLOR);
-            fl_font(FL_HELVETICA, FL_NORMAL_SIZE);
-            fl_color(active_r() ? FL_FOREGROUND_COLOR : FL_INACTIVE_COLOR);
-            fl_draw(headers_[C].c_str(), X+2,Y,W,H, FL_ALIGN_LEFT, 0, 0); // +2=pad left
+            if ( C < headers_.size())
+            {
+                fl_draw_box(FL_THIN_UP_BOX, X,Y,W,H, FL_BACKGROUND_COLOR);
+                fl_font(FL_HELVETICA, FL_NORMAL_SIZE);
+                fl_color(active_r() ? FL_FOREGROUND_COLOR : FL_INACTIVE_COLOR);
+                fl_draw(headers_[C].c_str(), X+2,Y,W,H, FL_ALIGN_LEFT, 0, 0); // +2=pad left
 
-            // Draw sort arrow
-            if ( C == sort_lastcol_ ) {
-                draw_sort_arrow(X,Y,W,H, sort_reverse_);
+                // Draw sort arrow
+                if ( C == sort_lastcol_ ) {
+                    draw_sort_arrow(X,Y,W,H, sort_reverse_);
+                }
+            }
+            else
+            {
+                LOG(WARNING) << "CONTEXT_COL_HEADER C/size=" << C << "/" << headers_.size();
             }
             fl_pop_clip();
         }
@@ -141,6 +146,7 @@ void StringTable::draw_cell(TableContext context, int R, int C, int X, int Y, in
         case CONTEXT_CELL:
         {
             fl_push_clip(X,Y,W,H);
+            if ( C < headers_.size() && R < static_cast<int>(rows_.size()) )
             {
                 // Bg color
                 Fl_Color bgcolor = (selectedRow_ == R) ? selection_color() : FL_BACKGROUND2_COLOR;
@@ -162,6 +168,11 @@ void StringTable::draw_cell(TableContext context, int R, int C, int X, int Y, in
                 // line below
                 fl_color(FL_BACKGROUND_COLOR);
                 fl_line(X,Y+H-1, X+W, Y+H-1);
+            }
+            else
+            {
+                // possible to draw empty area at end of row here
+                // LOG(WARNING) << "CONTEXT_CELL C/size=" << C << "/" << headers_.size() << ", R/size=" << R << "/" << rows_.size();
             }
             fl_pop_clip();
         }
