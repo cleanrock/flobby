@@ -8,4 +8,3 @@ implement game hosting
 
 ? battle preview (lower left) do not show host in player list, count host as a player
 ? extractSentence shall accept ""
-? alt+# shortcuts for tabs
