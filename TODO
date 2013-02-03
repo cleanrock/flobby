@@ -1,10 +1,14 @@
+fix cmake for ImageMagick 6.8.2
+friend list
+text color for "my text"
+tab complete not at end of line
 map window showing big map image, 512x512
 make it possible to configure font size (12 atm) 
 commands in all chat windows
 single player game
-handle FORCEQUITBATTLE
-quick find in StringTable, e.g. press C key to show first entry beginning with a C, ignore ^[.*] also maybe
 implement game hosting
 
-? battle preview (lower left) do not show host in player list, count host as a player
+? quick find in StringTable, e.g. press C key to show first entry beginning with a C, ignore ^[.*] also maybe
+? handle FORCEQUITBATTLE
+? battle preview (lower left) do not show host in player list, count host as a player if not bot
 ? extractSentence shall accept ""

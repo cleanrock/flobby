@@ -155,8 +155,8 @@ void BattleInfo::userLeftBattle(User const & user, const Battle & battle)
 
 void BattleInfo::userChanged(User const & user)
 {
-    Battle const * b = user.joinedBattle();
-    if ( b &&  b->id() == battleId_)
+    int const battleId = user.joinedBattle();
+    if ( battleId == battleId_)
     {
         // TODO ?
     }

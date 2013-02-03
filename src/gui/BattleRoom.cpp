@@ -316,8 +316,8 @@ void BattleRoom::userLeftBattle(User const & user, const Battle & battle)
 
 void BattleRoom::userChanged(User const & user)
 {
-    Battle const * b = user.joinedBattle();
-    if (b &&  b->id() == battleId_)
+    int const battleId = user.joinedBattle();
+    if (battleId_ != -1 && battleId == battleId_)
     {
         playerList_->updateRow(makeRow(user));
         User const & me = model_.me();
@@ -327,7 +327,8 @@ void BattleRoom::userChanged(User const & user)
             readyBtn_->value(user.battleStatus().ready());
             teamBtn_->value(user.battleStatus().allyTeam());
             mapImageBox_->setAlly( user.battleStatus().spectator() ? -1 : user.battleStatus().allyTeam());
-            if (b->running() && me.battleStatus().sync() == 1 && !me.status().inGame())
+            Battle const& battle = model_.getBattle(battleId);
+            if (battle.running() && me.battleStatus().sync() == 1 && !me.status().inGame())
             {
                 startBtn_->activate();
             }

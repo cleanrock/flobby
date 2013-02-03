@@ -49,7 +49,7 @@ std::string UserList::statusString(User const & user)
 {
     std::ostringstream oss;
     oss << (user.status().bot() ? "B" : "");
-    oss << (user.joinedBattle() != 0 ? "J" : "");
+    oss << (user.joinedBattle() != -1 ? "J" : "");
     oss << (user.status().inGame() ? "G" : "");
     oss << (user.status().away() ? "A" : "");
     return oss.str();
@@ -75,7 +75,6 @@ void UserList::userClicked(int rowIndex, int button)
 
         std::string const userName = row.id_;
         User const * user = 0;
-        int battleId;
         PopupMenu menu;
 
         try
@@ -90,11 +89,12 @@ void UserList::userClicked(int rowIndex, int button)
 
         menu.add("Open chat", 1);
 
-        if (user->joinedBattle())
+        int const battleId = user->joinedBattle();
+
+        if (battleId != -1)
         {
-            Battle const * battle = user->joinedBattle();
-            battleId = battle->id();
-            std::string joinText = "Join " + battle->title();
+            Battle const& battle = model_.getBattle(battleId);
+            std::string joinText = "Join " + battle.title();
             menu.add(joinText, 2);
         }
 
@@ -118,7 +118,7 @@ void UserList::userClicked(int rowIndex, int button)
             case 2:
                 try
                 {
-                    Battle const & battle = model_.getBattle(battleId);
+                    Battle const& battle = model_.getBattle(battleId);
                     if (battle.passworded())
                     {
                         char const * password = fl_input("Enter battle password");

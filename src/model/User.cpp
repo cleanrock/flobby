@@ -7,7 +7,8 @@
 
 
 User::User(std::istream & is):
-    joinedBattle_(0)
+    color_(0),
+    joinedBattle_(-1)
 {
     using namespace LobbyProtocol;
 
@@ -24,13 +25,19 @@ User::~User()
 {
 }
 
+void User::joinedBattle(Battle const& battle)
+{
+    joinedBattle_ = battle.id();
+}
+
+
 void User::leftBattle(Battle const & battle)
 {
-    if ( joinedBattle_ == 0 || joinedBattle_->id() != battle.id() )
+    if ( joinedBattle_ == -1 || joinedBattle_ != battle.id() )
     {
         throw std::runtime_error(__PRETTY_FUNCTION__);
     }
-    joinedBattle_ = 0;
+    joinedBattle_ = -1;
 }
 
 void User::print(std::ostream & os) const

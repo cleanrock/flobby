@@ -23,21 +23,21 @@ public:
     void color(int color);
 
     UserStatus const & status() const;
-    void status(UserStatus const & status);
+    void status(UserStatus const& status);
 
     UserBattleStatus const & battleStatus() const;
-    void battleStatus(UserBattleStatus const & battleStatus);
+    void battleStatus(UserBattleStatus const& battleStatus);
 
-    void joinedBattle(Battle const & battle);
-    Battle const * joinedBattle() const;
-    void leftBattle(Battle const & battle);
+    void joinedBattle(Battle const& battle);
+    int joinedBattle() const;
+    void leftBattle(Battle const& battle);
 
-    bool operator==(User const & other) const;
-    bool operator!=(User const & other) const;
+    bool operator==(User const& other) const;
+    bool operator!=(User const& other) const;
     void print(std::ostream & os) const;
 
 private:
-    friend class Model;
+    friend class Model; // TODO remove
 
     std::string name_;
     std::string country_;
@@ -45,9 +45,7 @@ private:
     int color_; // 0x00BBGGRR
     UserStatus status_;
     UserBattleStatus battleStatus_;
-
-    Battle const * joinedBattle_; // TODO shared_ptr
-
+    int joinedBattle_;
 };
 
 // inline methods
@@ -97,12 +95,7 @@ inline void User::battleStatus(UserBattleStatus const & battleStatus)
     battleStatus_ = battleStatus;
 }
 
-inline void User::joinedBattle(Battle const & battle)
-{
-    joinedBattle_ = &battle;
-}
-
-inline Battle const * User::joinedBattle() const
+inline int User::joinedBattle() const
 {
     return joinedBattle_;
 }

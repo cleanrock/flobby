@@ -212,10 +212,11 @@ int Tabs::handlePrivateChatClick(PrivateChatTab* pc)
         try {
             User const& user = model_.getUser(pc->userName()); // throws if user not online
 
-            Battle const * battle = user.joinedBattle();
-            if (battle) {
-                battleId = battle->id();
-                std::string joinText = "Join " + battle->title();
+            int const battleId = user.joinedBattle();
+            if (battleId != -1)
+            {
+                Battle const& battle = model_.getBattle(battleId);
+                std::string joinText = "Join " + battle.title();
                 menu.add(joinText, 2);
             }
         }
