@@ -24,6 +24,7 @@
 #include <X11/extensions/scrnsaver.h>
 #include <FL/x.H>
 #include "icon.xpm.h"
+#include <Magick++.h>
 
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Menu_Bar.H>
@@ -139,6 +140,8 @@ UserInterface::UserInterface(Model & model) :
     model.connectLoginResult( boost::bind(&UserInterface::loginResult, this, _1, _2) );
     model.connectJoinBattleFailed( boost::bind(&UserInterface::joinBattleFailed, this, _1) );
     model.connectDownloadDone( boost::bind(&UserInterface::downloadDone, this, _1, _2) );
+
+    Magick::InitializeMagick(0);
 }
 
 UserInterface::~UserInterface()
