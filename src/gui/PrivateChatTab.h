@@ -33,7 +33,7 @@ private:
     bool beep_;
 
     int handle(int event);
-    void append(std::string const & msg, bool interesting = false);
+    void append(std::string const & msg, int interest = 0);
     void onInput(std::string const & text);
 
     void initChatSettings();

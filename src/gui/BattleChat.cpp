@@ -55,7 +55,7 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
 
     if (userName == myName)
     {
-        interest = -1;
+        interest = -2;
     }
 
     // handle messages from host
@@ -72,7 +72,11 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
             oss << inGameUserName << ": " << inGameMsg;
             if (inGameUserName == myName)
             {
-                interest = -1;
+                interest = -2;
+            }
+            else
+            {
+                interest = 0;
             }
         }
         else
@@ -86,7 +90,7 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
         oss << userName << ": " << msg;
     }
 
-    if (interest == 0)
+    if (interest != -1)
     {
         if (msg.find(myName) != std::string::npos)
         {

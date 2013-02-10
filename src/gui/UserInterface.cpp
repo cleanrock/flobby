@@ -59,6 +59,8 @@ UserInterface::UserInterface(Model & model) :
 {
     FL_NORMAL_SIZE = 12; // TODO ??
 
+    TextDisplay2::initTextStyles();
+
     Fl_File_Icon::load_system_icons();
 
     int const H = 1000;

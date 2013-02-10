@@ -76,7 +76,7 @@ void PrivateChatTab::say(std::string const & userName, std::string const & msg)
 {
     if (userName == userName_)
     {
-        append(msg);
+        append(msg, -2); // my text
     }
 }
 
@@ -84,7 +84,7 @@ void PrivateChatTab::said(std::string const & userName, std::string const & msg)
 {
     if (userName == userName_)
     {
-        append(userName + ": " + msg, true);
+        append(userName + ": " + msg, 0); // normal
     }
 }
 
@@ -92,7 +92,7 @@ void PrivateChatTab::userJoined(User const & user)
 {
     if (user.name() == userName_)
     {
-        append(userName_ + " joined server");
+        append(userName_ + " joined server", -1);
     }
 }
 
@@ -121,7 +121,7 @@ void PrivateChatTab::userLeft(User const & user)
 {
     if (user.name() == userName_)
     {
-        append(userName_ + " left server");
+        append(userName_ + " left server", -1);
     }
 }
 
@@ -129,7 +129,7 @@ void PrivateChatTab::userJoinedBattle(User const & user, Battle const & battle)
 {
     if (user.name() == userName_)
     {
-        append(userName_ + " joined " + battle.title());
+        append(userName_ + " joined " + battle.title(), -1);
     }
 }
 
@@ -137,24 +137,29 @@ void PrivateChatTab::userLeftBattle(User const & user, Battle const & battle)
 {
     if (user.name() == userName_)
     {
-        append(userName_ + " left " + battle.title());
+        append(userName_ + " left " + battle.title(), -1);
     }
 }
 
-void PrivateChatTab::append(std::string const & msg, bool interesting)
+void PrivateChatTab::append(std::string const & msg, int interest)
 {
     logFile_.log(msg);
 
-    text_->append(msg, interesting ? 0 : -1);
+    // interest can be :
+    // -2 my text
+    // -1 join/leave messages
+    // 0 other part sent text
 
-    // make Tabs redraw header
-    if (interesting && !visible() && labelcolor() != FL_RED)
+    text_->append(msg, interest);
+
+    // make Tabs redraw header if other part send text
+    if (interest == 0 && !visible() && labelcolor() != FL_RED)
     {
         labelcolor(FL_RED);
         iTabs_.redrawTabs();
     }
 
-    if (interesting && beep_)
+    if (interest == 0 && beep_)
     {
         Sound::beep();
     }

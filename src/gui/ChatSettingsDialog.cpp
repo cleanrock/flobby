@@ -23,6 +23,7 @@ static char const * const PrefTimeColor = "TimeColor";
 static char const * const PrefLowInterestColor = "LowInterestColor";
 static char const * const PrefNormalInterestColor = "NormalInterestColor";
 static char const * const PrefHighInterestColor = "HighInterestColor";
+static char const * const PrefMyTextColor = "MyTextColor";
 
 ChatSettingsDialog::ChatSettingsDialog():
     Fl_Window(800, 400, "Chat settings")
@@ -69,11 +70,18 @@ ChatSettingsDialog::ChatSettingsDialog():
         setTextColor_[index]->callback(ChatSettingsDialog::callbackHighColor, this);
         y += 40;
 
+        index = TextDisplay2::STYLE_MYTEXT;
+        setTextColor_[index] = new Fl_Button(410, y, 200, 30, "Set my text color ...");
+        textColor_[index] = new Fl_Box(FL_BORDER_BOX, 620, y, 30, 30, 0);
+        setTextColor_[index]->callback(ChatSettingsDialog::callbackMyTextColor, this);
+        y += 40;
+
         y += 20;
         chatSample_ = new TextDisplay2(410, y, 380, 65, "Chat sample (FLTK will force black or white if contrast is low)");
         chatSample_->append("Low Interest", -1);
         chatSample_->append("Normal Interest", 0);
         chatSample_->append("High Interest", 1);
+        chatSample_->append("My text", -2);
     }
 
     Fl_Return_Button * btn = new Fl_Return_Button(700, 360, 90, 30, "Apply");
@@ -137,6 +145,9 @@ void ChatSettingsDialog::loadPrefs()
 
         prefs.get(PrefHighInterestColor, val, FL_FOREGROUND_COLOR);
         textColor_[TextDisplay2::STYLE_HIGH]->color(val);
+
+        prefs.get(PrefMyTextColor, val, FL_FOREGROUND_COLOR);
+        textColor_[TextDisplay2::STYLE_MYTEXT]->color(val);
     }
 
     setCurrentSettings();
@@ -173,6 +184,7 @@ void ChatSettingsDialog::savePrefs()
         prefs.set(PrefLowInterestColor, static_cast<int>(textColor_[TextDisplay2::STYLE_LOW]->color()) );
         prefs.set(PrefNormalInterestColor, static_cast<int>(textColor_[TextDisplay2::STYLE_NORMAL]->color()) );
         prefs.set(PrefHighInterestColor, static_cast<int>(textColor_[TextDisplay2::STYLE_HIGH]->color()) );
+        prefs.set(PrefMyTextColor, static_cast<int>(textColor_[TextDisplay2::STYLE_MYTEXT]->color()) );
     }
 
     setCurrentSettings();
@@ -251,6 +263,12 @@ void ChatSettingsDialog::callbackHighColor(Fl_Widget* w, void *data)
 {
     ChatSettingsDialog * o = static_cast<ChatSettingsDialog*>(data);
     o->selectColor("High", TextDisplay2::STYLE_HIGH);
+}
+
+void ChatSettingsDialog::callbackMyTextColor(Fl_Widget* w, void *data)
+{
+    ChatSettingsDialog * o = static_cast<ChatSettingsDialog*>(data);
+    o->selectColor("My text", TextDisplay2::STYLE_MYTEXT);
 }
 
 void ChatSettingsDialog::callbackApply(Fl_Widget*, void *data)

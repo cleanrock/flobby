@@ -18,9 +18,11 @@ public:
         STYLE_LOW,
         STYLE_NORMAL,
         STYLE_HIGH,
+        STYLE_MYTEXT,
         STYLE_COUNT
     };
-    static Fl_Text_Display::Style_Table_Entry textStyles_[];
+    static Fl_Text_Display::Style_Table_Entry textStyles_[STYLE_COUNT];
+    static void initTextStyles(); // call after setting font size
 
 private:
     Fl_Text_Buffer * text_;

@@ -60,6 +60,7 @@ private:
     static void callbackLowColor(Fl_Widget* w, void* d);
     static void callbackNormalColor(Fl_Widget* w, void* d);
     static void callbackHighColor(Fl_Widget* w, void* d);
+    static void callbackMyTextColor(Fl_Widget* w, void* d);
 
     static void callbackApply(Fl_Widget*, void*);
 

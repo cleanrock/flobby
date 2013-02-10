@@ -166,7 +166,7 @@ void ChannelChatTab::said(std::string const & channelName, std::string const & u
         std::string const& myName = model_.me().name();
         if (userName == myName)
         {
-            interest = -1;
+            interest = -2;
         }
         else if (message.find(myName) != std::string::npos)
         {

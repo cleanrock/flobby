@@ -9,13 +9,18 @@
 #include <cstring>
 #include <ctime>
 
-Fl_Text_Display::Style_Table_Entry TextDisplay2::textStyles_[] =
+Fl_Text_Display::Style_Table_Entry TextDisplay2::textStyles_[STYLE_COUNT];
+
+
+void TextDisplay2::initTextStyles()
 {
-    {  FL_FOREGROUND_COLOR, FL_COURIER, 10 },   // A - time
-    {  FL_FOREGROUND_COLOR, FL_HELVETICA, 12 }, // B - low interest
-    {  FL_FOREGROUND_COLOR, FL_HELVETICA, 12 }, // C - normal interest
-    {  FL_FOREGROUND_COLOR, FL_HELVETICA, 12 }, // D - high interest
-};
+    textStyles_[STYLE_TIME] =   {  FL_FOREGROUND_COLOR, FL_COURIER, FL_NORMAL_SIZE };
+    textStyles_[STYLE_LOW] =    {  FL_FOREGROUND_COLOR, FL_HELVETICA, FL_NORMAL_SIZE };
+    textStyles_[STYLE_NORMAL] = {  FL_FOREGROUND_COLOR, FL_HELVETICA, FL_NORMAL_SIZE };
+    textStyles_[STYLE_HIGH] =   {  FL_FOREGROUND_COLOR, FL_HELVETICA, FL_NORMAL_SIZE };
+    textStyles_[STYLE_MYTEXT] = {  FL_FOREGROUND_COLOR, FL_HELVETICA, FL_NORMAL_SIZE };
+}
+
 
 TextDisplay2::TextDisplay2(int x, int y, int w, int h, char const * label):
     Fl_Text_Display(x, y, w, h, label)
@@ -73,7 +78,20 @@ void TextDisplay2::append(std::string const & text, int interest)
         style_->append(styleTime.c_str());
 
         // style for rest (text + newline)
-        std::string const styleText(text2.size(), interest < 0 ? 'B' : (interest > 0 ? 'D' : 'C') );
+        char style;
+        switch (interest)
+        {
+        case -2: style = 'E'; break;
+        case -1: style = 'B'; break;
+        case  0: style = 'C'; break;
+        case  1: style = 'D'; break;
+
+        default:
+            style = 'D';
+            LOG(WARNING)<< "unknown interest level "<< interest;
+            break;
+        }
+        std::string const styleText(text2.size(), style);
         style_->append(styleText.c_str());
         style_->append("\n");
     }
