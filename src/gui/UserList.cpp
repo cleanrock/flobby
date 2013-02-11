@@ -93,9 +93,16 @@ void UserList::userClicked(int rowIndex, int button)
 
         if (battleId != -1)
         {
-            Battle const& battle = model_.getBattle(battleId);
-            std::string joinText = "Join " + battle.title();
-            menu.add(joinText, 2);
+            try
+            {
+                Battle const& battle = model_.getBattle(battleId);
+                std::string joinText = "Join " + battle.title();
+                menu.add(joinText, 2);
+            }
+            catch (std::invalid_argument const& e)
+            {
+                LOG(WARNING) << e.what();
+            }
         }
 
         if (menu.size() > 0)
@@ -112,9 +119,9 @@ void UserList::userClicked(int rowIndex, int button)
                 catch (std::invalid_argument const & e)
                 {
                     LOG(WARNING)<< e.what();
-                    return;
                 }
                 break;
+
             case 2:
                 try
                 {
@@ -135,7 +142,6 @@ void UserList::userClicked(int rowIndex, int button)
                 catch (std::invalid_argument const & e)
                 {
                     LOG(WARNING)<< e.what();
-                    return;
                 }
                 break;
             }
