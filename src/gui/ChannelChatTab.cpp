@@ -33,7 +33,7 @@ ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & c
     // left side (text and input)
     int const leftW = 0.75*w;
     Fl_Group * left = new Fl_Group(x, y, leftW, h);
-    int const ih = 24; // input height
+    int const ih = FL_NORMAL_SIZE*2; // input height
     text_ = new TextDisplay2(x, y, leftW, h-ih);
     input_ = new ChatInput(x, y+h-ih, leftW, ih);
     input_->connectText( boost::bind(&ChannelChatTab::onInput, this, _1) );

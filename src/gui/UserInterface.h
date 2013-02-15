@@ -21,6 +21,7 @@ class BattleRoom;
 class Tabs;
 class ChatSettingsDialog;
 class SoundSettingsDialog;
+class FontSettingsDialog;
 
 class Fl_Double_Window;
 class Fl_Browser;
@@ -35,13 +36,15 @@ public:
     UserInterface(Model & model);
     virtual ~UserInterface();
 
-    static void setupLogging();
+    static void setupEarlySettings();
 
     int run(int argc, char** argv);
 
     void addCallbackEvent(void (*cb)(void*) /* Fl_Awake_Handler */, void *data);
 
 private:
+    static void setupLogging();
+
     Model & model_;
     std::unique_ptr<Cache> cache_;
 
@@ -59,6 +62,7 @@ private:
     TextDialog * autoJoinChannelsDialog_;
     ChatSettingsDialog * chatSettingsDialog_;
     SoundSettingsDialog * soundSettingsDialog_;
+    FontSettingsDialog * fontSettingsDialog_;
 
     Fl_Tile * tile_; // whole app window client area
     Fl_Tile * tileLeft_; // chat and battle list
@@ -99,6 +103,7 @@ private:
     static void menuChannelsAutoJoin(Fl_Widget *w, void* d);
     static void menuChatSettings(Fl_Widget *w, void* d);
     static void menuSoundSettings(Fl_Widget *w, void* d);
+    static void menuFontSettings(Fl_Widget *w, void* d);
     static void checkAway(void* d);
 
     void enableMenuItem(void(*cb)(Fl_Widget*, void*), bool enable);

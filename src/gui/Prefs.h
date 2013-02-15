@@ -3,6 +3,8 @@
 #include <FL/Fl_Preferences.H>
 
 // prefs used by multiple classes
+static char const * PrefFontSize = "FontSize";
+
 char const * const PrefLogin = "Login";
 char const * const PrefLoginHost = "Host";
 char const * const PrefLoginPort = "Port";

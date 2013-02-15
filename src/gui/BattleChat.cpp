@@ -19,7 +19,7 @@ BattleChat::BattleChat(int x, int y, int w, int h, Model & model):
     model_(model),
     logFile_("battlechat")
 {
-    int const ih = 24; // input height
+    int const ih = FL_NORMAL_SIZE*2; // input height
 
     voteLine_ = new VoteLine(x, y, w, ih, model_);
 

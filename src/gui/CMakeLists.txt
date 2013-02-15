@@ -51,6 +51,7 @@ add_library (gui STATIC
     SoundSettingsDialog.cpp
     MyImage.cpp
     TextFunctions.cpp
+    FontSettingsDialog.cpp
 )
 
 target_link_libraries (gui

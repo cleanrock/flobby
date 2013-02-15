@@ -25,7 +25,7 @@ int main(int argc, char * argv[])
     // extra scope to be able to check destruction
     {
         // setup
-        UserInterface::setupLogging();
+        UserInterface::setupEarlySettings();
 
         Controller controller;
         Model model(controller);

@@ -20,7 +20,7 @@ VoteLine::VoteLine(int x, int y, int w, int h, Model & model):
 {
     box(FL_NO_BOX);
 
-    int const btnWidth = 30;
+    int const btnWidth = h*1.2;
 
     text_ = new Fl_Box(x, y, w-2*btnWidth, h);
     text_->box(FL_THIN_DOWN_BOX);

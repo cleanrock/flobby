@@ -16,6 +16,7 @@
 #include "SpringDialog.h"
 #include "ChatSettingsDialog.h"
 #include "SoundSettingsDialog.h"
+#include "FontSettingsDialog.h"
 
 #include "log/Log.h"
 #include "model/Model.h"
@@ -57,8 +58,6 @@ UserInterface::UserInterface(Model & model) :
     model_(model),
     cache_(new Cache(model_))
 {
-    FL_NORMAL_SIZE = 12; // TODO ??
-
     TextDisplay2::initTextStyles();
 
     Fl_File_Icon::load_system_icons();
@@ -67,7 +66,7 @@ UserInterface::UserInterface(Model & model) :
     int const W = 1000;
     int const leftW = 400;
     int const rightW = 600; // hack to avoid problem with headertext in battle room
-    int const mH = 20;
+    int const mH = FL_NORMAL_SIZE*1.5;
     int const cH = H-mH;
 
     mainWindow_ = new Fl_Double_Window(W, H, "flobby");
@@ -90,10 +89,11 @@ UserInterface::UserInterface(Model & model) :
             { 0 },
         { "Se&ttings",              0, 0, 0, FL_SUBMENU },
                 { "&Spring...", 0, (Fl_Callback *)&menuSpring, this },
-                { "&Battle list filter...", 0, (Fl_Callback *)&menuBattleListFilter, this },
+                { "&Battle list filter...", FL_COMMAND +'b', (Fl_Callback *)&menuBattleListFilter, this },
                 { "Channels to &auto-join...", 0, (Fl_Callback *)&menuChannelsAutoJoin, this },
                 { "Soun&d...", 0, (Fl_Callback *)&menuSoundSettings, this },
                 { "&Chat...", 0, (Fl_Callback *)&menuChatSettings, this },
+                { "&Font ...", 0, (Fl_Callback *)&menuFontSettings, this },
                 { "&Logging...", 0, (Fl_Callback *)&menuLogging, this },
                 { 0 },
         { "&Other",              0, 0, 0, FL_SUBMENU },
@@ -111,8 +111,9 @@ UserInterface::UserInterface(Model & model) :
     tile_ = new Fl_Tile(0, mH, W, cH);
 
     tileLeft_ = new Fl_Tile(0, mH, leftW, cH);
-    tabs_ = new Tabs(0, mH, leftW, cH/2, model_);
-    battleList_ = new BattleList(0, mH+cH/2, leftW, cH/2, model_, *cache_);
+    int const tabsH = cH/2;
+    tabs_ = new Tabs(0, mH, leftW, tabsH, model_);
+    battleList_ = new BattleList(0, mH+tabsH, leftW, cH-tabsH, model_, *cache_);
     tileLeft_->end();
 
     battleRoom_ = new BattleRoom(leftW, mH, rightW, cH, model_, *cache_, *tabs_);
@@ -135,6 +136,7 @@ UserInterface::UserInterface(Model & model) :
     autoJoinChannelsDialog_->connectTextSave(boost::bind(&UserInterface::autoJoinChannels, this, _1));
     soundSettingsDialog_ = new SoundSettingsDialog();
     chatSettingsDialog_ = new ChatSettingsDialog();
+    fontSettingsDialog_ = new FontSettingsDialog();
     tabs_->setChatSettingsDialog(chatSettingsDialog_); // ugly dependency injection
 
     // model signal handlers
@@ -161,6 +163,12 @@ UserInterface::~UserInterface()
     delete mainWindow_;
 
     model_.disconnect();
+}
+
+void UserInterface::setupEarlySettings()
+{
+    setupLogging();
+    FontSettingsDialog::setupFont();
 }
 
 void UserInterface::setupLogging()
@@ -518,6 +526,13 @@ void UserInterface::menuChatSettings(Fl_Widget *w, void* d)
     UserInterface * ui = static_cast<UserInterface*>(d);
 
     ui->chatSettingsDialog_->show();
+}
+
+void UserInterface::menuFontSettings(Fl_Widget *w, void* d)
+{
+    UserInterface * ui = static_cast<UserInterface*>(d);
+
+    ui->fontSettingsDialog_->show();
 }
 
 void UserInterface::menuLogging(Fl_Widget *w, void* d)

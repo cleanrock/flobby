@@ -36,22 +36,22 @@ SpringDialog::SpringDialog(Model & model) :
     btn = new Fl_Button(570, 90, 20, 40, "...");
     btn->callback(SpringDialog::callbackBrowseSpring, this);
 
-    unitSyncPath_ = new Fl_File_Input(220, 150, 350, 40, "UnitSync path  (e.g. /usr/lib/libunitsync.so)");
+    unitSyncPath_ = new Fl_File_Input(220, 160, 350, 40, "UnitSync path  (e.g. /usr/lib/libunitsync.so)");
     unitSyncPath_->align(FL_ALIGN_TOP_LEFT);
 
-    btn = new Fl_Button(570, 150, 20, 40, "...");
+    btn = new Fl_Button(570, 160, 20, 40, "...");
     btn->callback(SpringDialog::callbackBrowseUnitSync, this);
 
-    prDownloaderCmd_ = new Fl_File_Input(220, 210, 350, 40, "pr-downloader");
+    prDownloaderCmd_ = new Fl_File_Input(220, 230, 350, 40, "pr-downloader");
     prDownloaderCmd_->align(FL_ALIGN_TOP_LEFT);
 
-    btn = new Fl_Button(570, 210, 20, 40, "...");
+    btn = new Fl_Button(570, 230, 20, 40, "...");
     btn->callback(SpringDialog::callbackBrowsePrDownloader, this);
 
-    save_ = new Fl_Button(500, 260, 90, 30, "Save");
+    save_ = new Fl_Button(500, 290, 90, 30, "Save");
     save_->callback(SpringDialog::callbackSave, this);
 
-    delete_ = new Fl_Button(400, 260, 90, 30, "Delete");
+    delete_ = new Fl_Button(400, 290, 90, 30, "Delete");
     delete_->callback(SpringDialog::callbackDelete, this);
 
     select_ = new Fl_Return_Button(500, 350, 90, 30, "Select");

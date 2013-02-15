@@ -31,6 +31,7 @@ StringTable::StringTable(int x, int y, int w, int h, std::string const & name, s
 
     color(FL_BACKGROUND2_COLOR);
     col_header(1);
+    col_header_height(FL_NORMAL_SIZE*1.6);
     col_resize(1);
     col_resize_min(10);
     type(Fl_Table_Row::SELECT_NONE);
@@ -104,6 +105,7 @@ void StringTable::draw_sort_arrow(int X,int Y,int W,int H,int sort) {
     int xrit = X+(W-6)-0;
     int ytop = Y+(H/2)-4;
     int ybot = Y+(H/2)+4;
+
     if ( sort_reverse_ ) {
         // down arrow
         fl_color(active_r() ? FL_FOREGROUND_COLOR : FL_INACTIVE_COLOR);

@@ -26,7 +26,7 @@ PrivateChatTab::PrivateChatTab(int x, int y, int w, int h, std::string const & u
     copy_label(tabName.c_str());
 
     int const m = 0; // margin
-    int const ih = 24; // input height
+    int const ih = FL_NORMAL_SIZE*2; // input height
     text_ = new TextDisplay2(x+m, y+m, w-2*m, h-ih-2*m);
 
     input_ = new ChatInput(x, y+h-ih, w, ih);

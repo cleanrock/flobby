@@ -42,7 +42,8 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
 
     // header (info text)
     //
-    int const headerH = 48;
+    int headerH = FL_NORMAL_SIZE*3*1.3;
+    headerH += (headerH & 1); // make sure headerH is even
     int const rightW = 256; // 2 times image width
 
     int const headerTextW = w-rightW;
@@ -65,7 +66,7 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
 
     // buttons (2 rows)
     int buttonX = x + headerTextW;
-    int const buttonH = 24;
+    int const buttonH = headerH/2; // safe, headerH is even
     // Spec and Ready
     specBtn_ = new Fl_Check_Button(buttonX, y, 70, buttonH, "Spec");
     readyBtn_ = new Fl_Check_Button(buttonX, y+buttonH, 70, buttonH, "Ready");

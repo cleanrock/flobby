@@ -45,7 +45,7 @@ RegisterDialog::RegisterDialog(Model & model):
 
     info_ = new Fl_Box(10, 310, 380, 30);
 
-    register_ = new Fl_Return_Button(300, 350, 90, 30, "Register");
+    register_ = new Fl_Return_Button(280, 350, 110, 30, "Register");
     register_->callback(RegisterDialog::callback, this);
 
     end();

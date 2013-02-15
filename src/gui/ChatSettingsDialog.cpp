@@ -47,37 +47,37 @@ ChatSettingsDialog::ChatSettingsDialog():
         int y = 30;
 
         index = TextDisplay2::STYLE_TIME;
-        setTextColor_[index] = new Fl_Button(410, y, 200, 30, "Set Time color ...");
-        textColor_[index] = new Fl_Box(FL_BORDER_BOX, 620, y, 30, 30, 0);
+        setTextColor_[index] = new Fl_Button(410, y, 240, 30, "Set Time color ...");
+        textColor_[index] = new Fl_Box(FL_BORDER_BOX, 660, y, 30, 30, 0);
         setTextColor_[index]->callback(ChatSettingsDialog::callbackTimeColor, this);
         y += 40;
 
         index = TextDisplay2::STYLE_LOW;
-        setTextColor_[index] = new Fl_Button(410, y, 200, 30, "Set Low Interest color ...");
-        textColor_[index] = new Fl_Box(FL_BORDER_BOX, 620, y, 30, 30, 0);
+        setTextColor_[index] = new Fl_Button(410, y, 240, 30, "Set Low Interest color ...");
+        textColor_[index] = new Fl_Box(FL_BORDER_BOX, 660, y, 30, 30, 0);
         setTextColor_[index]->callback(ChatSettingsDialog::callbackLowColor, this);
         y += 40;
 
         index = TextDisplay2::STYLE_NORMAL;
-        setTextColor_[index] = new Fl_Button(410, y, 200, 30, "Set Normal Interest color ...");
-        textColor_[index] = new Fl_Box(FL_BORDER_BOX, 620, y, 30, 30, 0);
+        setTextColor_[index] = new Fl_Button(410, y, 240, 30, "Set Normal Interest color ...");
+        textColor_[index] = new Fl_Box(FL_BORDER_BOX, 660, y, 30, 30, 0);
         setTextColor_[index]->callback(ChatSettingsDialog::callbackNormalColor, this);
         y += 40;
 
         index = TextDisplay2::STYLE_HIGH;
-        setTextColor_[index] = new Fl_Button(410, y, 200, 30, "Set High Interest color ...");
-        textColor_[index] = new Fl_Box(FL_BORDER_BOX, 620, y, 30, 30, 0);
+        setTextColor_[index] = new Fl_Button(410, y, 240, 30, "Set High Interest color ...");
+        textColor_[index] = new Fl_Box(FL_BORDER_BOX, 660, y, 30, 30, 0);
         setTextColor_[index]->callback(ChatSettingsDialog::callbackHighColor, this);
         y += 40;
 
         index = TextDisplay2::STYLE_MYTEXT;
-        setTextColor_[index] = new Fl_Button(410, y, 200, 30, "Set my text color ...");
-        textColor_[index] = new Fl_Box(FL_BORDER_BOX, 620, y, 30, 30, 0);
+        setTextColor_[index] = new Fl_Button(410, y, 240, 30, "Set my text color ...");
+        textColor_[index] = new Fl_Box(FL_BORDER_BOX, 660, y, 30, 30, 0);
         setTextColor_[index]->callback(ChatSettingsDialog::callbackMyTextColor, this);
         y += 40;
 
         y += 20;
-        chatSample_ = new TextDisplay2(410, y, 380, 65, "Chat sample (FLTK will force black or white if contrast is low)");
+        chatSample_ = new TextDisplay2(410, y, 380, 85, "Chat sample (FLTK will force black or white if contrast is low)");
         chatSample_->append("Low Interest", -1);
         chatSample_->append("Normal Interest", 0);
         chatSample_->append("High Interest", 1);

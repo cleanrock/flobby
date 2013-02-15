@@ -26,7 +26,7 @@ BattleFilterDialog::BattleFilterDialog():
     box_ = new Fl_Box(10, 170, 380, 30);
     box_->labelcolor(FL_RED);
 
-    Fl_Return_Button * btn = new Fl_Return_Button(300, 350, 90, 30, "Set filter");
+    Fl_Return_Button * btn = new Fl_Return_Button(280, 350, 110, 30, "Set filter");
     btn->callback(BattleFilterDialog::callback, this);
 
     end();
