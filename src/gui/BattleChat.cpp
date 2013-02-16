@@ -90,7 +90,7 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
         oss << userName << ": " << msg;
     }
 
-    if (interest != -1)
+    if (interest == 0)
     {
         if (msg.find(myName) != std::string::npos)
         {
