@@ -149,7 +149,7 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
     playerList_->connectRowClicked( boost::bind(&BattleRoom::playerClicked, this, _1, _2) );
     playerList_->connectRowDoubleClicked( boost::bind(&BattleRoom::playerDoubleClicked, this, _1, _2) );
 
-    battleChat_->getChatInput().connectComplete( boost::bind(&BattleRoom::onComplete, this, _1, _2) );
+    battleChat_->getChatInput().connectComplete( boost::bind(&BattleRoom::onComplete, this, _1, _2, _3) );
 
 }
 
@@ -855,9 +855,9 @@ void BattleRoom::showDownloadGameButton()
     header_->init_sizes();
 }
 
-void BattleRoom::onComplete(std::string const& text, std::string& result)
+void BattleRoom::onComplete(std::string const& text, std::size_t pos, std::pair<std::string, std::size_t>& result)
 {
-    auto const pairWordPos = getLastWord(text);
+    auto const pairWordPos = getLastWord(text, pos);
 
     for (int i=0; i<playerList_->rows(); ++i)
     {
@@ -866,7 +866,8 @@ void BattleRoom::onComplete(std::string const& text, std::string& result)
 
         if (containsI(name, pairWordPos.first))
         {
-            result = text.substr(0, pairWordPos.second) + name;
+            result.first = text.substr(0, pairWordPos.second) + name + text.substr(pos);
+            result.second = pairWordPos.second + name.length();
             return;
         }
     }

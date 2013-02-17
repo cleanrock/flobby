@@ -37,7 +37,7 @@ ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & c
     text_ = new TextDisplay2(x, y, leftW, h-ih);
     input_ = new ChatInput(x, y+h-ih, leftW, ih);
     input_->connectText( boost::bind(&ChannelChatTab::onInput, this, _1) );
-    input_->connectComplete( boost::bind(&ChannelChatTab::onComplete, this, _1, _2) );
+    input_->connectComplete( boost::bind(&ChannelChatTab::onComplete, this, _1, _2, _3) );
     left->resizable(text_);
     left->end();
 
@@ -233,14 +233,15 @@ void ChannelChatTab::initChatSettings()
     }
 }
 
-void ChannelChatTab::onComplete(std::string const & text, std::string & result)
+void ChannelChatTab::onComplete(std::string const& text, std::size_t pos, std::pair<std::string, std::size_t>& result)
 {
-    auto const pairWordPos = getLastWord(text);
+    auto const pairWordPos = getLastWord(text, pos);
 
     std::string const userName = userList_->completeUserName(pairWordPos.first);
 
     if (!userName.empty())
     {
-        result = text.substr(0, pairWordPos.second) + userName;
+        result.first = text.substr(0, pairWordPos.second) + userName + text.substr(pos);
+        result.second = pairWordPos.second + userName.length();
     }
 }

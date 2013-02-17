@@ -32,7 +32,7 @@ private:
 
     int handle(int event);
     void onInput(std::string const & text);
-    void onComplete(std::string const & text, std::string & result);
+    void onComplete(std::string const & text, std::size_t pos, std::pair<std::string, std::size_t>& result);
 
     void append(std::string const & msg, bool interesting = false);
 

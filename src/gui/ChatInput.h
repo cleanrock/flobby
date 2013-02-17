@@ -15,8 +15,8 @@ public:
     boost::signals::connection connectText(TextSignal::slot_type subscriber)
     { return textSignal_.connect(subscriber); }
 
-    // complete signal is only fired if cursor is at end of line and last char is a non-space
-    typedef boost::signal<void (std::string const & text, std::string & result)> CompleteSignal;
+    // result contain completed word and new insert position, completed word is unchanged if not found
+    typedef boost::signal<void (std::string const & text, std::size_t pos, std::pair<std::string, std::size_t>& result)> CompleteSignal;
     boost::signals::connection connectComplete(CompleteSignal::slot_type subscriber)
     { assert(completeSignal_.num_slots() == 0); return completeSignal_.connect(subscriber); }
 

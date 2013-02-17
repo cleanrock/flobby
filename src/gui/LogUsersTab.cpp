@@ -28,7 +28,7 @@ LogUsersTab::LogUsersTab(int x, int y, int w, int h,
     text_ = new TextDisplay2(x, y, leftW, h-ih);
     input_ = new ChatInput(x, y+h-ih, leftW, ih);
     input_->connectText( boost::bind(&LogUsersTab::onInput, this, _1) );
-    input_->connectComplete( boost::bind(&LogUsersTab::onComplete, this, _1, _2) );
+    input_->connectComplete( boost::bind(&LogUsersTab::onComplete, this, _1, _2, _3) );
     left->resizable(text_);
     left->end();
 
@@ -162,7 +162,7 @@ void LogUsersTab::onInput(std::string const & text)
     // TODO
 }
 
-void LogUsersTab::onComplete(std::string const & text, std::string & result)
+void LogUsersTab::onComplete(std::string const & text, std::size_t pos, std::pair<std::string, std::size_t>& result)
 {
     // TODO
 }

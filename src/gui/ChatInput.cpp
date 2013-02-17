@@ -12,7 +12,7 @@ ChatInput::ChatInput(int x, int y, int w, int h, size_t historySize):
 {
     box(FL_THIN_DOWN_BOX);
     callback(ChatInput::callbackText, this);
-    when(FL_WHEN_ENTER_KEY);
+    when(FL_WHEN_ENTER_KEY|FL_WHEN_NOT_CHANGED);
 }
 
 void ChatInput::callbackText(Fl_Widget * w, void * data)
@@ -77,17 +77,17 @@ int ChatInput::handleKeyDown()
             return 1;
 
         case FL_Tab:
-            // do tab completion if last char is not a space
-            if ( (Fl::event_state() & (FL_SHIFT | FL_CTRL | FL_ALT | FL_META)) == 0
-                 && size() > 0 && position() == size() && value()[size()-1] != ' ')
+            // do tab completion
+            if ( (Fl::event_state() & (FL_SHIFT | FL_CTRL | FL_ALT | FL_META)) == 0)
             {
-                std::string result;
-                completeSignal_(value(), result);
-                if (!result.empty())
+                std::pair<std::string, std::size_t> result;
+                completeSignal_(value(), position(), result);
+                if (!result.first.empty())
                 {
-                    value(result.c_str());
+                    value(result.first.c_str());
+                    position(result.second);
+                    return 1;
                 }
-                return 1;
             }
             break;
 

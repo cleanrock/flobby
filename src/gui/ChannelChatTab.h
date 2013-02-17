@@ -35,7 +35,7 @@ private:
     bool beep_;
 
     void onInput(std::string const & text);
-    void onComplete(std::string const & text, std::string & result);
+    void onComplete(std::string const& text, std::size_t pos, std::pair<std::string, std::size_t>& result);
     int handle(int event);
     void append(std::string const & msg, int interest = -1);
 
