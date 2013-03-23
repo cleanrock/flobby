@@ -149,17 +149,17 @@ foreach(component ${ImageMagick_FIND_COMPONENTS}
     )
   if(component STREQUAL "Magick++")
     FIND_IMAGEMAGICK_API(Magick++ Magick++.h
-      Magick++ Magick++-Q16 CORE_RL_Magick++_
+      Magick++ Magick++-Q16 Magick++-6.Q16 CORE_RL_Magick++_
       )
     list(APPEND ImageMagick_REQUIRED_VARS ImageMagick_Magick++_LIBRARY)
   elseif(component STREQUAL "MagickWand")
     FIND_IMAGEMAGICK_API(MagickWand wand/MagickWand.h
-      Wand MagickWand MagickWand-Q16 CORE_RL_wand_
+      Wand MagickWand MagickWand-Q16 MagickWand-6.Q16 CORE_RL_wand_
       )
     list(APPEND ImageMagick_REQUIRED_VARS ImageMagick_MagickWand_LIBRARY)
   elseif(component STREQUAL "MagickCore")
     FIND_IMAGEMAGICK_API(MagickCore magick/MagickCore.h
-      Magick MagickCore MagickCore-Q16 CORE_RL_magick_
+      Magick MagickCore MagickCore-Q16 MagickCore-6.Q16 CORE_RL_magick_
       )
     list(APPEND ImageMagick_REQUIRED_VARS ImageMagick_MagickCore_LIBRARY)
   else()
