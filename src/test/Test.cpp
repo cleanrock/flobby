@@ -291,6 +291,39 @@ void Test::testScript()
 {
     Script script;
 
+    {
+        auto keyValuePair = script.getKeyValuePair("GAME/Players/[CLAN]PlayerName/skill=(35)");
+        CPPUNIT_ASSERT_EQUAL( keyValuePair.first, std::string("Players/[CLAN]PlayerName/skill") );
+        CPPUNIT_ASSERT_EQUAL( keyValuePair.second, std::string("(35)") );
+    }
+
+    {
+        auto keyValuePair = script.getKeyValuePair("Players/[CLAN]PlayerName/skill=(35)");
+        CPPUNIT_ASSERT_EQUAL( keyValuePair.first, std::string("") );
+        CPPUNIT_ASSERT_EQUAL( keyValuePair.second, std::string("") );
+    }
+
+    {
+        auto keyValuePair = script.getKeyValuePair("GAME/Players/[CLAN]PlayerName/crap");
+        CPPUNIT_ASSERT_EQUAL( keyValuePair.first, std::string("") );
+        CPPUNIT_ASSERT_EQUAL( keyValuePair.second, std::string("") );
+    }
+
+    {
+        auto key = script.getKey("GAME/removed");
+        CPPUNIT_ASSERT_EQUAL( std::string("removed"), key );
+    }
+
+    {
+        auto key = script.getKey("GAME/removed=bla");
+        CPPUNIT_ASSERT_EQUAL( std::string("removed"), key );
+    }
+
+    {
+        auto key = script.getKey("GAME_missing");
+        CPPUNIT_ASSERT_EQUAL( key, std::string("") );
+    }
+
     script.add("GAME/Sub1/Sub2/key1=val1");
     script.add("GAME/key1=val1");
     script.add("GAME/Sub1/key1=val1");

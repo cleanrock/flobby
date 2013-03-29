@@ -10,6 +10,8 @@ public:
     virtual ~Script();
 
     void clear();
+    std::pair<std::string, std::string> getKeyValuePair(std::string const & str); // e.g. str=GAME/MODOPTIONS/maxunits=3000, returns MODOPTIONS/maxunits,3000
+    std::string getKey(std::string const & str); // e.g. str=GAME/MODOPTIONS/maxunits=3000, returns MODOPTIONS/maxunits
     std::pair<std::string, std::string> add(std::string const & str); // e.g. str=GAME/MODOPTIONS/maxunits=3000, returns maxunits,3000
     std::string remove(std::string const & key); // e.g. GAME/MODOPTIONS/maxunits, returns maxunits
     void write(std::string const & fileName);

@@ -1,4 +1,5 @@
 #include "Script.h"
+#include "log/Log.h"
 
 #include <boost/algorithm/string.hpp>
 #include <fstream>
@@ -18,6 +19,74 @@ void Script::clear()
 {
     root_.nodes_.clear();
     root_.values_.clear();
+}
+
+std::pair<std::string, std::string> Script::getKeyValuePair(std::string const & str)
+{
+    std::string key, value;
+    std::istringstream iss(str);
+
+    std::string ex;
+
+    // skip initial "GAME/"
+    std::getline(iss, ex, '/');
+    if (!iss.eof())
+    {
+        boost::to_upper(ex);
+        if (ex != "GAME")
+        {
+            LOG(WARNING)<< "key not starting with GAME '" << str << "'";
+            return std::make_pair(key, value);
+        }
+    }
+    else
+    {
+        LOG(WARNING)<< "/ not found in '" << str << "'";
+        return std::make_pair(key, value);
+    }
+
+    // get key and value
+    std::getline(iss, ex, '=');
+    if (!iss.eof())
+    {
+        key = ex;
+        std::getline(iss, value);
+    }
+    else
+    {
+        LOG(WARNING)<< "= not found in '" << str << "'";
+    }
+
+    return std::make_pair(key, value);
+}
+
+std::string Script::getKey(std::string const & str)
+{
+    std::string key;
+    std::istringstream iss(str);
+
+    std::string ex;
+
+    // skip initial "GAME/"
+    std::getline(iss, ex, '/');
+    if (!iss.eof())
+    {
+        boost::to_upper(ex);
+        if (ex != "GAME")
+        {
+            LOG(WARNING)<< "key not starting with GAME '" << str << "'";
+        }
+        else
+        {
+            std::getline(iss, key, '=');
+        }
+    }
+    else
+    {
+        LOG(WARNING)<< "/ not found in '" << str << "'";
+    }
+
+    return key;
 }
 
 std::pair<std::string, std::string> Script::add(std::string const & str)

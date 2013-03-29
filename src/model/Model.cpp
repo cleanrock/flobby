@@ -1028,8 +1028,11 @@ void Model::handle_SETSCRIPTTAGS(std::istream & is) // {data} [{data} ...]
         while (true)
         {
             extractSentence(is, ex); // will break out of loop when it throws
-            auto keyValuePair = script_.add(ex);
-            setScriptTagSignal_(keyValuePair.first, keyValuePair.second);
+            auto keyValuePair = script_.getKeyValuePair(ex);
+            if (!keyValuePair.first.empty())
+            {
+                setScriptTagSignal_(keyValuePair.first, keyValuePair.second);
+            }
         }
     }
     catch (...)
@@ -1040,7 +1043,6 @@ void Model::handle_SETSCRIPTTAGS(std::istream & is) // {data} [{data} ...]
 
 void Model::handle_REMOVESCRIPTTAGS(std::istream & is) // key [key ...]
 {
-    // REMOVESCRIPTTAGS is not used/sent as far as i can tell
     using namespace LobbyProtocol;
     std::string ex;
     try
@@ -1048,8 +1050,11 @@ void Model::handle_REMOVESCRIPTTAGS(std::istream & is) // key [key ...]
         while (true)
         {
             extractWord(is, ex); // will break out of loop when it throws
-            std::string const key = script_.remove(ex);
-            removeScriptTagSignal_(key);
+            std::string const key = script_.getKey(ex);
+            if (!key.empty())
+            {
+                removeScriptTagSignal_(key);
+            }
         }
     }
     catch (...)
