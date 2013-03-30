@@ -6,6 +6,7 @@
 #include "LoggingDialog.h"
 #include "ProgressDialog.h"
 #include "ChannelsWindow.h"
+#include "MapsWindow.h"
 #include "BattleList.h"
 #include "BattleInfo.h"
 #include "BattleRoom.h"
@@ -99,6 +100,7 @@ UserInterface::UserInterface(Model & model) :
         { "&Other",              0, 0, 0, FL_SUBMENU },
             { "&Reload available games && maps", FL_COMMAND + 'r', (Fl_Callback *)&menuRefresh, this },
             { "&Generate missing cache files", 0, (Fl_Callback *)&menuGenerateCacheFiles, this },
+            { "&Maps...", FL_COMMAND +'m', (Fl_Callback *)&menuMaps, this },
             { 0 },
 
         { 0 }
@@ -124,6 +126,7 @@ UserInterface::UserInterface(Model & model) :
     mainWindow_->end();
 
     channelsWindow_ = new ChannelsWindow(model_);
+    mapsWindow_ = new MapsWindow(model_, *cache_);
 
     springDialog_ = new SpringDialog(model_);
     springDialog_->connectProfileSet(boost::bind(&UserInterface::springProfileSet, this, _1));
@@ -138,6 +141,7 @@ UserInterface::UserInterface(Model & model) :
     chatSettingsDialog_ = new ChatSettingsDialog();
     fontSettingsDialog_ = new FontSettingsDialog();
     tabs_->setChatSettingsDialog(chatSettingsDialog_); // ugly dependency injection
+
 
     // model signal handlers
     model.connectConnected( boost::bind(&UserInterface::connected, this, _1) );
@@ -159,6 +163,7 @@ UserInterface::~UserInterface()
     prefs.set(PrefLeftSplitV, battleList_->y());
 
     delete channelsWindow_;
+    delete mapsWindow_;
     delete loginDialog_;
     delete mainWindow_;
 
@@ -487,6 +492,12 @@ void UserInterface::menuGenerateCacheFiles(Fl_Widget *w, void* d)
     ui->progressDialog_->hide();
 }
 
+void UserInterface::menuMaps(Fl_Widget *w, void* d)
+{
+    UserInterface * ui = static_cast<UserInterface*>(d);
+    ui->mapsWindow_->show();
+}
+
 void UserInterface::menuBattleListFilter(Fl_Widget *w, void* d)
 {
     UserInterface * ui = static_cast<UserInterface*>(d);
@@ -625,6 +636,7 @@ void UserInterface::mainWindowCallback(Fl_Widget * w, void * p)
 void UserInterface::quit()
 {
     channelsWindow_->hide();
+    mapsWindow_->hide();
     mainWindow_->hide();
 }
 

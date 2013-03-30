@@ -16,6 +16,7 @@ class LoggingDialog;
 class ProgressDialog;
 class TextDialog;
 class ChannelsWindow;
+class MapsWindow;
 class BattleList;
 class BattleRoom;
 class Tabs;
@@ -52,6 +53,7 @@ private:
     Fl_Menu_Bar * menuBar_;
 
     ChannelsWindow * channelsWindow_;
+    MapsWindow * mapsWindow_;
 
     SpringDialog * springDialog_;
     LoginDialog * loginDialog_;
@@ -94,6 +96,7 @@ private:
     static void onTest(Fl_Widget* w, void* d);
     static void menuRefresh(Fl_Widget *w, void* d);
     static void menuGenerateCacheFiles(Fl_Widget *w, void* d);
+    static void menuMaps(Fl_Widget *w, void* d);
     static void menuSpring(Fl_Widget *w, void* d);
     static void menuLogging(Fl_Widget *w, void* d);
     static void menuJoinChannel(Fl_Widget *w, void* d);

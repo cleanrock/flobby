@@ -52,6 +52,7 @@ add_library (gui STATIC
     MyImage.cpp
     TextFunctions.cpp
     FontSettingsDialog.cpp
+    MapsWindow.cpp
 )
 
 target_link_libraries (gui
