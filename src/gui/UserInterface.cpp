@@ -89,7 +89,7 @@ UserInterface::UserInterface(Model & model) :
             { "E&xit", FL_COMMAND +'q', (Fl_Callback *)&onQuit, this },
             { 0 },
         { "Se&ttings",              0, 0, 0, FL_SUBMENU },
-                { "&Spring...", 0, (Fl_Callback *)&menuSpring, this },
+                { "&Spring...", FL_COMMAND +'s', (Fl_Callback *)&menuSpring, this },
                 { "&Battle list filter...", FL_COMMAND +'b', (Fl_Callback *)&menuBattleListFilter, this },
                 { "Channels to &auto-join...", 0, (Fl_Callback *)&menuChannelsAutoJoin, this },
                 { "Soun&d...", 0, (Fl_Callback *)&menuSoundSettings, this },
