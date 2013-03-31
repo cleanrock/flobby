@@ -23,6 +23,8 @@ public:
     bool passworded() const;
     int rank() const;
     int mapHash() const;
+    std::string const & engineName() const;
+    std::string const & engineVersion() const;
     std::string const & mapName() const;
     std::string const & title() const;
     std::string const & modName() const;
@@ -57,6 +59,8 @@ private:
     bool passworded_;
     int rank_;
     int mapHash_;
+    std::string engineName_;
+    std::string engineVersion_;
     std::string mapName_;
     std::string title_;
     std::string modName_;
@@ -119,6 +123,16 @@ inline int Battle::rank() const
 inline int Battle::mapHash() const
 {
     return mapHash_;
+}
+
+inline std::string const & Battle::engineName() const
+{
+    return engineName_;
+}
+
+inline std::string const & Battle::engineVersion() const
+{
+    return engineVersion_;
 }
 
 inline std::string const & Battle::mapName() const

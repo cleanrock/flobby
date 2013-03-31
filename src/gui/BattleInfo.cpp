@@ -93,7 +93,7 @@ void BattleInfo::onJoin(Fl_Widget* w, void* data)
 void BattleInfo::setHeaderText(Battle const & battle)
 {
     std::ostringstream oss;
-    oss << battle.title() << " / " << battle.founder() << "\n"
+    oss << battle.title() << " / " << battle.founder() << " / " << battle.engineVersion() <<"\n"
         << battle.mapName() << "\n"
         << battle.modName() << "\n"
         << "Players:";

@@ -551,7 +551,7 @@ void BattleRoom::springExit()
 void BattleRoom::setHeaderText(Battle const & battle)
 {
     std::ostringstream oss;
-    oss << battle.title() << " / " << battle.founder() << "\n"
+    oss << battle.title() << " / " << battle.founder() << " / " << battle.engineVersion() << "\n"
         << battle.mapName() << "\n"
         << battle.modName();
     headerText_->value(oss.str().c_str());

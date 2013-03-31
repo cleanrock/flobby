@@ -359,6 +359,7 @@ private:
     void handle_ADDUSER(std::istream & is);
     void handle_REMOVEUSER(std::istream & is);
     void handle_BATTLEOPENED(std::istream & is);
+    void handle_BATTLEOPENEDEX(std::istream & is);
     void handle_BATTLECLOSED(std::istream & is);
     void handle_UPDATEBATTLEINFO(std::istream & is);
     void handle_JOINEDBATTLE(std::istream & is);

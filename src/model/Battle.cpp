@@ -44,6 +44,10 @@ Battle::Battle(std::istream & is): // battleId type natType founder IP port maxp
     extractWord(is, ex);
     mapHash_ = boost::lexical_cast<int>(ex);
 
+    // BATTLEOPENEDEX specific
+    extractWord(is, engineName_);
+    extractWord(is, engineVersion_);
+
     extractSentence(is, mapName_);
 
     extractSentence(is, title_);

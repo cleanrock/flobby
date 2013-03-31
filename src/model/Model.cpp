@@ -37,6 +37,7 @@ Model::Model(IController & controller):
     ADD_MSG_HANDLER(ADDUSER)
     ADD_MSG_HANDLER(REMOVEUSER)
     ADD_MSG_HANDLER(BATTLEOPENED)
+    ADD_MSG_HANDLER(BATTLEOPENEDEX)
     ADD_MSG_HANDLER(BATTLECLOSED)
     ADD_MSG_HANDLER(UPDATEBATTLEINFO)
     ADD_MSG_HANDLER(JOINEDBATTLE)
@@ -156,7 +157,7 @@ void Model::connected(bool connected)
 void Model::attemptLogin()
 {
     std::ostringstream oss;
-    oss << "LOGIN " << userName_ << " " << password_ << " 0 * flobby 0.1";
+    oss << "LOGIN " << userName_ << " " << password_ << " 0 * flobby 0.1\t0\teb";
     controller_.send(oss.str());
 }
 
@@ -204,9 +205,7 @@ void Model::login(const std::string & username, const std::string & password)
         userName_ = username;
         password_ = password;
 
-        std::ostringstream oss;
-        oss << "LOGIN " << userName_ << " " << password_ << " 0 * flobby 0.1";
-        controller_.send(oss.str());
+        attemptLogin();
     }
     else
     {
@@ -861,6 +860,11 @@ void Model::handle_REMOVEUSER(std::istream & is) // userName
 }
 
 void Model::handle_BATTLEOPENED(std::istream & is)
+{
+    LOG(WARNING)<< "BATTLEOPENED not supported";
+}
+
+void Model::handle_BATTLEOPENEDEX(std::istream & is)
 {
     std::shared_ptr<Battle> b(new Battle(is));
     battles_[b->id()] = b;

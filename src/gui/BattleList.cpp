@@ -29,7 +29,7 @@ BattleList::BattleList(int x, int y, int w, int h, Model & model, Cache & cache)
 {
     int const h1 = h-128;
     battleList_ = new StringTable(x, y, w, h1, "BattleList",
-            { "status", "title", "game", "map", "players" });
+            { "status", "title / host", "engine", "game", "map", "players" });
 
     battleInfo_ = new BattleInfo(x, y+h1, w, h-h1, model_, cache);
 
@@ -236,7 +236,8 @@ StringTableRow BattleList::makeRow(Battle const & battle)
 
     return StringTableRow( boost::lexical_cast<std::string>(battle.id()),
             { statusString(battle),
-              battle.title(),
+              battle.title() + " / " + battle.founder(),
+              battle.engineVersion(),
               battle.modName(),
               battle.mapName(),
               players.str() } );
