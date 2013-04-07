@@ -226,6 +226,7 @@ void Test::testBattle()
                 "8235 0 0 Founder " // id, replay, nat, founder
                 "94.23.170.70 8463 32 " // ip, port, maxPlayers
                 "0 0 -112462944 " // passw, rank, mapHash
+                "engineName engineVersion "
                 "Map name\t"
                 "Battle title\t"
                 "Mod name";
@@ -244,6 +245,8 @@ void Test::testBattle()
         CPPUNIT_ASSERT(b.passworded() == false);
         CPPUNIT_ASSERT(b.rank() == 0);
         CPPUNIT_ASSERT(b.mapHash() == -112462944);
+        CPPUNIT_ASSERT(b.engineName() == "engineName");
+        CPPUNIT_ASSERT(b.engineVersion() == "engineVersion");
         CPPUNIT_ASSERT(b.mapName() == "Map name");
         CPPUNIT_ASSERT(b.title() == "Battle title");
         CPPUNIT_ASSERT(b.modName() == "Mod name");

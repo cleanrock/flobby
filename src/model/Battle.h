@@ -1,5 +1,6 @@
 #pragma once
 
+#include <boost/algorithm/string.hpp>
 #include <map>
 #include <iosfwd>
 #include <string>
@@ -10,7 +11,7 @@ class User;
 class Battle
 {
 public:
-    Battle(std::istream & is); // BATTLEOPENED content
+    Battle(std::istream & is); // BATTLEOPENEDEX content
     virtual ~Battle();
 
     int id() const;
@@ -28,7 +29,8 @@ public:
     std::string const & mapName() const;
     std::string const & title() const;
     std::string const & modName() const;
-    int players() const;
+    int userCount() const;
+    int playerCount() const; // number of non-bot users
     int spectators() const;
     bool locked() const;
     bool running() const;
@@ -41,8 +43,15 @@ public:
     void modHash(int modHash) { modHash_ = modHash; }
     int modHash() const { return modHash_; }
 
-    typedef std::map<std::string, User const *> BattleUsers;
-    BattleUsers const & users() const;
+    struct ciLessBoost : std::binary_function<std::string, std::string, bool>
+    {
+        bool operator() (std::string const& s1, std::string const& s2) const {
+            return boost::ilexicographical_compare(s1, s2);
+        }
+    };
+
+    typedef std::map<std::string, User const*, ciLessBoost> BattleUsers;
+    BattleUsers const& users() const;
 
     void print(std::ostream & os) const;
 
@@ -160,7 +169,7 @@ inline bool Battle::locked() const
     return locked_;
 }
 
-inline int Battle::players() const
+inline int Battle::userCount() const
 {
     return users_.size();
 }
@@ -170,10 +179,11 @@ inline bool Battle::running() const
     return running_;
 }
 
-inline Battle::BattleUsers const & Battle::users() const
+inline Battle::BattleUsers const&  Battle::users() const
 {
     return users_;
 }
+
 
 // global functions
 //

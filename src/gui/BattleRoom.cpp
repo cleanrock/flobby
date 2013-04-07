@@ -226,9 +226,6 @@ void BattleRoom::joined(Battle const & battle)
         startBtn_->activate();
     }
 
-    User const & founder = model_.getUser(battle.founder());
-    playerList_->addRow(makeRow(founder));
-
     for (Battle::BattleUsers::value_type pair : battle.users())
     {
         assert(pair.second);

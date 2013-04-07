@@ -96,7 +96,7 @@ void BattleInfo::setHeaderText(Battle const & battle)
     oss << battle.title() << " / " << battle.founder() << " / " << battle.engineVersion() <<"\n"
         << battle.mapName() << "\n"
         << battle.modName() << "\n"
-        << "Players:";
+        << "Users:";
 
     for (Battle::BattleUsers::value_type pair : battle.users())
     {

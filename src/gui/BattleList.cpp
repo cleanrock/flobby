@@ -232,7 +232,7 @@ std::string BattleList::statusString(Battle const & battle)
 StringTableRow BattleList::makeRow(Battle const & battle)
 {
     boost::format players("%2d");
-    players % battle.players();
+    players % battle.playerCount();
 
     return StringTableRow( boost::lexical_cast<std::string>(battle.id()),
             { statusString(battle),
@@ -271,7 +271,7 @@ void BattleList::setFilter(std::string const & game, int players)
 
 bool BattleList::passesFilter(Battle const & battle)
 {
-    if (battle.players() < filterPlayers_) return false;
+    if (battle.playerCount() < filterPlayers_) return false;
 
     if (!filterGame_.empty())
     {

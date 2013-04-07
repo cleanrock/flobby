@@ -870,10 +870,12 @@ void Model::handle_BATTLEOPENEDEX(std::istream & is)
     battles_[b->id()] = b;
 
     // set running status
-    User & founder = user(b->founder());
+    User& founder = user(b->founder());
     b->running(founder.status().inGame());
 
     founder.joinedBattle(*b);
+
+    b->joined(founder);
 
     if (loggedIn_)
     {
