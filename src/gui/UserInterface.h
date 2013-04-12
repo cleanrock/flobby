@@ -52,6 +52,7 @@ private:
     Fl_Double_Window * mainWindow_;
     Fl_Menu_Bar * menuBar_;
 
+    ProgressDialog * progressDialog_;
     ChannelsWindow * channelsWindow_;
     MapsWindow * mapsWindow_;
 
@@ -60,7 +61,6 @@ private:
     RegisterDialog * registerDialog_;
     AgreementDialog * agreementDialog_;
     LoggingDialog * loggingDialog_;
-    ProgressDialog * progressDialog_;
     TextDialog * autoJoinChannelsDialog_;
     ChatSettingsDialog * chatSettingsDialog_;
     SoundSettingsDialog * soundSettingsDialog_;

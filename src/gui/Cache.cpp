@@ -20,30 +20,71 @@ Cache::~Cache()
 {
 }
 
-std::string const & Cache::basePath()
+std::string Cache::basePath()
 {
-    if (basePath_.empty())
+    std::string basePath = model_.getWriteableDataDir() + "flobby/cache/";
+    if (!boost::filesystem::is_directory(basePath.c_str()))
     {
-        basePath_ = model_.getWriteableDataDir() + "flobby/cache/";
-        if (!boost::filesystem::is_directory(basePath_.c_str()))
-        {
-            boost::filesystem::create_directories(basePath_.c_str());
-        }
+        boost::filesystem::create_directories(basePath.c_str());
     }
-    return basePath_;
+    return basePath;
+}
+
+std::string Cache::getPath(std::string const& mapName, std::string const& type)
+{
+    std::string path;
+
+    unsigned int const chksum = model_.getMapChecksum(mapName);
+    if (chksum != 0)
+    {
+        std::ostringstream oss;
+        oss << basePath() << mapName << "_" << chksum << "_" << type << "_128.png";
+        path = oss.str();
+    }
+
+    return path;
+}
+
+std::string Cache::pathMapImage(std::string const& mapName)
+{
+    return getPath(mapName, "minimap");
+}
+
+std::string Cache::pathMetalImage(std::string const& mapName)
+{
+    return getPath(mapName, "metal");
+}
+
+std::string Cache::pathHeightImage(std::string const& mapName)
+{
+    return getPath(mapName, "height");
+}
+
+bool Cache::hasMapImage(std::string const & mapName)
+{
+    std::string const path = pathMapImage(mapName);
+
+    return !path.empty() && boost::filesystem::exists(path);
+}
+
+bool Cache::hasMetalImage(std::string const & mapName)
+{
+    std::string const path = pathMetalImage(mapName);
+
+    return !path.empty() && boost::filesystem::exists(path);
+}
+
+bool Cache::hasHeightImage(std::string const & mapName)
+{
+    std::string const path = pathHeightImage(mapName);
+
+    return !path.empty() && boost::filesystem::exists(path);
 }
 
 Fl_Shared_Image * Cache::getMapImage(std::string const & mapName)
 {
-    unsigned int const chksum = model_.getMapChecksum(mapName);
-    if (chksum == 0)
-    {
-        return 0;
-    }
-
-    std::ostringstream oss;
-    oss << basePath() << mapName << "_" << chksum << "_minimap_128.png";
-    std::string const path = oss.str();
+    std::string const path = pathMapImage(mapName);
+    if (path.empty()) return 0;
 
     Fl_Shared_Image * image = Fl_Shared_Image::get(path.c_str());
 
@@ -74,15 +115,8 @@ Fl_Shared_Image * Cache::getMapImage(std::string const & mapName)
 
 Fl_Shared_Image * Cache::getMetalImage(std::string const & mapName)
 {
-    unsigned int const chksum = model_.getMapChecksum(mapName);
-    if (chksum == 0)
-    {
-        return 0;
-    }
-
-    std::ostringstream oss;
-    oss << basePath() << mapName << "_" << chksum << "_metal_128.png";
-    std::string const path = oss.str();
+    std::string const path = pathMetalImage(mapName);
+    if (path.empty()) return 0;
 
     Fl_Shared_Image * image = Fl_Shared_Image::get(path.c_str());
 
@@ -115,15 +149,8 @@ Fl_Shared_Image * Cache::getMetalImage(std::string const & mapName)
 
 Fl_Shared_Image * Cache::getHeightImage(std::string const & mapName)
 {
-    unsigned int const chksum = model_.getMapChecksum(mapName);
-    if (chksum == 0)
-    {
-        return 0;
-    }
-
-    std::ostringstream oss;
-    oss << basePath() << mapName << "_" << chksum << "_height_128.png";
-    std::string const path = oss.str();
+    std::string const path = pathHeightImage(mapName);
+    if (path.empty()) return 0;
 
     Fl_Shared_Image * image = Fl_Shared_Image::get(path.c_str());
 

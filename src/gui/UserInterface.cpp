@@ -125,6 +125,7 @@ UserInterface::UserInterface(Model & model) :
     mainWindow_->resizable(tile_);
     mainWindow_->end();
 
+    progressDialog_ = new ProgressDialog();
     channelsWindow_ = new ChannelsWindow(model_);
     mapsWindow_ = new MapsWindow(model_, *cache_);
 
@@ -134,7 +135,6 @@ UserInterface::UserInterface(Model & model) :
     registerDialog_ = new RegisterDialog(model_);
     agreementDialog_ = new AgreementDialog(model_, *loginDialog_);
     loggingDialog_ = new LoggingDialog();
-    progressDialog_ = new ProgressDialog();
     autoJoinChannelsDialog_ = new TextDialog("Channels to auto-join", "One channel per line");
     autoJoinChannelsDialog_->connectTextSave(boost::bind(&UserInterface::autoJoinChannels, this, _1));
     soundSettingsDialog_ = new SoundSettingsDialog();
@@ -298,13 +298,13 @@ void UserInterface::menuChannels(Fl_Widget *w, void* d)
 // TODO remove
 void UserInterface::onTest(Fl_Widget *w, void* d)
 {
-    //UserInterface * ui = static_cast<UserInterface*>(d);
-    //Model & m = ui->model_;
+//    UserInterface * ui = static_cast<UserInterface*>(d);
+//    Model & m = ui->model_;
 
-    // Sound::beep();
-    // ui->sound_->play();
-
-    // m.getModAIs("Zero-K v1.0.3.8");
+//     Sound::beep();
+//     ui->sound_->play();
+//
+//     m.getModAIs("Zero-K v1.0.3.8");
 
 #if 0
     auto maps = m.getMaps();
@@ -458,28 +458,31 @@ void UserInterface::menuGenerateCacheFiles(Fl_Widget *w, void* d)
 
     auto maps = ui->model_.getMaps();
 
-    ui->progressDialog_->label("Generating cache files ...");
-    ui->progressDialog_->show();
+    ProgressDialog::open("Generating cache files ...");
 
     int cnt = 0;
     for (auto const & map : maps)
     {
         float const percentage = 100*static_cast<float>(cnt)/maps.size();
-        ui->progressDialog_->progress(percentage, map);
+        ProgressDialog::progress(percentage, map);
         try
         {
+            ui->cache_->getMapInfo(map);
+            Fl::check();
+
             Fl_Shared_Image * img;
 
             img = ui->cache_->getMapImage(map);
             if (img) img->release();
+            Fl::check();
 
             img = ui->cache_->getMetalImage(map);
             if (img) img->release();
+            Fl::check();
 
             img = ui->cache_->getHeightImage(map);
             if (img) img->release();
-
-            ui->cache_->getMapInfo(map);
+            Fl::check();
         }
         catch (std::exception const & e)
         {
@@ -487,14 +490,55 @@ void UserInterface::menuGenerateCacheFiles(Fl_Widget *w, void* d)
         }
         ++cnt;
     }
-    ui->progressDialog_->progress(100, "Done");
+    ProgressDialog::progress(100, "Done");
     ::usleep(500000); // TODO remove ?
-    ui->progressDialog_->hide();
+    ProgressDialog::close();
 }
 
 void UserInterface::menuMaps(Fl_Widget *w, void* d)
 {
     UserInterface * ui = static_cast<UserInterface*>(d);
+
+    auto maps = ui->model_.getMaps();
+
+    std::vector<std::string> missing;
+
+    for (auto const& mapName : maps)
+    {
+        if (!ui->cache_->hasMapImage(mapName))
+        {
+            missing.push_back(mapName);
+        }
+    }
+
+    if (!missing.empty())
+    {
+        ProgressDialog::open("Generating map images ...");
+    }
+
+    int cnt = 0;
+    for (auto const& mapName : missing)
+    {
+        float const percentage = 100*static_cast<float>(cnt)/missing.size();
+        ProgressDialog::progress(percentage, mapName);
+
+        try
+        {
+            ui->cache_->getMapInfo(mapName);
+            Fl::check();
+
+            Fl_Shared_Image* img;
+            img = ui->cache_->getMapImage(mapName);
+            Fl::check();
+        }
+        catch (std::exception const & e)
+        {
+            LOG(WARNING) << e.what();
+        }
+        ++cnt;
+    }
+    ProgressDialog::close();
+
     ui->mapsWindow_->show();
 }
 

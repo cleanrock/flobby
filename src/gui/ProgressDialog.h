@@ -12,7 +12,9 @@ public:
     ProgressDialog();
     virtual ~ProgressDialog();
 
-    void progress(float percentage, std::string const & text);
+    static void open(std::string const& title);
+    static void progress(float percentage, std::string const & text);
+    static void close();
 
 private:
     Fl_Progress * progress_;

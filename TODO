@@ -1,10 +1,11 @@
-case insensitive settings
+case insensitive settings (SCRIPTTAGS)
 friend list
 map window showing big map image, 512x512
 commands in all chat windows
 single player game
 implement game hosting
 
+? load chat history
 ? quick find in StringTable, e.g. press C key to show first entry beginning with a C, ignore ^[.*] also maybe
 ? handle FORCEQUITBATTLE
 ? battle preview (lower left) do not show host in player list, count host as a player if not bot
