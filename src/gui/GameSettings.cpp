@@ -3,6 +3,7 @@
 #include "model/Model.h"
 
 #include <boost/bind.hpp>
+#include <boost/algorithm/string.hpp>
 
 GameSettings::GameSettings(int x, int y, int w, int h, Model & model):
     StringTable(x, y, w, h, "GameSettings", {"setting", "value"}),
@@ -17,8 +18,11 @@ GameSettings::GameSettings(int x, int y, int w, int h, Model & model):
 
 void GameSettings::setScriptTag(std::string const & key, std::string const & value)
 {
-    StringTableRow row(key, { key, value });
-    if (rowExist(key))
+    std::string key2 = key;
+    boost::to_lower(key2);
+
+    StringTableRow row(key2, { key, value });
+    if (rowExist(key2))
     {
         updateRow(row);
     }
@@ -30,7 +34,10 @@ void GameSettings::setScriptTag(std::string const & key, std::string const & val
 
 void GameSettings::removeScriptTag(std::string const & key)
 {
-    removeRow(key);
+    std::string key2 = key;
+    boost::to_lower(key2);
+
+    removeRow(key2);
 }
 
 /* TODO
