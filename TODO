@@ -1,12 +1,12 @@
-~/.config/flobby/
 friend list
 map window showing big map image, 512x512
 commands in all chat windows
 single player game
 implement game hosting
 
+? link statically to pr-downloader lib
+? freeimage instead of imagemagick
 ? load chat history
 ? quick find in StringTable, e.g. press C key to show first entry beginning with a C, ignore ^[.*] also maybe
 ? handle FORCEQUITBATTLE
-? battle preview (lower left) do not show host in player list, count host as a player if not bot
 ? extractSentence shall accept ""

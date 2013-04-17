@@ -23,7 +23,7 @@ MapsWindow::MapsWindow(Model & model, Cache& cache):
     Fl_Double_Window(100, 100, "Maps"),
     model_(model),
     cache_(cache),
-    prefs_(prefs, label())
+    prefs_(prefs(), label())
 {
     int const scrollW = Fl::scrollbar_size();
     mapArea_ = new MapArea(0, 0, w()-scrollW, h());

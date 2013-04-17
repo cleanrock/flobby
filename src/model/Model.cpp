@@ -8,6 +8,7 @@
 #include "UnitSync.h"
 
 #include "log/Log.h"
+#include "FlobbyDirs.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -537,7 +538,7 @@ void Model::startSpring()
 
     // start spring
     {
-        std::string const scriptPath("flobby_script.txt");
+        std::string const scriptPath = cacheDir() + "flobby_script.txt";
         script_.write(scriptPath);
         std::ostringstream oss;
         oss << springPath_ << " " << scriptPath;

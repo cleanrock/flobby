@@ -20,7 +20,7 @@ void FontSettingsDialog::setupFont()
 int FontSettingsDialog::getFontSize()
 {
     int fontSize;
-    prefs.get(PrefFontSize, fontSize, 13);
+    prefs().get(PrefFontSize, fontSize, 13);
     return fontSize;
 }
 
@@ -70,7 +70,7 @@ void FontSettingsDialog::onApply()
         return;
     }
 
-    prefs.set(PrefFontSize, fontSize);
+    prefs().set(PrefFontSize, fontSize);
 
     box_->label(0);
     hide();

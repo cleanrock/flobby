@@ -51,13 +51,13 @@ LogUsersTab::LogUsersTab(int x, int y, int w, int h,
 
 LogUsersTab::~LogUsersTab()
 {
-    prefs.set(PrefServerMessagesSplitH, userList_->x());
+    prefs().set(PrefServerMessagesSplitH, userList_->x());
 }
 
 void LogUsersTab::initTiles()
 {
     int x;
-    prefs.get(PrefServerMessagesSplitH, x, 0);
+    prefs().get(PrefServerMessagesSplitH, x, 0);
     if (x != 0)
     {
         position(userList_->x(), 0, x, 0);

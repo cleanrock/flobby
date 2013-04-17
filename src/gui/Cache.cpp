@@ -2,6 +2,7 @@
 
 #include "log/Log.h"
 #include "model/Model.h"
+#include "FlobbyDirs.h"
 
 #include <Magick++.h>
 #include <FL/Fl_Shared_Image.H>
@@ -20,9 +21,9 @@ Cache::~Cache()
 {
 }
 
-std::string Cache::basePath()
+std::string Cache::mapDir()
 {
-    std::string basePath = model_.getWriteableDataDir() + "flobby/cache/";
+    std::string basePath = cacheDir() + "map/";
     if (!boost::filesystem::is_directory(basePath.c_str()))
     {
         boost::filesystem::create_directories(basePath.c_str());
@@ -30,7 +31,7 @@ std::string Cache::basePath()
     return basePath;
 }
 
-std::string Cache::getPath(std::string const& mapName, std::string const& type)
+std::string Cache::mapPath(std::string const& mapName, std::string const& type)
 {
     std::string path;
 
@@ -38,7 +39,7 @@ std::string Cache::getPath(std::string const& mapName, std::string const& type)
     if (chksum != 0)
     {
         std::ostringstream oss;
-        oss << basePath() << mapName << "_" << chksum << "_" << type << "_128.png";
+        oss << mapDir() << mapName << "_" << chksum << "_" << type << "_128.png";
         path = oss.str();
     }
 
@@ -47,17 +48,17 @@ std::string Cache::getPath(std::string const& mapName, std::string const& type)
 
 std::string Cache::pathMapImage(std::string const& mapName)
 {
-    return getPath(mapName, "minimap");
+    return mapPath(mapName, "minimap");
 }
 
 std::string Cache::pathMetalImage(std::string const& mapName)
 {
-    return getPath(mapName, "metal");
+    return mapPath(mapName, "metal");
 }
 
 std::string Cache::pathHeightImage(std::string const& mapName)
 {
-    return getPath(mapName, "height");
+    return mapPath(mapName, "height");
 }
 
 bool Cache::hasMapImage(std::string const & mapName)
@@ -228,7 +229,7 @@ MapInfo const & Cache::getMapInfo(std::string const & mapName)
     else
     {
         std::ostringstream oss;
-        oss << basePath() << key << "_info.bin";
+        oss << mapDir() << key << "_info.bin";
         std::string const path = oss.str();
 
         std::ifstream ifs(path);

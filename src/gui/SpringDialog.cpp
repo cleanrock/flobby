@@ -16,7 +16,7 @@ char const * const PrefUnitSyncPath = "UnitSyncPath";
 char const * const PrefPrDownloaderCmd = "PrDownloaderCmd";
 
 SpringDialog::SpringDialog(Model & model) :
-        model_(model), prefs_(prefs, "SpringProfiles"), Fl_Window(600, 400,
+        model_(model), prefs_(prefs(), "SpringProfiles"), Fl_Window(600, 400,
                 "Spring")
 {
     set_modal();
@@ -248,7 +248,7 @@ void SpringDialog::onSave()
     }
 
     // flush prefs to make debugging easier
-    prefs.flush();
+    prefs().flush();
 }
 
 void SpringDialog::onDelete()

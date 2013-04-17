@@ -1,11 +1,12 @@
 #include "LogFile.h"
+#include "FlobbyDirs.h"
 
 #include <boost/filesystem.hpp>
 #include <stdexcept>
 #include <ctime>
 
-std::string const LogFile::dir_ = "flobby/log/";
-bool LogFile::enabled_ = false;
+static std::string dir_;
+static bool enabled_ = false;
 
 LogFile::LogFile(std::string const & name):
     name_(name)
@@ -16,12 +17,19 @@ LogFile::~LogFile()
 {
 }
 
-std::string const & LogFile::dir()
+void LogFile::init()
 {
+    assert(dir_.empty());
+    dir_ = cacheDir() + "log/";
     if (!boost::filesystem::is_directory(dir_.c_str()))
     {
         boost::filesystem::create_directories(dir_.c_str());
     }
+}
+
+std::string const & LogFile::dir()
+{
+    assert(!dir_.empty());
     return dir_;
 }
 
@@ -36,7 +44,7 @@ void LogFile::log(std::string const & text)
 
     if (!ofs_.is_open())
     {
-        std::string const fileName = dir() + "flobby_" + name_ + ".log";
+        std::string const fileName = dir() + name_ + ".log";
         ofs_.open(fileName, std::fstream::app);
         if (!ofs_.good())
         {

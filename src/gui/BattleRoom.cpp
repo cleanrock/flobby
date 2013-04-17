@@ -155,13 +155,13 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
 
 BattleRoom::~BattleRoom()
 {
-    prefs.set(PrefBattleRoomSplitV, battleChat_->y());
+    prefs().set(PrefBattleRoomSplitV, battleChat_->y());
 }
 
 void BattleRoom::initTiles()
 {
     int y;
-    prefs.get(PrefBattleRoomSplitV, y, 0);
+    prefs().get(PrefBattleRoomSplitV, y, 0);
     if (y != 0)
     {
         position(0, battleChat_->y(), 0, y);

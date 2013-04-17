@@ -12,6 +12,7 @@ include_directories (
 
 add_executable (flobby
     main.cpp
+	FlobbyDirs.cpp
 )
 
 target_link_libraries (flobby

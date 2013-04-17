@@ -48,10 +48,10 @@ void LoggingDialog::callbackApply(Fl_Widget*, void *data)
 {
     LoggingDialog * o = static_cast<LoggingDialog*>(data);
 
-    prefs.set(PrefLogDebug, o->logDebug_->value());
+    prefs().set(PrefLogDebug, o->logDebug_->value());
     Log::minSeverity(o->logDebug_->value() == 1 ? Log::Debug : Log::Info);
 
-    prefs.set(PrefLogChats, o->logChats_->value());
+    prefs().set(PrefLogChats, o->logChats_->value());
     LogFile::enable(o->logChats_->value() == 1 ? true : false);
 
     // sanity check of log file path
@@ -82,7 +82,7 @@ void LoggingDialog::callbackApply(Fl_Widget*, void *data)
     }
 
     Log::logFile(logPath.string());
-    prefs.set(PrefLogFilePath, logPath.string().c_str());
+    prefs().set(PrefLogFilePath, logPath.string().c_str());
 
     o->hide();
 }

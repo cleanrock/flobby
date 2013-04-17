@@ -56,16 +56,16 @@ BattleList::BattleList(int x, int y, int w, int h, Model & model, Cache & cache)
 
     // read prefs
     char str[65];
-    prefs.get(PrefBattleFilterGame, str, "", 64);
+    prefs().get(PrefBattleFilterGame, str, "", 64);
     filterGame_ = str;
-    prefs.get(PrefBattleFilterPlayers, filterPlayers_, 0);
+    prefs().get(PrefBattleFilterPlayers, filterPlayers_, 0);
 
 }
 
 BattleList::~BattleList()
 {
-    prefs.set(PrefBattleFilterGame, filterGame_.c_str());
-    prefs.set(PrefBattleFilterPlayers, filterPlayers_);
+    prefs().set(PrefBattleFilterGame, filterGame_.c_str());
+    prefs().set(PrefBattleFilterPlayers, filterPlayers_);
 }
 
 void BattleList::loginResult(bool success, std::string const & info)

@@ -48,7 +48,7 @@ ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & c
     // setup split
     {
         int x;
-        prefs.get(PrefServerMessagesSplitH, x, 0);
+        prefs().get(PrefServerMessagesSplitH, x, 0);
         if (x != 0)
         {
             position(userList_->x(), 0, x, 0);

@@ -18,7 +18,7 @@
 RegisterDialog::RegisterDialog(Model & model):
     Fl_Window(400, 400, "Register"),
     model_(model),
-    prefs_(prefs, PrefLogin),
+    prefs_(prefs(), PrefLogin),
     registerInProgress_(false)
 {
     set_modal();

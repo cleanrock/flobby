@@ -19,7 +19,7 @@ StringTable::StringTable(int x, int y, int w, int h, std::string const & name, s
     Fl_Table_Row(x,y,w,h, name.c_str()),
     selectedRow_(-1),
     headers_(headers),
-    prefs_(prefs, label()),
+    prefs_(prefs(), label()),
     savePrefs_(savePrefs)
 {
     labeltype(FL_NO_LABEL);

@@ -154,13 +154,13 @@ UserInterface::UserInterface(Model & model) :
 
 UserInterface::~UserInterface()
 {
-    prefs.set(PrefAppWindowX, mainWindow_->x_root());
-    prefs.set(PrefAppWindowY, mainWindow_->y_root());
-    prefs.set(PrefAppWindowW, mainWindow_->w());
-    prefs.set(PrefAppWindowH, mainWindow_->h());
+    prefs().set(PrefAppWindowX, mainWindow_->x_root());
+    prefs().set(PrefAppWindowY, mainWindow_->y_root());
+    prefs().set(PrefAppWindowW, mainWindow_->w());
+    prefs().set(PrefAppWindowH, mainWindow_->h());
 
-    prefs.set(PrefAppWindowSplitH, battleRoom_->x());
-    prefs.set(PrefLeftSplitV, battleList_->y());
+    prefs().set(PrefAppWindowSplitH, battleRoom_->x());
+    prefs().set(PrefLeftSplitV, battleList_->y());
 
     delete channelsWindow_;
     delete mapsWindow_;
@@ -168,10 +168,14 @@ UserInterface::~UserInterface()
     delete mainWindow_;
 
     model_.disconnect();
+
+    prefs().flush();
 }
 
 void UserInterface::setupEarlySettings()
 {
+    LogFile::init();
+    initPrefs();
     setupLogging();
     FontSettingsDialog::setupFont();
 }
@@ -179,10 +183,10 @@ void UserInterface::setupEarlySettings()
 void UserInterface::setupLogging()
 {
     int logDebug;
-    prefs.get(PrefLogDebug, logDebug, 0);
+    prefs().get(PrefLogDebug, logDebug, 0);
 
     char * logFilePath; // freed below
-    prefs.get(PrefLogFilePath, logFilePath, "/tmp/flobby.log");
+    prefs().get(PrefLogFilePath, logFilePath, "/tmp/flobby.log");
 
     if (logDebug != 0)
     {
@@ -193,7 +197,7 @@ void UserInterface::setupLogging()
     ::free(logFilePath);
 
     int logChats;
-    prefs.get(PrefLogChats, logChats, 1);
+    prefs().get(PrefLogChats, logChats, 1);
     LogFile::enable(logChats == 1 ? true : false);
 }
 
@@ -201,19 +205,19 @@ int UserInterface::run(int argc, char** argv)
 {
     {
         int x, y, w, h;
-        prefs.get(PrefAppWindowX, x, 0);
-        prefs.get(PrefAppWindowY, y, 0);
-        prefs.get(PrefAppWindowW, w, 1000);
-        prefs.get(PrefAppWindowH, h, 1000);
+        prefs().get(PrefAppWindowX, x, 0);
+        prefs().get(PrefAppWindowY, y, 0);
+        prefs().get(PrefAppWindowW, w, 1000);
+        prefs().get(PrefAppWindowH, h, 1000);
         mainWindow_->resize(x,y,w,h);
 
-        prefs.get(PrefAppWindowSplitH, x, 0);
+        prefs().get(PrefAppWindowSplitH, x, 0);
         if (x != 0)
         {
             tile_->position(battleRoom_->x(), 0, x, 0);
         }
 
-        prefs.get(PrefLeftSplitV, y, 0);
+        prefs().get(PrefLeftSplitV, y, 0);
         if (y != 0)
         {
             tileLeft_->position(0, battleList_->y(), 0, y);
@@ -427,7 +431,7 @@ void UserInterface::loginResult(bool success, std::string const & info)
     if (success)
     {
         char * val;
-        prefs.get(PrefAutoJoinChannels, val, "");
+        prefs().get(PrefAutoJoinChannels, val, "");
         autoJoinChannels(val);
         ::free(val);
 
@@ -560,7 +564,7 @@ void UserInterface::menuChannelsAutoJoin(Fl_Widget *w, void* d)
     UserInterface * ui = static_cast<UserInterface*>(d);
 
     char * val;
-    prefs.get(PrefAutoJoinChannels, val, "");
+    prefs().get(PrefAutoJoinChannels, val, "");
     std::string text(val);
     ::free(val);
 
@@ -644,7 +648,7 @@ void UserInterface::autoJoinChannels(std::string const & text)
             model_.joinChannel(v);
         }
     }
-    prefs.set(PrefAutoJoinChannels, oss.str().c_str());
+    prefs().set(PrefAutoJoinChannels, oss.str().c_str());
 }
 
 void UserInterface::springProfileSet(std::string const & profile)

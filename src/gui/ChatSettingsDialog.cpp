@@ -109,44 +109,44 @@ void ChatSettingsDialog::loadPrefs()
 
     // channel chat
     {
-        prefs.get(PrefShowJoinLeaveInChannels, val, 0);
+        prefs().get(PrefShowJoinLeaveInChannels, val, 0);
         showJoinLeaveInChannels_->value(val);
 
-        prefs.get(PrefChannelChatBeep, val, 0);
+        prefs().get(PrefChannelChatBeep, val, 0);
         channelChatBeep_->value(val);
 
         char * text;
-        prefs.get(PrefChannelChatBeepExceptions, text, "");
+        prefs().get(PrefChannelChatBeepExceptions, text, "");
         channelChatBeepExceptions_->value(text);
         ::free(text);
     }
 
     // private chat
     {
-        prefs.get(PrefPrivateChatBeep, val, 1);
+        prefs().get(PrefPrivateChatBeep, val, 1);
         privateChatBeep_->value(val);
 
         char * text;
-        prefs.get(PrefPrivateChatBeepExceptions, text, "");
+        prefs().get(PrefPrivateChatBeepExceptions, text, "");
         privateChatBeepExceptions_->value(text);
         ::free(text);
     }
 
     // chat text color
     {
-        prefs.get(PrefTimeColor, val, FL_INACTIVE_COLOR);
+        prefs().get(PrefTimeColor, val, FL_INACTIVE_COLOR);
         textColor_[TextDisplay2::STYLE_TIME]->color(val);
 
-        prefs.get(PrefLowInterestColor, val, FL_INACTIVE_COLOR);
+        prefs().get(PrefLowInterestColor, val, FL_INACTIVE_COLOR);
         textColor_[TextDisplay2::STYLE_LOW]->color(val);
 
-        prefs.get(PrefNormalInterestColor, val, FL_FOREGROUND_COLOR);
+        prefs().get(PrefNormalInterestColor, val, FL_FOREGROUND_COLOR);
         textColor_[TextDisplay2::STYLE_NORMAL]->color(val);
 
-        prefs.get(PrefHighInterestColor, val, FL_FOREGROUND_COLOR);
+        prefs().get(PrefHighInterestColor, val, FL_FOREGROUND_COLOR);
         textColor_[TextDisplay2::STYLE_HIGH]->color(val);
 
-        prefs.get(PrefMyTextColor, val, FL_FOREGROUND_COLOR);
+        prefs().get(PrefMyTextColor, val, FL_FOREGROUND_COLOR);
         textColor_[TextDisplay2::STYLE_MYTEXT]->color(val);
     }
 
@@ -160,31 +160,31 @@ void ChatSettingsDialog::savePrefs()
     // channel chat
     {
         int const showJoinLeave = showJoinLeaveInChannels_->value();
-        prefs.set(PrefShowJoinLeaveInChannels, showJoinLeave);
+        prefs().set(PrefShowJoinLeaveInChannels, showJoinLeave);
 
         int const beep = channelChatBeep_->value();
-        prefs.set(PrefChannelChatBeep, beep);
+        prefs().set(PrefChannelChatBeep, beep);
 
         std::string const beepExceptions(channelChatBeepExceptions_->value());
-        prefs.set(PrefChannelChatBeepExceptions, beepExceptions.c_str());
+        prefs().set(PrefChannelChatBeepExceptions, beepExceptions.c_str());
     }
 
     // private chat
     {
         int const beep = privateChatBeep_->value();
-        prefs.set(PrefPrivateChatBeep, beep);
+        prefs().set(PrefPrivateChatBeep, beep);
 
         std::string const beepExceptions(privateChatBeepExceptions_->value());
-        prefs.set(PrefPrivateChatBeepExceptions, beepExceptions.c_str());
+        prefs().set(PrefPrivateChatBeepExceptions, beepExceptions.c_str());
     }
 
     // chat text color
     {
-        prefs.set(PrefTimeColor, static_cast<int>(textColor_[TextDisplay2::STYLE_TIME]->color()) );
-        prefs.set(PrefLowInterestColor, static_cast<int>(textColor_[TextDisplay2::STYLE_LOW]->color()) );
-        prefs.set(PrefNormalInterestColor, static_cast<int>(textColor_[TextDisplay2::STYLE_NORMAL]->color()) );
-        prefs.set(PrefHighInterestColor, static_cast<int>(textColor_[TextDisplay2::STYLE_HIGH]->color()) );
-        prefs.set(PrefMyTextColor, static_cast<int>(textColor_[TextDisplay2::STYLE_MYTEXT]->color()) );
+        prefs().set(PrefTimeColor, static_cast<int>(textColor_[TextDisplay2::STYLE_TIME]->color()) );
+        prefs().set(PrefLowInterestColor, static_cast<int>(textColor_[TextDisplay2::STYLE_LOW]->color()) );
+        prefs().set(PrefNormalInterestColor, static_cast<int>(textColor_[TextDisplay2::STYLE_NORMAL]->color()) );
+        prefs().set(PrefHighInterestColor, static_cast<int>(textColor_[TextDisplay2::STYLE_HIGH]->color()) );
+        prefs().set(PrefMyTextColor, static_cast<int>(textColor_[TextDisplay2::STYLE_MYTEXT]->color()) );
     }
 
     setCurrentSettings();

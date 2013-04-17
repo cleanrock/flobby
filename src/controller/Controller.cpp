@@ -3,6 +3,7 @@
 #include "model/Model.h"
 #include "IServerEvent.h"
 #include "log/Log.h"
+#include "FlobbyDirs.h"
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
@@ -61,7 +62,7 @@ void Controller::runProcess(std::string const & cmd, bool logToFile, unsigned in
         // create log filename
         std::string const first = cmd.substr(0, cmd.find(' '));
         boost::filesystem::path const path(first);
-        std::string const log = "flobby_process_" + path.stem().string() + ".log";
+        std::string const log = cacheDir() + "flobby_process_" + path.stem().string() + ".log";
         LOG(DEBUG) << "runProcess logFile: '" << log << "'";
 
         // redirect stdout and stderr to log file

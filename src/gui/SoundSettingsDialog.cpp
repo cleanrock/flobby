@@ -48,20 +48,20 @@ void SoundSettingsDialog::loadPrefs()
 {
     int val;
 
-    prefs.get(PrefSound, val, 1);
+    prefs().get(PrefSound, val, 1);
     enable_->value(val);
 
     char * text;
-    prefs.get(PrefSoundCommand, text, "xkbbell -v 100");
+    prefs().get(PrefSoundCommand, text, "xkbbell -v 100");
     command_->value(text);
     ::free(text);
 }
 
 void SoundSettingsDialog::savePrefs()
 {
-    prefs.set(PrefSound, enable_->value());
+    prefs().set(PrefSound, enable_->value());
 
-    prefs.set(PrefSoundCommand, command_->value());
+    prefs().set(PrefSoundCommand, command_->value());
 
     Sound::enable_ = enable_->value() == 1 ? true : false;
     Sound::command_ = command_->value();

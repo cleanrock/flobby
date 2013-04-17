@@ -2,6 +2,9 @@
 
 #include <FL/Fl_Preferences.H>
 
+void initPrefs();
+Fl_Preferences& prefs();
+
 // prefs used by multiple classes
 static char const * PrefFontSize = "FontSize";
 
@@ -14,5 +17,3 @@ char const * const PrefLoginPassword = "Password";
 char const * const PrefLogDebug = "LogDebug";
 char const * const PrefLogFilePath = "LogFilePath";
 char const * const PrefLogChats = "LogChats";
-
-extern Fl_Preferences prefs;

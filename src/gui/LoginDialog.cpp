@@ -22,7 +22,7 @@ static char const * const PrefAutoLogin = "AutoLogin";
 LoginDialog::LoginDialog(Model & model):
     Fl_Window(400, 400, "Login"),
     model_(model),
-    prefs_(prefs, PrefLogin),
+    prefs_(prefs(), PrefLogin),
     loginInProgress_(false)
 {
     set_modal();

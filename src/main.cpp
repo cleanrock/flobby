@@ -1,3 +1,4 @@
+#include "FlobbyDirs.h"
 #include "controller/Controller.h"
 #include "model/Model.h"
 #include "gui/UserInterface.h"
@@ -21,6 +22,8 @@ int main(int argc, char * argv[])
             argvRest[i+1] = (char*)rest[i].c_str();
         }
     */
+
+    initDirs();
 
     // extra scope to be able to check destruction
     {

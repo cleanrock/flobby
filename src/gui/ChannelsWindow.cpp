@@ -16,7 +16,7 @@ static char const * PrefWindowH = "WindowH";
 ChannelsWindow::ChannelsWindow(Model & model):
     Fl_Double_Window(100, 100, "Channels"),
     model_(model),
-    prefs_(prefs, label()),
+    prefs_(prefs(), label()),
     channelsRetrieved_(false)
 {
     channelList_ = new StringTable(0, 0, 100, 100, "ChannelList",

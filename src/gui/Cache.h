@@ -28,11 +28,11 @@ private:
     Model & model_;
     std::map<std::string, MapInfo> mapInfos_;
 
-    std::string basePath();
+    std::string mapDir();
     std::string pathMapImage(std::string const& mapName);
     std::string pathMetalImage(std::string const& mapName);
     std::string pathHeightImage(std::string const& mapName);
-    std::string getPath(std::string const& mapName, std::string const& type);
+    std::string mapPath(std::string const& mapName, std::string const& type); // returns empty string map do not exist
 
     void createImageFile(uint8_t const * data, int w, int h, int d, std::string const & path, double r = 1 /* w/h */);
 };
