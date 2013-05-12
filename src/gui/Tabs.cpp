@@ -212,7 +212,7 @@ int Tabs::handlePrivateChatClick(PrivateChatTab* pc)
         try {
             User const& user = model_.getUser(pc->userName()); // throws if user not online
 
-            int const battleId = user.joinedBattle();
+            battleId = user.joinedBattle();
             if (battleId != -1)
             {
                 Battle const& battle = model_.getBattle(battleId);
