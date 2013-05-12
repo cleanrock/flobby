@@ -30,13 +30,13 @@ SpringDialog::SpringDialog(Model & model) :
     name_ = new Fl_Input(220, 30, 370, 30, "Name");
     name_->align(FL_ALIGN_TOP_LEFT);
 
-    springPath_ = new Fl_File_Input(220, 90, 350, 40, "Spring path  (e.g. /usr/bin/spring)");
+    springPath_ = new Fl_File_Input(220, 90, 350, 40, "Spring (e.g. /usr/bin/spring [options])");
     springPath_->align(FL_ALIGN_TOP_LEFT);
 
     btn = new Fl_Button(570, 90, 20, 40, "...");
     btn->callback(SpringDialog::callbackBrowseSpring, this);
 
-    unitSyncPath_ = new Fl_File_Input(220, 160, 350, 40, "UnitSync path  (e.g. /usr/lib/libunitsync.so)");
+    unitSyncPath_ = new Fl_File_Input(220, 160, 350, 40, "UnitSync (e.g. /usr/lib/libunitsync.so)");
     unitSyncPath_->align(FL_ALIGN_TOP_LEFT);
 
     btn = new Fl_Button(570, 160, 20, 40, "...");
@@ -319,12 +319,6 @@ bool SpringDialog::setPaths()
         std::string springPath(str);
         ::free(str);
 
-        if (!boost::filesystem::is_regular_file(springPath))
-        {
-            fl_alert("%s is not a regular file.", springPath.c_str());
-            show();
-            return false;
-        }
         model_.setSpringPath(springPath);
 
         // UnitSync
@@ -332,12 +326,6 @@ bool SpringDialog::setPaths()
         std::string unitSyncPath(str);
         ::free(str);
 
-        if (!boost::filesystem::is_regular_file(unitSyncPath))
-        {
-            fl_alert("%s is not a regular file.", unitSyncPath.c_str());
-            show();
-            return false;
-        }
         try
         {
             model_.setUnitSyncPath(unitSyncPath);
