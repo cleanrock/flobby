@@ -245,6 +245,7 @@ void Test::testBattle()
         CPPUNIT_ASSERT(b.passworded() == false);
         CPPUNIT_ASSERT(b.rank() == 0);
         CPPUNIT_ASSERT(b.mapHash() == -112462944);
+        CPPUNIT_ASSERT(b.mapHash() == static_cast<unsigned int>(-112462944));
         CPPUNIT_ASSERT(b.engineName() == "engineName");
         CPPUNIT_ASSERT(b.engineVersion() == "engineVersion");
         CPPUNIT_ASSERT(b.mapName() == "Map name");

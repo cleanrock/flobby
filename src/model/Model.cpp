@@ -760,8 +760,8 @@ bool Model::gameExist(std::string const & gameName)
 
 int Model::calcSync(Battle const & battle)
 {
-    int const modChecksum = unitSync_->GetPrimaryModChecksumFromName( battle.modName().c_str() );
-    int const mapChecksum = unitSync_->GetMapChecksumFromName( battle.mapName().c_str() );
+    unsigned int const modChecksum = unitSync_->GetPrimaryModChecksumFromName( battle.modName().c_str() );
+    unsigned int const mapChecksum = unitSync_->GetMapChecksumFromName( battle.mapName().c_str() );
 
     if (modChecksum == 0 || mapChecksum == 0)
     {
@@ -1009,7 +1009,7 @@ void Model::handle_JOINBATTLE(std::istream & is) // battleId hashCode
     joinedBattleId_ = boost::lexical_cast<int>(ex);
     Battle & b = battle(joinedBattleId_);
     extractWord(is, ex);
-    b.modHash(boost::lexical_cast<int>(ex));
+    b.modHash( static_cast<unsigned int>( boost::lexical_cast<int64_t>(ex)) );
     script_.clear();
     bots_.clear();
     LOG(DEBUG) << "modHash " << b.modHash();

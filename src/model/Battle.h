@@ -23,7 +23,7 @@ public:
     int maxPlayers() const;
     bool passworded() const;
     int rank() const;
-    int mapHash() const;
+    unsigned int mapHash() const;
     std::string const & engineName() const;
     std::string const & engineVersion() const;
     std::string const & mapName() const;
@@ -40,8 +40,8 @@ public:
     void joined(User const & user);
     void left(User const & user);
 
-    void modHash(int modHash) { modHash_ = modHash; }
-    int modHash() const { return modHash_; }
+    void modHash(unsigned int modHash) { modHash_ = modHash; }
+    unsigned int modHash() const { return modHash_; }
 
     struct ciLessBoost : std::binary_function<std::string, std::string, bool>
     {
@@ -67,7 +67,7 @@ private:
     int maxPlayers_;
     bool passworded_;
     int rank_;
-    int mapHash_;
+    unsigned int mapHash_;
     std::string engineName_;
     std::string engineVersion_;
     std::string mapName_;
@@ -77,7 +77,7 @@ private:
     int spectators_; // set to 1 in ctor if its a replay battle
     bool locked_;
     bool running_;
-    int modHash_;
+    unsigned int modHash_;
 
     BattleUsers users_;
 };
@@ -129,7 +129,7 @@ inline int Battle::rank() const
     return rank_;
 }
 
-inline int Battle::mapHash() const
+inline unsigned int Battle::mapHash() const
 {
     return mapHash_;
 }
