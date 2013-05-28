@@ -856,16 +856,28 @@ void BattleRoom::onComplete(std::string const& text, std::size_t pos, std::pair<
 {
     auto const pairWordPos = getLastWord(text, pos);
 
+    if (pairWordPos.first.empty())
+    {
+        LOG(DEBUG)<< "ignored trying to complete empty string";
+        return;
+    }
+
+    std::vector<std::string> userNames;
+
     for (int i=0; i<playerList_->rows(); ++i)
     {
         StringTableRow const & row = playerList_->getRow(static_cast<std::size_t>(i));
-        std::string const & name = row.data_[2];
+        userNames.push_back(row.data_[2]);
 
-        if (containsI(name, pairWordPos.first))
-        {
-            result.first = text.substr(0, pairWordPos.second) + name + text.substr(pos);
-            result.second = pairWordPos.second + name.length();
-            return;
-        }
+    }
+
+    auto const pairResultName = findMatch(userNames, pairWordPos.first);
+    if (pairResultName.first != MR_NO_MATCH)
+    {
+        // contain full new line
+        result.first = text.substr(0, pairWordPos.second) + pairResultName.second + text.substr(pos);
+
+        // contain new cursor pos
+        result.second = pairWordPos.second + pairResultName.second.length();
     }
 }

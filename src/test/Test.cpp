@@ -1,6 +1,7 @@
 #include "Test.h"
 #include "model/Model.h"
 #include "gui/MyImage.h"
+#include "gui/TextFunctions.h"
 #include "log/Log.h"
 
 #include <boost/lexical_cast.hpp>
@@ -459,4 +460,44 @@ void Test::logThread(int id)
     {
         LOG(INFO) << "test_thread_" << id; // change to WARNING to see how it looks on std::cout
     }
+}
+
+void Test::testTextFunctions()
+{
+    typedef std::vector<std::string> StringVector;
+
+    StringVector strings = { "Habc", "abc", "ABC", "Hagf", "aGF" };
+
+    std::pair<MatchResult, std::string> result;
+
+    result = findMatch(strings, "");
+    CPPUNIT_ASSERT_EQUAL(MR_NO_MATCH, result.first);
+
+    result = findMatch(strings, "GHabc");
+    CPPUNIT_ASSERT_EQUAL(MR_NO_MATCH, result.first);
+
+    result = findMatch(strings, "ab");
+    CPPUNIT_ASSERT_EQUAL(MR_BEGINS_I, result.first);
+    CPPUNIT_ASSERT("abc" == result.second);
+
+//    result = findMatch(strings, "ab");
+//    CPPUNIT_ASSERT_EQUAL(MR_BEGINS_C, result.first);
+//    CPPUNIT_ASSERT("abc" == result.second);
+
+//    result = findMatch(strings, "A");
+//    CPPUNIT_ASSERT_EQUAL(MR_BEGINS_C, result.first);
+//    CPPUNIT_ASSERT("ABC" == result.second);
+
+    result = findMatch(strings, "ag");
+    CPPUNIT_ASSERT_EQUAL(MR_BEGINS_I, result.first);
+    CPPUNIT_ASSERT("aGF" == result.second);
+
+    result = findMatch(strings, "BC");
+    CPPUNIT_ASSERT_EQUAL(MR_CONTAINS_I, result.first);
+    CPPUNIT_ASSERT("Habc" == result.second);
+
+    result = findMatch(strings, "gf");
+    CPPUNIT_ASSERT_EQUAL(MR_CONTAINS_I, result.first);
+    CPPUNIT_ASSERT("Hagf" == result.second);
+
 }

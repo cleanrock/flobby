@@ -15,6 +15,7 @@ class Test : public CppUnit::TestFixture
     CPPUNIT_TEST( testBot );
     CPPUNIT_TEST( testMyImage );
     CPPUNIT_TEST( testLog );
+    CPPUNIT_TEST( testTextFunctions );
     CPPUNIT_TEST_SUITE_END();
 
  public:
@@ -29,6 +30,7 @@ class Test : public CppUnit::TestFixture
     void testBot();
     void testMyImage();
     void testLog();
+    void testTextFunctions();
 
 private:
     static void logThread(int id);
