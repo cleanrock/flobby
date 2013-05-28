@@ -81,7 +81,7 @@ void Battle::updateBattleInfo(std::istream & is)
     locked_ = boost::lexical_cast<bool>(ex);
 
     extractWord(is, ex);
-    mapHash_ = boost::lexical_cast<int>(ex);
+    mapHash_ = static_cast<unsigned int>( boost::lexical_cast<int64_t>(ex) );
 
     extractSentence(is, mapName_);
 }
