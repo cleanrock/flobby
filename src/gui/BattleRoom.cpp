@@ -206,7 +206,6 @@ void BattleRoom::joined(Battle const & battle)
     playerList_->clear();
     top_->activate();
 
-    setHeaderText(battle);
     if ( !model_.gameExist(battle.modName()) )
     {
         showDownloadGameButton();
@@ -241,6 +240,11 @@ void BattleRoom::joined(Battle const & battle)
     }
 
     battleChat_->battleJoined(battle);
+
+    balance_.clear();
+    updateBalance();
+
+    setHeaderText(battle);
 }
 
 void BattleRoom::battleChanged(const Battle & battle)
@@ -293,6 +297,7 @@ void BattleRoom::userJoinedBattle(User const & user, const Battle & battle)
     {
         playerList_->addRow(makeRow(user));
         battleChat_->addInfo(user.name() + " joined battle");
+        updateBalance();
     }
 }
 
@@ -308,6 +313,7 @@ void BattleRoom::userLeftBattle(User const & user, const Battle & battle)
         else
         {
             playerList_->removeRow(user.name());
+            updateBalance();
         }
     }
 }
@@ -335,6 +341,7 @@ void BattleRoom::userChanged(User const & user)
                 startBtn_->deactivate();
             }
         }
+        updateBalance();
     }
 }
 
@@ -528,16 +535,19 @@ void BattleRoom::onDownloadGame(Fl_Widget* w, void* data)
 void BattleRoom::botAdded(Bot const & bot)
 {
     playerList_->addRow(makeRow(bot));
+    updateBalance();
 }
 
 void BattleRoom::botChanged(Bot const & bot)
 {
     playerList_->updateRow(makeRow(bot));
+    updateBalance();
 }
 
 void BattleRoom::botRemoved(Bot const & bot)
 {
     playerList_->removeRow(bot.name() + ":" + bot.owner());
+    updateBalance();
 }
 
 void BattleRoom::springExit()
@@ -547,9 +557,19 @@ void BattleRoom::springExit()
 
 void BattleRoom::setHeaderText(Battle const & battle)
 {
+    std::ostringstream ossBalance;
+    for (Balance::iterator it = balance_.begin(); it != balance_.end(); ++it)
+    {
+        ossBalance << it->second;
+        if (it != --balance_.end())
+        {
+            ossBalance << 'v';
+        }
+    }
+
     std::ostringstream oss;
     oss << battle.title() << " / " << battle.founder() << " / " << battle.engineVersion() << "\n"
-        << battle.mapName() << "\n"
+        << battle.mapName() << "  " << ossBalance.str() << "\n"
         << battle.modName();
     headerText_->value(oss.str().c_str());
 }
@@ -881,3 +901,43 @@ void BattleRoom::onComplete(std::string const& text, std::size_t pos, std::pair<
         result.second = pairWordPos.second + pairResultName.second.length();
     }
 }
+
+void BattleRoom::updateBalance()
+{
+    Balance balance;
+
+    for (int i=0; i<playerList_->rows(); ++i)
+    {
+        StringTableRow const& row = playerList_->getRow(static_cast<std::size_t>(i));
+        std::string str = row.data_[4]; // copy since we may remove initial space below
+        if (str.empty())
+        {
+            LOG(WARNING)<< "unexpected empty ally team string";
+            continue;
+        }
+        if (str[0] != 's') // only non-specs
+        {
+            if (str[0] == ' ')
+            {
+                str.erase(0, 1);
+            }
+
+            try
+            {
+                int allyTeam = boost::lexical_cast<int>(str);
+                balance[allyTeam] += 1;
+            }
+            catch (boost::bad_lexical_cast const& ex)
+            {
+                LOG(WARNING)<< "unexpected allyTeam: " << str;
+            }
+        }
+    }
+
+    if (balance_ != balance)
+    {
+        balance_ = balance;
+        setHeaderText(model_.getBattle(battleId_));
+    }
+}
+

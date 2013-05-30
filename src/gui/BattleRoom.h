@@ -51,7 +51,6 @@ public:
     void connected(bool connected);
 
     int battleId() const;
-    void addUser(User const & user);
 
     void refresh();
 
@@ -79,6 +78,10 @@ private:
     GameSettings * settings_;
     std::string currentMapImage_; // optimization, indicates what map image is currently shown to avoid setting the same image
     std::vector<std::string> sideNames_;
+
+    typedef std::map<int,int> Balance;
+    Balance balance_; // number of non-spec players in unique ally teams
+    void updateBalance();
 
     StringTable * playerList_;
 
