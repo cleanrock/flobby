@@ -19,6 +19,9 @@ static char const * PrefWindowY = "WindowY";
 static char const * PrefWindowW  = "WindowW";
 static char const * PrefWindowH = "WindowH";
 
+// Fl_Tooltip::margin_width/height() not available in FLTK 1.3.0
+static int const MARGIN = 3;
+
 MapsWindow::MapsWindow(Model & model, Cache& cache):
     Fl_Double_Window(100, 100, "Maps"),
     model_(model),
@@ -123,7 +126,7 @@ void MapsWindow::MapArea::MapInfoWin::info(std::string const& info)
     int W = 0;
     int H = 0;
     fl_measure(info_.c_str(), W, H, 0);
-    size(W + 2*Fl_Tooltip::margin_width(), H + 2*Fl_Tooltip::margin_height());
+    size(W + 2*MARGIN, H + 2*MARGIN);
     redraw();
 }
 
@@ -132,10 +135,11 @@ void MapsWindow::MapArea::MapInfoWin::draw()
     draw_box(FL_BORDER_BOX, 0, 0, w(), h(), Fl_Tooltip::color());
     fl_color(Fl_Tooltip::textcolor());
     fl_font(Fl_Tooltip::font(), Fl_Tooltip::size());
-    int X = Fl_Tooltip::margin_width();
-    int Y = Fl_Tooltip::margin_height();
-    int W = w() - (Fl_Tooltip::margin_width()*2);
-    int H = h() - (Fl_Tooltip::margin_height()*2);
+
+    int X = MARGIN;
+    int Y = MARGIN;
+    int W = w() - (MARGIN*2);
+    int H = h() - (MARGIN*2);
     fl_draw(info_.c_str(), X, Y, W, H, Fl_Align(FL_ALIGN_LEFT|FL_ALIGN_WRAP));
 }
 
