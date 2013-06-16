@@ -881,6 +881,8 @@ void Model::handle_BATTLEOPENEDEX(std::istream & is)
     if (loggedIn_)
     {
         battleOpenedSignal_(*b);
+        userJoinedBattleSignal_(founder, *b);
+        userChangedSignal_(founder);
     }
 }
 
@@ -891,14 +893,18 @@ void Model::handle_BATTLECLOSED(std::istream & is) // battleId
     extractWord(is, ex);
     int const battleId = boost::lexical_cast<int>(ex);
     Battle const & battle = getBattle(battleId);
-    User & founder = user(battle.founder());
-    founder.leftBattle(battle);
+
+    // simulate LEFTBATTLE messages since uberserver do not send this before BATTLECLOSED
+    auto const users = battle.users(); // we need to a copy here since handle_LEFTBATTLE changes battle users map
+    for (auto const& pairNameUser : users)
+    {
+        std::stringstream ss;
+        ss << battle.id() << " " << pairNameUser.first;
+        handle_LEFTBATTLE(ss);
+    }
 
     battleClosedSignal_(battle);
-    if (joinedBattleId_ == battleId)
-    {
-        joinedBattleId_ = -1;
-    }
+
     battles_.erase(battleId);
 }
 
