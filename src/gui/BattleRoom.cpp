@@ -934,7 +934,7 @@ void BattleRoom::updateBalance()
         }
     }
 
-    if (balance_ != balance)
+    if (battleId_ != -1 && balance_ != balance)
     {
         balance_ = balance;
         setHeaderText(model_.getBattle(battleId_));
