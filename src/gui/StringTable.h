@@ -3,7 +3,7 @@
 #include <FL/Fl_Table_Row.H>
 #include <FL/Fl_Preferences.H>
 
-#include <boost/signal.hpp>
+#include <boost/signals2/signal.hpp>
 #include <string>
 #include <vector>
 #include <array>
@@ -35,14 +35,14 @@ public:
 
     // signals
     //
-    typedef boost::signal<void (int rowIndex)> SelectedRowChangedSignal;
-    boost::signals::connection connectSelectedRowChanged(SelectedRowChangedSignal::slot_type subscriber) { return selectedRowSignal_.connect(subscriber); }
+    typedef boost::signals2::signal<void (int rowIndex)> SelectedRowChangedSignal;
+    boost::signals2::connection connectSelectedRowChanged(SelectedRowChangedSignal::slot_type subscriber) { return selectedRowSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (int rowIndex, int button)> RowClickedSignal; // button is FL_LEFT/MIDDLE/RIGHT_MOUSE (1,2,3)
-    boost::signals::connection connectRowClicked(RowClickedSignal::slot_type subscriber) { return rowClickedSignal_.connect(subscriber); }
+    typedef boost::signals2::signal<void (int rowIndex, int button)> RowClickedSignal; // button is FL_LEFT/MIDDLE/RIGHT_MOUSE (1,2,3)
+    boost::signals2::connection connectRowClicked(RowClickedSignal::slot_type subscriber) { return rowClickedSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (int rowIndex, int button)> RowDoubleClickedSignal;
-    boost::signals::connection connectRowDoubleClicked(RowDoubleClickedSignal::slot_type subscriber) { return rowDoubleClickedSignal_.connect(subscriber); }
+    typedef boost::signals2::signal<void (int rowIndex, int button)> RowDoubleClickedSignal;
+    boost::signals2::connection connectRowDoubleClicked(RowDoubleClickedSignal::slot_type subscriber) { return rowDoubleClickedSignal_.connect(subscriber); }
 
     StringTableRow const & getRow(std::size_t rowIndex);
     void addRow(StringTableRow const & row);

@@ -2,7 +2,7 @@
 
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Preferences.H>
-#include <boost/signal.hpp>
+#include <boost/signals2/signal.hpp>
 #include <string>
 
 class Model;
@@ -22,8 +22,8 @@ public:
     bool setPaths(); // returns true on success
 
     // signals
-    typedef boost::signal<void (std::string const & text)> ProfileSetSignal;
-    boost::signals::connection connectProfileSet(ProfileSetSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & text)> ProfileSetSignal;
+    boost::signals2::connection connectProfileSet(ProfileSetSignal::slot_type subscriber)
     { return profileSetSignal_.connect(subscriber); }
 
 private:

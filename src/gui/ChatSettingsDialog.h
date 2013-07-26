@@ -3,7 +3,7 @@
 #include "TextDisplay2.h"
 
 #include <FL/Fl_Window.H>
-#include <boost/signals2.hpp>
+#include <boost/signals2/signal.hpp>
 #include <vector>
 #include <string>
 

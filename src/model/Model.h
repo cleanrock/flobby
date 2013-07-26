@@ -12,7 +12,8 @@
 #include "ServerInfo.h"
 #include "AI.h"
 
-#include <boost/signal.hpp>
+#include <boost/signals2/signal.hpp>
+#include <sstream>
 #include <unordered_map>
 #include <functional>
 #include <map>
@@ -105,152 +106,152 @@ public:
 
     // signals
     //
-    typedef boost::signal<void (bool connected)> ConnectedSignal;
-    boost::signals::connection connectConnected(ConnectedSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (bool connected)> ConnectedSignal;
+    boost::signals2::connection connectConnected(ConnectedSignal::slot_type subscriber)
     { return connectedSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (ServerInfo const & serverInfo)> ServerInfoSignal;
-    boost::signals::connection connectServerInfo(ServerInfoSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (ServerInfo const & serverInfo)> ServerInfoSignal;
+    boost::signals2::connection connectServerInfo(ServerInfoSignal::slot_type subscriber)
     { return serverInfoSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (bool success, std::string const & msg)> LoginResultSignal;
-    boost::signals::connection connectLoginResult(LoginResultSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (bool success, std::string const & msg)> LoginResultSignal;
+    boost::signals2::connection connectLoginResult(LoginResultSignal::slot_type subscriber)
     { return loginResultSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (bool success, std::string const & msg)> RegisterResultSignal;
-    boost::signals::connection connectRegisterResult(RegisterResultSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (bool success, std::string const & msg)> RegisterResultSignal;
+    boost::signals2::connection connectRegisterResult(RegisterResultSignal::slot_type subscriber)
     { return registerResultSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & text)> AgreementSignal;
-    boost::signals::connection connectAgreement(AgreementSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & text)> AgreementSignal;
+    boost::signals2::connection connectAgreement(AgreementSignal::slot_type subscriber)
     { return agreementSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (User const & user)> UserJoinedSignal;
-    boost::signals::connection connectUserJoined(UserJoinedSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (User const & user)> UserJoinedSignal;
+    boost::signals2::connection connectUserJoined(UserJoinedSignal::slot_type subscriber)
     { return userJoinedSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (User const & user)> UserChangedSignal;
-    boost::signals::connection connectUserChanged(UserChangedSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (User const & user)> UserChangedSignal;
+    boost::signals2::connection connectUserChanged(UserChangedSignal::slot_type subscriber)
     { return userChangedSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (User const & user)> UserLeftSignal;
-    boost::signals::connection connectUserLeft(UserLeftSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (User const & user)> UserLeftSignal;
+    boost::signals2::connection connectUserLeft(UserLeftSignal::slot_type subscriber)
     { return userLeftSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (Battle const & battle)> BattleOpenedSignal;
-    boost::signals::connection connectBattleOpened(BattleOpenedSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (Battle const & battle)> BattleOpenedSignal;
+    boost::signals2::connection connectBattleOpened(BattleOpenedSignal::slot_type subscriber)
     { return battleOpenedSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (Battle const & battle)> BattleClosedSignal;
-    boost::signals::connection connectBattleClosed(BattleClosedSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (Battle const & battle)> BattleClosedSignal;
+    boost::signals2::connection connectBattleClosed(BattleClosedSignal::slot_type subscriber)
     { return battleClosedSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (Battle const & battle)> BattleChangedSignal;
-    boost::signals::connection connectBattleChanged(BattleChangedSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (Battle const & battle)> BattleChangedSignal;
+    boost::signals2::connection connectBattleChanged(BattleChangedSignal::slot_type subscriber)
     { return battleChangedSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (Battle const & battle)> BattleJoinedSignal;
-    boost::signals::connection connectBattleJoined(BattleJoinedSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (Battle const & battle)> BattleJoinedSignal;
+    boost::signals2::connection connectBattleJoined(BattleJoinedSignal::slot_type subscriber)
     { return battleJoinedSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & reason)> JoinBattleFailedSignal;
-    boost::signals::connection connectJoinBattleFailed(JoinBattleFailedSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & reason)> JoinBattleFailedSignal;
+    boost::signals2::connection connectJoinBattleFailed(JoinBattleFailedSignal::slot_type subscriber)
     { return joinBattleFailedSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (User const & user, Battle const & battle)> UserJoinedBattleSignal;
-    boost::signals::connection connectUserJoinedBattle(UserJoinedBattleSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (User const & user, Battle const & battle)> UserJoinedBattleSignal;
+    boost::signals2::connection connectUserJoinedBattle(UserJoinedBattleSignal::slot_type subscriber)
     { return userJoinedBattleSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (User const & user, Battle const & battle)> UserLeftBattleSignal;
-    boost::signals::connection connectUserLeftBattle(UserLeftBattleSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (User const & user, Battle const & battle)> UserLeftBattleSignal;
+    boost::signals2::connection connectUserLeftBattle(UserLeftBattleSignal::slot_type subscriber)
     { return userLeftBattleSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (Bot const & bot)> BotAddedSignal;
-    boost::signals::connection connectBotAdded(BotAddedSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (Bot const & bot)> BotAddedSignal;
+    boost::signals2::connection connectBotAdded(BotAddedSignal::slot_type subscriber)
     { return botAddedSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (Bot const & bot)> BotChangedSignal;
-    boost::signals::connection connectBotChanged(BotChangedSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (Bot const & bot)> BotChangedSignal;
+    boost::signals2::connection connectBotChanged(BotChangedSignal::slot_type subscriber)
     { return botChangedSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (Bot const & bot)> BotRemovedSignal;
-    boost::signals::connection connectBotRemoved(BotRemovedSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (Bot const & bot)> BotRemovedSignal;
+    boost::signals2::connection connectBotRemoved(BotRemovedSignal::slot_type subscriber)
     { return botRemovedSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & userName, std::string const & msg)> BattleChatMsgSignal;
-    boost::signals::connection connectBattleChatMsg(BattleChatMsgSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & userName, std::string const & msg)> BattleChatMsgSignal;
+    boost::signals2::connection connectBattleChatMsg(BattleChatMsgSignal::slot_type subscriber)
     { return battleChatMsgSignal_.connect(subscriber); }
 
-    typedef boost::signal<void ()> SpringExitSignal;
-    boost::signals::connection connectSpringExit(SpringExitSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void ()> SpringExitSignal;
+    boost::signals2::connection connectSpringExit(SpringExitSignal::slot_type subscriber)
     { return springExitSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & name, bool success)> DownloadDoneSignal;
-    boost::signals::connection connectDownloadDone(DownloadDoneSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & name, bool success)> DownloadDoneSignal;
+    boost::signals2::connection connectDownloadDone(DownloadDoneSignal::slot_type subscriber)
     { return downloadDoneSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & msg)> ServerMsgSignal;
-    boost::signals::connection connectServerMsg(ServerMsgSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & msg)> ServerMsgSignal;
+    boost::signals2::connection connectServerMsg(ServerMsgSignal::slot_type subscriber)
     { return serverMsgSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & userName, std::string const & msg)> SayPrivateSignal;
-    boost::signals::connection connectSayPrivate(SayPrivateSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & userName, std::string const & msg)> SayPrivateSignal;
+    boost::signals2::connection connectSayPrivate(SayPrivateSignal::slot_type subscriber)
     { return sayPrivateSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & userName, std::string const & msg)> SaidPrivateSignal;
-    boost::signals::connection connectSaidPrivate(SaidPrivateSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & userName, std::string const & msg)> SaidPrivateSignal;
+    boost::signals2::connection connectSaidPrivate(SaidPrivateSignal::slot_type subscriber)
     { return saidPrivateSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (Channels const &)> ChannelsSignal;
-    boost::signals::connection connectChannels(ChannelsSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (Channels const &)> ChannelsSignal;
+    boost::signals2::connection connectChannels(ChannelsSignal::slot_type subscriber)
     { return channelsSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & channelName)> ChannelJoinedSignal;
-    boost::signals::connection connectChannelJoined(ChannelJoinedSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & channelName)> ChannelJoinedSignal;
+    boost::signals2::connection connectChannelJoined(ChannelJoinedSignal::slot_type subscriber)
     { return channelJoinedSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & channelName, std::string const & author, time_t epochSeconds, std::string const & topic)> ChannelTopicSignal;
-    boost::signals::connection connectChannelTopicSignal(ChannelTopicSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & channelName, std::string const & author, time_t epochSeconds, std::string const & topic)> ChannelTopicSignal;
+    boost::signals2::connection connectChannelTopicSignal(ChannelTopicSignal::slot_type subscriber)
     { return channelTopicSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & channelName, std::string const & message)> ChannelMessageSignal;
-    boost::signals::connection connectChannelMessageSignal(ChannelMessageSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & channelName, std::string const & message)> ChannelMessageSignal;
+    boost::signals2::connection connectChannelMessageSignal(ChannelMessageSignal::slot_type subscriber)
     { return channelMessageSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & channelName, std::vector<std::string> const & clients)> ChannelClientsSignal;
-    boost::signals::connection connectChannelClients(ChannelClientsSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & channelName, std::vector<std::string> const & clients)> ChannelClientsSignal;
+    boost::signals2::connection connectChannelClients(ChannelClientsSignal::slot_type subscriber)
     { return channelClientsSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & channelName, std::string const & userName)> UserJoinedChannelSignal;
-    boost::signals::connection connectUserJoinedChannel(UserJoinedChannelSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & channelName, std::string const & userName)> UserJoinedChannelSignal;
+    boost::signals2::connection connectUserJoinedChannel(UserJoinedChannelSignal::slot_type subscriber)
     { return userJoinedChannelSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & channelName, std::string const & userName, std::string const & reason)> UserLeftChannelSignal;
-    boost::signals::connection connectUserLeftChannel(UserLeftChannelSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & channelName, std::string const & userName, std::string const & reason)> UserLeftChannelSignal;
+    boost::signals2::connection connectUserLeftChannel(UserLeftChannelSignal::slot_type subscriber)
     { return userLeftChannelSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & channelName, std::string const & userName, std::string const & message)> SaidChannelSignal;
-    boost::signals::connection connectSaidChannel(SaidChannelSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & channelName, std::string const & userName, std::string const & message)> SaidChannelSignal;
+    boost::signals2::connection connectSaidChannel(SaidChannelSignal::slot_type subscriber)
     { return saidChannelSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & userName)> RingSignal;
-    boost::signals::connection connectRing(RingSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & userName)> RingSignal;
+    boost::signals2::connection connectRing(RingSignal::slot_type subscriber)
     { return ringSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (StartRect const & startRect)> AddStartRectSignal;
-    boost::signals::connection connectAddStartRect(AddStartRectSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (StartRect const & startRect)> AddStartRectSignal;
+    boost::signals2::connection connectAddStartRect(AddStartRectSignal::slot_type subscriber)
     { return addStartRectSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (int ally)> RemoveStartRectSignal;
-    boost::signals::connection connectRemoveStartRect(RemoveStartRectSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (int ally)> RemoveStartRectSignal;
+    boost::signals2::connection connectRemoveStartRect(RemoveStartRectSignal::slot_type subscriber)
     { return removeStartRectSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & key, std::string const & value)> SetScriptTagSignal;
-    boost::signals::connection connectSetScriptTag(SetScriptTagSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & key, std::string const & value)> SetScriptTagSignal;
+    boost::signals2::connection connectSetScriptTag(SetScriptTagSignal::slot_type subscriber)
     { return setScriptTagSignal_.connect(subscriber); }
 
-    typedef boost::signal<void (std::string const & key)> RemoveScriptTagSignal;
-    boost::signals::connection connectRemoveScriptTag(RemoveScriptTagSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & key)> RemoveScriptTagSignal;
+    boost::signals2::connection connectRemoveScriptTag(RemoveScriptTagSignal::slot_type subscriber)
     { return removeScriptTagSignal_.connect(subscriber); }
 
 private:

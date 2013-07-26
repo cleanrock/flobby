@@ -1,7 +1,7 @@
 #pragma once
 
 #include <FL/Fl_Window.H>
-#include <boost/signal.hpp>
+#include <boost/signals2/signal.hpp>
 #include <string>
 
 class Fl_Input;
@@ -18,8 +18,8 @@ public:
 
     // signals
     //
-    typedef boost::signal<void (std::string const & game, int players)> FilterSetSignal;
-    boost::signals::connection connectFilterSet(FilterSetSignal::slot_type subscriber)
+    typedef boost::signals2::signal<void (std::string const & game, int players)> FilterSetSignal;
+    boost::signals2::connection connectFilterSet(FilterSetSignal::slot_type subscriber)
     { return filterSetSignal_.connect(subscriber); }
 
 private:

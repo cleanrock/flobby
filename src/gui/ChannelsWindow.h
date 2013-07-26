@@ -5,7 +5,7 @@
 
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Preferences.H>
-#include <boost/signal.hpp>
+#include <boost/signals2/signal.hpp>
 #include <string>
 
 
