@@ -126,7 +126,13 @@ void Tabs::saidPrivate(std::string const & userName, std::string const & msg)
     if (it == privateChatTabs_.end())
     {
         pc = createChat(userName, privateChatTabs_);
-        // we don't need to call pc->said(userName, msg) here since the signal will be sent to the newly created Chat also
+
+        // connecting to a signal during signal invocation does not guarantee signal being delivered (its unspecified), so add message if chat text is empty
+        // this changed when switching to Boost.Signals2, Signals did deliver the signal for me but was unspecified as well
+        if (pc->text_->buffer()->length() == 0)
+        {
+            pc->said(userName, msg);
+        }
     }
     else
     {

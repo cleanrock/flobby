@@ -23,6 +23,8 @@ public:
     std::string const& userName() const { return userName_; }
 
 private:
+    friend class Tabs;
+
     std::string userName_;
     ITabs & iTabs_;
     Model & model_;
