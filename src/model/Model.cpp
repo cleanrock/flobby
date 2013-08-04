@@ -6,6 +6,7 @@
 #include "IController.h"
 #include "Bot.h"
 #include "UnitSync.h"
+#include "UserId.h"
 
 #include "log/Log.h"
 #include "FlobbyDirs.h"
@@ -157,8 +158,10 @@ void Model::connected(bool connected)
 
 void Model::attemptLogin()
 {
+    uint32_t const userId = UserId::get();
+
     std::ostringstream oss;
-    oss << "LOGIN " << userName_ << " " << password_ << " 0 * flobby 0.1\t0\teb";
+    oss << "LOGIN " << userName_ << " " << password_ << " 0 * flobby 0.1\t" << userId << "\teb";
     controller_.send(oss.str());
 }
 

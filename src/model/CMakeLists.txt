@@ -12,6 +12,7 @@ add_library (model STATIC
     MapInfo.cpp
     StartRect.cpp
     AI.cpp
+    UserId.cpp
 )
 
 target_link_libraries (model
