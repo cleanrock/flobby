@@ -39,7 +39,7 @@ Log::~Log()
 
     if (!ofs_.is_open() && !fileName_.empty())
     {
-        ofs_.open(fileName_, std::fstream::app);
+        ofs_.open(fileName_);
         if (!ofs_.good())
         {
             std::cout << "failed to open log file: " << fileName_ << std::endl;

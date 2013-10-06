@@ -84,6 +84,8 @@ public:
 
     std::string const & getWriteableDataDir() const;
 
+    void checkPing(); // call regularly to make sure we send a PING at least every 30s, it will also check if we got the PONG back
+
     // map
     unsigned int getMapChecksum(std::string const & mapName); // returns 0 if map not found
     std::vector<std::string> getMaps();
@@ -260,6 +262,8 @@ private:
     bool checkFirstMsg_;
     bool loginInProgress_;
     bool loggedIn_; // set to true when we get LOGININFOEND
+    uint64_t timePingSent_;
+    bool waitingForPong_;
     std::unique_ptr<UnitSync> unitSync_;
 
     std::string writeableDataDir_;
@@ -398,5 +402,6 @@ private:
     void handle_REGISTRATIONDENIED(std::istream & is);
     void handle_AGREEMENT(std::istream & is);
     void handle_AGREEMENTEND(std::istream & is);
+    void handle_PONG(std::istream & is);
 
 };

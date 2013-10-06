@@ -22,7 +22,7 @@ LoggingDialog::LoggingDialog():
     logFilePath_ = new Fl_File_Input(10, 90, 380, 40, "Log file (change takes effect on restart)");
     logFilePath_->align(FL_ALIGN_TOP_LEFT);
 
-    logChats_ = new Fl_Check_Button(10, 160, 380, 30, "Chat history (stored in ~/.spring/flobby/log/)");
+    logChats_ = new Fl_Check_Button(10, 160, 380, 30, "Chat history (stored in ~/.cache/flobby/log/)");
 
     Fl_Return_Button * btn = new Fl_Return_Button(300, 360, 90, 30, "Save");
     btn->callback(LoggingDialog::callbackApply, this);

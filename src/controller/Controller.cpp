@@ -7,7 +7,14 @@
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/chrono.hpp>
 #include <cstdlib>
+
+using namespace boost::chrono;
+
+static time_point<steady_clock> timeStart_ = steady_clock::now();
+static time_point<steady_clock> timeLastSend_ = timeStart_;
+
 
 Controller::Controller():
     client_(0),
@@ -39,6 +46,19 @@ void Controller::send(const std::string msg)
         throw std::runtime_error("not connected");
     }
     server_->send(msg);
+    timeLastSend_ = boost::chrono::steady_clock::now();
+}
+
+uint64_t Controller::lastSendTime() const
+{
+    auto const diff = timeLastSend_ - timeStart_;
+    return duration_cast<milliseconds>(diff).count();
+}
+
+uint64_t Controller::timeNow() const
+{
+    auto const diff = steady_clock::now() - timeStart_;
+    return duration_cast<milliseconds>(diff).count();
 }
 
 unsigned int Controller::startProcess(std::string const & cmd, bool logToFile)

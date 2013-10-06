@@ -705,5 +705,6 @@ void UserInterface::checkAway(void* d)
             Fl::add_timeout(10.0, checkAway, d);
             ui->model_.meAway(false);
         }
+        ui->model_.checkPing();
     }
 }

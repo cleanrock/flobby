@@ -26,6 +26,8 @@ Model::Model(IController & controller):
     connected_(false),
     checkFirstMsg_(false),
     loggedIn_(false),
+    timePingSent_(0),
+    waitingForPong_(false),
     joinedBattleId_(-1),
     me_(0),
     springId_(0),
@@ -80,6 +82,7 @@ Model::Model(IController & controller):
     ADD_MSG_HANDLER(AGREEMENTEND)
     ADD_MSG_HANDLER(SETSCRIPTTAGS)
     ADD_MSG_HANDLER(REMOVESCRIPTTAGS)
+    ADD_MSG_HANDLER(PONG)
 
 }
 
@@ -132,6 +135,7 @@ void Model::connected(bool connected)
     if (connected_)
     {
         checkFirstMsg_ = true; // check that first message is TASServer
+        timePingSent_ = controller_.timeNow();
     }
     else
     {
@@ -1566,6 +1570,13 @@ void Model::handle_AGREEMENTEND(std::istream & is)
     agreementSignal_(a);
 }
 
+void Model::handle_PONG(std::istream & is)
+{
+    using namespace LobbyProtocol;
+
+    waitingForPong_ = false;
+}
+
 std::vector<AI> Model::getModAIs(std::string const & modName)
 {
     std::vector<AI> ais;
@@ -1745,4 +1756,26 @@ bool Model::download(std::string const & name, DownloadType type)
     oss << "\"" << name << "\"";
     downloaderId_ = controller_.startProcess(oss.str(), true);
     return true;
+}
+
+void Model::checkPing()
+{
+    uint64_t const timeNow = controller_.timeNow();
+
+    if (timeNow > timePingSent_ + 30000)
+    {
+        if (waitingForPong_)
+        {
+            std::string const msg = "PONG not received in time, disconnecting";
+            LOG(WARNING) << msg;
+            serverMsgSignal_(msg);
+            disconnect();
+        }
+        else
+        {
+            controller_.send("PING");
+            timePingSent_ = timeNow;
+            waitingForPong_ = true;
+        }
+    }
 }
