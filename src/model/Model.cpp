@@ -141,6 +141,7 @@ void Model::connected(bool connected)
     {
         // reset model on disconnect
         loggedIn_ = false;
+        waitingForPong_ = false;
         userName_.clear();
         password_.clear();
         myScriptPassword_.clear();
