@@ -28,7 +28,7 @@ public:
     void setIControllerEvent(IControllerEvent & iControllerEvent);
     void connect(std::string const & host, std::string const & service);
     void disconnect();
-    void send(std::string const msg);
+    void send(std::string const& msg);
     uint64_t lastSendTime() const;
     uint64_t timeNow() const;
     unsigned int startProcess(std::string const & cmd, bool logToFile = false); // e.g. "/usr/bin/spring script.txt"

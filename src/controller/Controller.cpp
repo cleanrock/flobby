@@ -34,12 +34,12 @@ void Controller::setIControllerEvent(IControllerEvent & iControllerEvent)
     client_ = &iControllerEvent;
 }
 
-void Controller::connect(const std::string & host, const std::string & service)
+void Controller::connect(std::string const& host, std::string const& service)
 {
     server_.reset(new ServerConn(host, service, *this));
 }
 
-void Controller::send(const std::string msg)
+void Controller::send(std::string const& msg)
 {
     if (!server_)
     {
@@ -61,7 +61,7 @@ uint64_t Controller::timeNow() const
     return duration_cast<milliseconds>(diff).count();
 }
 
-unsigned int Controller::startProcess(std::string const & cmd, bool logToFile)
+unsigned int Controller::startProcess(std::string const& cmd, bool logToFile)
 {
     ++processId_;
     processId_ = std::max(processId_, 1U); // make sure it doesn't wrap to zero (not very likely though)
@@ -72,7 +72,7 @@ unsigned int Controller::startProcess(std::string const & cmd, bool logToFile)
     return processId_;
 }
 
-void Controller::runProcess(std::string const & cmd, bool logToFile, unsigned int id)
+void Controller::runProcess(std::string const& cmd, bool logToFile, unsigned int id)
 {
     LOG(DEBUG) << "runProcess: '" << cmd << "'";
 

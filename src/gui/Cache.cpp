@@ -31,7 +31,7 @@ std::string Cache::mapDir()
     return basePath;
 }
 
-std::string Cache::mapPath(std::string const& mapName, std::string const& type)
+std::string Cache::mapPath(std::string const& mapName, std::string const& suffix)
 {
     std::string path;
 
@@ -39,47 +39,83 @@ std::string Cache::mapPath(std::string const& mapName, std::string const& type)
     if (chksum != 0)
     {
         std::ostringstream oss;
-        oss << mapDir() << mapName << "_" << chksum << "_" << type << "_128.png";
+        oss << mapDir() << mapName << "_" << chksum << "_" << suffix;
         path = oss.str();
     }
 
     return path;
 }
 
+std::string Cache::pathMapInfo(std::string const& mapName)
+{
+    return mapPath(mapName, "info.bin");
+}
+
 std::string Cache::pathMapImage(std::string const& mapName)
 {
-    return mapPath(mapName, "minimap");
+    return mapPath(mapName, "minimap_128.png");
 }
 
 std::string Cache::pathMetalImage(std::string const& mapName)
 {
-    return mapPath(mapName, "metal");
+    return mapPath(mapName, "metal_128.png");
 }
 
 std::string Cache::pathHeightImage(std::string const& mapName)
 {
-    return mapPath(mapName, "height");
+    return mapPath(mapName, "height_128.png");
+}
+
+std::string Cache::mapInfoKey(std::string const& mapName)
+{
+    std::string key;
+
+    unsigned int chksum = model_.getMapChecksum(mapName);
+    if (chksum == 0)
+    {
+        LOG(WARNING) << "map not found:" << mapName;
+        throw std::runtime_error("map not found: " + mapName);
+    }
+    std::ostringstream oss;
+    oss << mapName << "_" << chksum;
+    key = oss.str();
+    return key;
+}
+
+bool Cache::hasMapInfo(std::string const& mapName)
+{
+    std::string const key = mapInfoKey(mapName);
+    auto it = mapInfos_.find(key);
+    if (it != mapInfos_.end())
+    {
+        // loaded into memory
+        return true;
+    }
+
+    std::string const path = pathMapInfo(mapName);
+
+    return !path.empty() && boost::filesystem::exists(path);
 }
 
 bool Cache::hasMapImage(std::string const & mapName)
 {
     std::string const path = pathMapImage(mapName);
 
-    return !path.empty() && boost::filesystem::exists(path);
+    return !path.empty() && (Fl_Shared_Image::find(path.c_str()) || boost::filesystem::exists(path));
 }
 
 bool Cache::hasMetalImage(std::string const & mapName)
 {
     std::string const path = pathMetalImage(mapName);
 
-    return !path.empty() && boost::filesystem::exists(path);
+    return !path.empty() && (Fl_Shared_Image::find(path.c_str()) || boost::filesystem::exists(path));
 }
 
 bool Cache::hasHeightImage(std::string const & mapName)
 {
     std::string const path = pathHeightImage(mapName);
 
-    return !path.empty() && boost::filesystem::exists(path);
+    return !path.empty() && (Fl_Shared_Image::find(path.c_str()) || boost::filesystem::exists(path));
 }
 
 Fl_Shared_Image * Cache::getMapImage(std::string const & mapName)
@@ -209,16 +245,7 @@ void Cache::createImageFile(uint8_t const * data, int w, int h, int d, std::stri
 
 MapInfo const & Cache::getMapInfo(std::string const & mapName)
 {
-    unsigned int chksum = model_.getMapChecksum(mapName);
-    if (chksum == 0)
-    {
-        LOG(WARNING) << "map not found:" << mapName;
-        throw std::runtime_error("map not found: " + mapName);
-    }
-
-    std::ostringstream oss;
-    oss << mapName << "_" << chksum;
-    std::string const key = oss.str();
+    std::string const key = mapInfoKey(mapName);
 
     auto it = mapInfos_.find(key);
     if (it != mapInfos_.end())
@@ -228,9 +255,7 @@ MapInfo const & Cache::getMapInfo(std::string const & mapName)
     }
     else
     {
-        std::ostringstream oss;
-        oss << mapDir() << key << "_info.bin";
-        std::string const path = oss.str();
+        std::string const path = pathMapInfo(mapName);
 
         std::ifstream ifs(path);
         if (ifs.good())

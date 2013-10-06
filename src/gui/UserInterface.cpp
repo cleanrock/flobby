@@ -57,7 +57,9 @@ static XScreenSaverInfo* xScreenSaverInfo = 0;
 
 UserInterface::UserInterface(Model & model) :
     model_(model),
-    cache_(new Cache(model_))
+    cache_(new Cache(model_)),
+    genJobsCount_(0),
+    openMapsWindow_(false)
 {
     TextDisplay2::initTextStyles();
 
@@ -460,90 +462,55 @@ void UserInterface::menuGenerateCacheFiles(Fl_Widget *w, void* d)
 {
     UserInterface * ui = static_cast<UserInterface*>(d);
 
-    auto maps = ui->model_.getMaps();
-
-    ProgressDialog::open("Generating cache files ...");
-
-    int cnt = 0;
-    for (auto const & map : maps)
+    if (!ui->genJobs_.empty())
     {
-        float const percentage = 100*static_cast<float>(cnt)/maps.size();
-        ProgressDialog::progress(percentage, map);
-        try
-        {
-            ui->cache_->getMapInfo(map);
-            Fl::check();
-
-            Fl_Shared_Image * img;
-
-            img = ui->cache_->getMapImage(map);
-            if (img) img->release();
-            Fl::check();
-
-            img = ui->cache_->getMetalImage(map);
-            if (img) img->release();
-            Fl::check();
-
-            img = ui->cache_->getHeightImage(map);
-            if (img) img->release();
-            Fl::check();
-        }
-        catch (std::exception const & e)
-        {
-            LOG(WARNING) << e.what();
-        }
-        ++cnt;
+        LOG(WARNING)<< "map generate job already in progress";
+        return;
     }
-    ProgressDialog::progress(100, "Done");
-    ::usleep(500000); // TODO remove ?
-    ProgressDialog::close();
+
+    ProgressDialog::open("Generating all map cache files ...");
+
+    auto maps = ui->model_.getMaps();
+    for (auto const& map : maps)
+    {
+        if (!ui->cache_->hasMapInfo(map)) ui->genJobs_.push_back(GenJob(map, GEN_INFO));
+        if (!ui->cache_->hasMapImage(map)) ui->genJobs_.push_back(GenJob(map, GEN_MAP));
+        if (!ui->cache_->hasMetalImage(map)) ui->genJobs_.push_back(GenJob(map, GEN_METAL));
+        if (!ui->cache_->hasHeightImage(map)) ui->genJobs_.push_back(GenJob(map, GEN_HEIGHT));
+    }
+    ui->genJobsCount_ = ui->genJobs_.size();
+
+    Fl::add_timeout(0, doGenJob, ui);
 }
 
 void UserInterface::menuMaps(Fl_Widget *w, void* d)
 {
     UserInterface * ui = static_cast<UserInterface*>(d);
 
-    auto maps = ui->model_.getMaps();
-
-    std::vector<std::string> missing;
-
-    for (auto const& mapName : maps)
+    if (!ui->genJobs_.empty())
     {
-        if (!ui->cache_->hasMapImage(mapName))
-        {
-            missing.push_back(mapName);
-        }
+        LOG(WARNING)<< "map generate job already in progress";
+        return;
     }
 
-    if (!missing.empty())
+    auto maps = ui->model_.getMaps();
+    for (auto const& map : maps)
+    {
+        if (!ui->cache_->hasMapImage(map)) ui->genJobs_.push_back(GenJob(map, GEN_MAP));
+    }
+
+    if (!ui->genJobs_.empty())
     {
         ProgressDialog::open("Generating map images ...");
-    }
 
-    int cnt = 0;
-    for (auto const& mapName : missing)
+        ui->genJobsCount_ = ui->genJobs_.size();
+        Fl::add_timeout(0, doGenJob, ui);
+        ui->openMapsWindow_ = true;
+    }
+    else
     {
-        float const percentage = 100*static_cast<float>(cnt)/missing.size();
-        ProgressDialog::progress(percentage, mapName);
-
-        try
-        {
-            ui->cache_->getMapInfo(mapName);
-            Fl::check();
-
-            Fl_Shared_Image* img;
-            img = ui->cache_->getMapImage(mapName);
-            Fl::check();
-        }
-        catch (std::exception const & e)
-        {
-            LOG(WARNING) << e.what();
-        }
-        ++cnt;
+        ui->mapsWindow_->show();
     }
-    ProgressDialog::close();
-
-    ui->mapsWindow_->show();
 }
 
 void UserInterface::menuBattleListFilter(Fl_Widget *w, void* d)
@@ -706,5 +673,78 @@ void UserInterface::checkAway(void* d)
             ui->model_.meAway(false);
         }
         ui->model_.checkPing();
+    }
+}
+
+void UserInterface::closeProgressDialog(void* d)
+{
+    ProgressDialog::close();
+}
+
+void UserInterface::doGenJob(void* d)
+{
+    UserInterface* ui = static_cast<UserInterface*>(d);
+
+    if (!ProgressDialog::isVisible())
+    {
+        // canceled by user
+        ui->genJobs_.clear();
+        ProgressDialog::close();
+        ui->openMapsWindow_ = false;
+    }
+    else if (ui->genJobs_.empty())
+    {
+        if (ui->openMapsWindow_)
+        {
+            ProgressDialog::close();
+            ui->mapsWindow_->show();
+            ui->openMapsWindow_ = false;
+        }
+        else
+        {
+            // show Done for a short time
+            ProgressDialog::progress(100, "Done");
+            Fl::add_timeout(0.5, closeProgressDialog, d);
+        }
+    }
+    else
+    {
+        float const percentage = 100*static_cast<float>(ui->genJobsCount_ - ui->genJobs_.size())/ui->genJobsCount_;
+        GenJob const job = ui->genJobs_.front();
+        ui->genJobs_.pop_front();
+        ProgressDialog::progress(percentage, job.name_);
+        Fl::check();
+
+        try
+        {
+            Fl_Shared_Image * img;
+            switch (job.type_)
+            {
+            case GEN_INFO:
+                ui->cache_->getMapInfo(job.name_);
+                break;
+
+            case GEN_MAP:
+                img = ui->cache_->getMapImage(job.name_);
+                if (img) img->release();
+                break;
+
+            case GEN_METAL:
+                img = ui->cache_->getMetalImage(job.name_);
+                if (img) img->release();
+                break;
+
+            case GEN_HEIGHT:
+                img = ui->cache_->getHeightImage(job.name_);
+                if (img) img->release();
+                break;
+            }
+        }
+        catch (std::exception const & e)
+        {
+            LOG(WARNING) << e.what();
+        }
+
+        Fl::add_timeout(0.01, doGenJob, d);
     }
 }

@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <deque>
 
 // forwards
 class Model;
@@ -48,6 +49,24 @@ private:
 
     Model & model_;
     std::unique_ptr<Cache> cache_;
+
+    // map cache file generation variables
+    enum GenType
+    {
+        GEN_INFO,
+        GEN_MAP,
+        GEN_METAL,
+        GEN_HEIGHT
+    };
+    struct GenJob
+    {
+        std::string name_;
+        GenType type_;
+        GenJob(std::string const& name, GenType type): name_(name), type_(type) {}
+    };
+    std::deque<GenJob> genJobs_;
+    std::size_t genJobsCount_;
+    bool openMapsWindow_; // used for showing maps windows after map image files generation is done
 
     Fl_Double_Window * mainWindow_;
     Fl_Menu_Bar * menuBar_;
@@ -108,6 +127,8 @@ private:
     static void menuSoundSettings(Fl_Widget *w, void* d);
     static void menuFontSettings(Fl_Widget *w, void* d);
     static void checkAway(void* d);
+    static void doGenJob(void* d);
+    static void closeProgressDialog(void* d);
 
     void enableMenuItem(void(*cb)(Fl_Widget*, void*), bool enable);
 
