@@ -67,6 +67,8 @@ public:
     void sayPrivate(std::string const & userName, std::string const & msg);
     void ring(std::string const & userName);
 
+    void sendCommand(std::string const& cmd);
+
     void startSpring(); // throws on failure
     void disconnect();
 

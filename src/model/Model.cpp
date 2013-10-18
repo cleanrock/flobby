@@ -1780,3 +1780,13 @@ void Model::checkPing()
         }
     }
 }
+
+void Model::sendCommand(std::string const& cmd)
+{
+    if (connected_)
+    {
+        LOG(INFO)<< "sendCommand: '" << cmd << "'";
+        controller_.send(cmd);
+    }
+}
+

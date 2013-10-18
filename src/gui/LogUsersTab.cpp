@@ -16,7 +16,7 @@ static char const * PrefServerMessagesSplitH = "ServerMessagesSplitH";
 
 LogUsersTab::LogUsersTab(int x, int y, int w, int h,
                                ITabs& iTabs, Model & model):
-    Fl_Tile(x,y,w,h, "Log && Users"),
+    Fl_Tile(x,y,w,h, "Server && Users"),
     iTabs_(iTabs),
     model_(model),
     logFile_("messages")
@@ -159,7 +159,7 @@ void LogUsersTab::downloadDone(std::string const & name, bool success)
 
 void LogUsersTab::onInput(std::string const & text)
 {
-    // TODO
+    model_.sendCommand(text);
 }
 
 void LogUsersTab::onComplete(std::string const & text, std::size_t pos, std::pair<std::string, std::size_t>& result)
