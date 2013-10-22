@@ -110,7 +110,6 @@ private:
     static void menuLogin(Fl_Widget* w, void* d);
     static void menuDisconnect(Fl_Widget* w, void* d);
     static void menuRegister(Fl_Widget* w, void* d);
-    static void menuRenameAccount(Fl_Widget* w, void* d);
     static void onQuit(Fl_Widget* w, void* d);
     static void onTest(Fl_Widget* w, void* d);
     static void menuRefresh(Fl_Widget *w, void* d);

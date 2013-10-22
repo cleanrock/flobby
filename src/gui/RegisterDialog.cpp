@@ -2,9 +2,6 @@
 #include "Prefs.h"
 #include "Sound.h"
 
-#include "md5/md5.h"
-#include "md5/base64.h"
-
 #include "model/Model.h"
 
 #include <FL/Fl_Input.H>
@@ -142,15 +139,7 @@ void RegisterDialog::connected(bool connected)
     {
         if (connected)
         {
-            md5_state_t md5;
-            md5_init(&md5);
-            std::string const pw(password_->value());
-            md5_append(&md5, (md5_byte_t const *)pw.data(), pw.size());
-
-            md5_byte_t result[16];
-            md5_finish(&md5, result);
-
-            passwordHash_ = base64_encode(result, 16);
+            passwordHash_ = model_.calcPasswordHash(password_->value());
 
             // TODO email not yet supported
             model_.registerAccount(userName_->value(), passwordHash_, "" /*email_->value()*/);

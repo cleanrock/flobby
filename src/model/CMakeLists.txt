@@ -13,6 +13,7 @@ add_library (model STATIC
     StartRect.cpp
     AI.cpp
     UserId.cpp
+    ServerCommands.cpp
 )
 
 target_link_libraries (model

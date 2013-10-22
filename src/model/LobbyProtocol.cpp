@@ -26,4 +26,12 @@ void extractSentence(std::istream & is, std::string & ex)
     }
 }
 
+void skipSpaces(std::istream & is)
+{
+    while (is.peek() == ' ')
+    {
+        is.ignore(1);
+    }
+}
+
 }; // namespace LobbyProtocol

@@ -11,12 +11,13 @@
 
 #include <FL/fl_ask.H>
 #include <boost/bind.hpp>
+#include <boost/algorithm/string.hpp>
 
 static char const * PrefServerMessagesSplitH = "ServerMessagesSplitH";
 
 LogUsersTab::LogUsersTab(int x, int y, int w, int h,
                                ITabs& iTabs, Model & model):
-    Fl_Tile(x,y,w,h, "Server && Users"),
+    Fl_Tile(x,y,w,h, "Server"),
     iTabs_(iTabs),
     model_(model),
     logFile_("messages")
@@ -37,6 +38,9 @@ LogUsersTab::LogUsersTab(int x, int y, int w, int h,
     userList_ = new UserList(x+leftW, y, rightW, h, model_, iTabs_, true); // we save the prefs for UserList
 
     end();
+
+    text_->append("type /help to see built-in commands");
+    text_->append("lines entered not starting with / will be sent to lobby server");
 
     // model signals
     model_.connectConnected( boost::bind(&LogUsersTab::connected, this, _1) );
@@ -94,7 +98,7 @@ void LogUsersTab::connected(bool connected)
     if (!connected)
     {
         userList_->clear();
-        append("Disconnected from server", true);
+        append("Disconnected from server\n", true); // extra newline for clarity
     }
 }
 
@@ -159,7 +163,14 @@ void LogUsersTab::downloadDone(std::string const & name, bool success)
 
 void LogUsersTab::onInput(std::string const & text)
 {
-    model_.sendCommand(text);
+    std::string textTrimmed = text;
+    boost::trim(textTrimmed);
+
+    std::string result = model_.serverCommand(textTrimmed);
+    if (!result.empty())
+    {
+        append("'" + textTrimmed + "' returned:\n" + result);
+    }
 }
 
 void LogUsersTab::onComplete(std::string const & text, std::size_t pos, std::pair<std::string, std::size_t>& result)

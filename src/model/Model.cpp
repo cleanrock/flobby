@@ -7,6 +7,10 @@
 #include "Bot.h"
 #include "UnitSync.h"
 #include "UserId.h"
+#include "ServerCommands.h"
+
+#include "md5/md5.h"
+#include "md5/base64.h"
 
 #include "log/Log.h"
 #include "FlobbyDirs.h"
@@ -34,6 +38,7 @@ Model::Model(IController & controller):
     downloaderId_(0)
 {
     controller_.setIControllerEvent(*this);
+    ServerCommand::init(*this);
 
     // setup message handlers
     ADD_MSG_HANDLER(ACCEPTED)
@@ -248,18 +253,6 @@ void Model::confirmAgreement()
     std::ostringstream oss;
     oss << "CONFIRMAGREEMENT";
     controller_.send(oss.str());
-}
-
-void Model::renameAccount(std::string const & userName)
-{
-    if (connected_)
-    {
-        LOG_IF(FATAL, userName.empty())<< "userName empty";
-
-        std::ostringstream oss;
-        oss << "RENAMEACCOUNT " << userName;
-        controller_.send(oss.str());
-    }
 }
 
 std::vector<Battle const *> Model::getBattles()
@@ -1781,12 +1774,41 @@ void Model::checkPing()
     }
 }
 
-void Model::sendCommand(std::string const& cmd)
+std::string Model::calcPasswordHash(std::string const& str)
+{
+    md5_state_t md5;
+    md5_init(&md5);
+    md5_append(&md5, (md5_byte_t const *)str.data(), str.size());
+
+    md5_byte_t result[16];
+    md5_finish(&md5, result);
+
+    return base64_encode(result, 16);
+}
+
+void Model::sendMessage(std::string const& msg)
 {
     if (connected_)
     {
-        LOG(INFO)<< "sendCommand: '" << cmd << "'";
-        controller_.send(cmd);
+        controller_.send(msg);
     }
 }
 
+std::string Model::serverCommand(std::string const& str)
+{
+    LOG(INFO)<< "serverCommand: '" << str << "'";
+
+    std::string result;
+
+    if (str.empty()) return result;
+
+    if (str[0] == '/' && str.size() > 1)
+    {
+        result = ServerCommand::process(str.substr(1));
+    }
+    else
+    {
+        sendMessage(str);
+    }
+    return result;
+}

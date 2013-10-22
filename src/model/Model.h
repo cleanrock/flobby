@@ -42,6 +42,8 @@ public:
 
     void connect(std::string const & host, std::string const & port);
     void login(std::string const & username, std::string const & passwordHash);
+    std::string calcPasswordHash(std::string const& str);
+    void sendMessage(std::string const& msg);
 
     void registerAccount(std::string const & username, std::string const & passwordHash, std::string const & email);
     void confirmAgreement();
@@ -67,7 +69,7 @@ public:
     void sayPrivate(std::string const & userName, std::string const & msg);
     void ring(std::string const & userName);
 
-    void sendCommand(std::string const& cmd);
+    std::string serverCommand(std::string const& str);
 
     void startSpring(); // throws on failure
     void disconnect();
