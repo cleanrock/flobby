@@ -11,7 +11,7 @@ class User;
 class Battle
 {
 public:
-    Battle(std::istream & is); // BATTLEOPENEDEX content
+    Battle(std::istream & is); // BATTLEOPENED content
     virtual ~Battle();
 
     int id() const;

@@ -7,7 +7,7 @@
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 
-Battle::Battle(std::istream & is): // battleId type natType founder IP port maxplayers passworded rank maphash engineName engineVersion {map} {title} {modname}
+Battle::Battle(std::istream & is): // battleId type natType founder IP port maxPlayers passworded rank mapHash {engineName} {engineVersion} {map} {title} {gameName}
         spectators_(0), // set to 1 below if replay
         locked_(false), // only set to true by UPDATEBATTLEINFO
         running_(false), // set by founder status
@@ -43,9 +43,8 @@ Battle::Battle(std::istream & is): // battleId type natType founder IP port maxp
     extractWord(is, ex);
     mapHash_ = static_cast<unsigned int>( boost::lexical_cast<int64_t>(ex) );
 
-    // BATTLEOPENEDEX specific
-    extractWord(is, engineName_);
-    extractWord(is, engineVersion_);
+    extractSentence(is, engineName_);
+    extractSentence(is, engineVersion_);
 
     extractSentence(is, mapName_);
     extractSentence(is, title_);
