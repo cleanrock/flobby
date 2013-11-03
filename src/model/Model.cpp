@@ -171,7 +171,7 @@ void Model::attemptLogin()
     uint32_t const userId = UserId::get();
 
     std::ostringstream oss;
-    oss << "LOGIN " << userName_ << " " << password_ << " 0 * flobby 0.2\t" << userId << "\teb";
+    oss << "LOGIN " << userName_ << " " << password_ << " 0 * flobby 0.2\t" << userId << "\teb sp";
     controller_.send(oss.str());
 }
 
