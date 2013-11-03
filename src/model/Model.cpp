@@ -550,6 +550,7 @@ void Model::startSpring()
 
 void Model::disconnect()
 {
+    sendMessage("EXIT");
     controller_.disconnect();
 }
 
