@@ -16,13 +16,9 @@ Channel::Channel(std::istream & is) // channelName userCount [{topic}]
     extractWord(is, ex);
     userCount_ = boost::lexical_cast<int>(ex);
 
-    try
+    if (!is.eof())
     {
         extractSentence(is, topic_);
-    }
-    catch (std::invalid_argument const & e)
-    {
-        // no topic, ignore
     }
 }
 

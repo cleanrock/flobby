@@ -64,20 +64,12 @@ std::string ServerCommand::process(std::string const& str)
     }
 
     std::vector<std::string> args;
-    try
+    while (!iss.eof())
     {
-        // extractWord will throw when no args left
-        while (true)
-        {
-            LobbyProtocol::skipSpaces(iss);
-            std::string arg;
-            LobbyProtocol::extractWord(iss, arg);
-            args.push_back(arg);
-        }
-    }
-    catch (std::invalid_argument const& e)
-    {
-        // do nothing, no more args
+        LobbyProtocol::skipSpaces(iss);
+        std::string arg;
+        LobbyProtocol::extractWord(iss, arg);
+        args.push_back(arg);
     }
 
     return itNamePtr->second->process(args);

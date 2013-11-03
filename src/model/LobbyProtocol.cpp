@@ -20,7 +20,7 @@ void extractWord(std::istream & is, std::string & ex)
 void extractSentence(std::istream & is, std::string & ex)
 {
     std::getline(is, ex, '\t');
-    if (is.fail())
+    if (is.fail() && !is.eof())
     {
         throw std::invalid_argument("extractSentence failed");
     }

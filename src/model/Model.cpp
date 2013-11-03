@@ -953,7 +953,7 @@ void Model::handle_JOINEDBATTLE(std::istream & is) // battleId username [scriptP
         }
         catch (std::invalid_argument const & e)
         {
-            // TODO fully OK to ignore optional scriptPassword ?
+            LOG(WARNING)<< "script password not sent in JOINEDBATTLE";
         }
 
     }
@@ -1032,21 +1032,14 @@ void Model::handle_SETSCRIPTTAGS(std::istream & is) // {data} [{data} ...]
 {
     using namespace LobbyProtocol;
     std::string ex;
-    try
+    while (!is.eof())
     {
-        while (true)
+        extractSentence(is, ex);
+        auto keyValuePair = script_.getKeyValuePair(ex);
+        if (!keyValuePair.first.empty())
         {
-            extractSentence(is, ex); // will break out of loop when it throws
-            auto keyValuePair = script_.getKeyValuePair(ex);
-            if (!keyValuePair.first.empty())
-            {
-                setScriptTagSignal_(keyValuePair.first, keyValuePair.second);
-            }
+            setScriptTagSignal_(keyValuePair.first, keyValuePair.second);
         }
-    }
-    catch (...)
-    {
-        // no more data
     }
 }
 
@@ -1054,21 +1047,14 @@ void Model::handle_REMOVESCRIPTTAGS(std::istream & is) // key [key ...]
 {
     using namespace LobbyProtocol;
     std::string ex;
-    try
+    while (!is.eof())
     {
-        while (true)
+        extractWord(is, ex);
+        std::string const key = script_.getKey(ex);
+        if (!key.empty())
         {
-            extractWord(is, ex); // will break out of loop when it throws
-            std::string const key = script_.getKey(ex);
-            if (!key.empty())
-            {
-                removeScriptTagSignal_(key);
-            }
+            removeScriptTagSignal_(key);
         }
-    }
-    catch (...)
-    {
-        // no more data
     }
 }
 
@@ -1190,18 +1176,15 @@ void Model::handle_SERVERMSG(std::istream & is) // {message}
 void Model::handle_SERVERMSGBOX(std::istream & is) // {message} [{url}]
 {
     using namespace LobbyProtocol;
-    std::string ex;
-    extractSentence(is, ex);
-    try
+    std::string msg;
+    extractSentence(is, msg);
+    if (!is.eof())
     {
         std::string url;
         extractSentence(is, url);
-        serverMsgSignal_(ex + " " + url);
+        msg += " " + url;
     }
-    catch (std::invalid_argument const & e)
-    {
-        serverMsgSignal_(ex);
-    }
+    serverMsgSignal_(msg);
 }
 
 void Model::handle_CHANNEL(std::istream & is) // channelName userCount [{topic}]
@@ -1230,20 +1213,12 @@ void Model::handle_CLIENTS(std::istream & is) // channelName {clients}
     extractWord(is, channelName);
 
     std::vector<std::string> clients;
-    try
+    std::string userName;
+    while (!is.eof())
     {
-        std::string userName;
-        while (1) // exits with exception when user list empty
-        {
-            extractWord(is, userName);
-            clients.push_back(userName);
-        }
+        extractWord(is, userName);
+        clients.push_back(userName);
     }
-    catch (std::invalid_argument const & e)
-    {
-        // all user names extracted, do nothing
-    }
-
     channelClientsSignal_(channelName, clients);
 }
 
@@ -1335,13 +1310,9 @@ void Model::handle_LEFT(std::istream & is) // channelName userName [{reason}]
     extractWord(is, userName);
 
     std::string reason;
-    try
+    if (!is.eof())
     {
         extractSentence(is, reason);
-    }
-    catch (std::invalid_argument const & e)
-    {
-        // no reason, reason will be empty
     }
 
     userLeftChannelSignal_(channelName, userName, reason);
