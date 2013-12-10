@@ -3,12 +3,13 @@ flobby is developed and tested on archlinux.
 
 Dependencies worth noting:
 FLTK 1.3
-libxpm (libxpm-dev)
-libxss (libxss-dev)
+libxpm
+libxss
 ImageMagick
+curl
 boost
 C++11 (gcc 4.6 should be enough)
-spring (http://springrts.com)
+
 
 Build and run:
 $ cmake .
