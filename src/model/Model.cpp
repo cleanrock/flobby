@@ -15,8 +15,11 @@
 #include "log/Log.h"
 #include "FlobbyDirs.h"
 
+#include <pr-downloader.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
 #include <stdexcept>
 #include <sstream>
 
@@ -109,6 +112,12 @@ void Model::setUnitSyncPath(std::string const & path)
     LOG(DEBUG) << "writeableDataDir_:" << writeableDataDir_;
 }
 
+void Model::useExternalPrDownloader(bool useExternal)
+{
+    useExternalPrDownloader_ = useExternal;
+    LOG(DEBUG) << "useExternalPrDownloader_:" << useExternalPrDownloader_;
+}
+
 void Model::setPrDownloaderCmd(std::string const & cmd)
 {
     prDownloaderCmd_ = cmd;
@@ -179,6 +188,35 @@ void Model::message(std::string const & msg)
     LOG(DEBUG) << "message: " << msg;
 
     processServerMsg(msg);
+}
+
+int Model::runProcess(std::string const& cmd, bool logToFile)
+{
+    LOG(DEBUG) << "runProcess: '" << cmd << "'";
+
+    int ret;
+    if (logToFile)
+    {
+        // create log filename
+        std::string const first = cmd.substr(0, cmd.find(' '));
+        boost::filesystem::path const path(first);
+        std::string const log = cacheDir() + "flobby_process_" + path.stem().string() + ".log";
+        LOG(DEBUG) << "runProcess logFile: '" << log << "'";
+
+        // redirect stdout and stderr to log file
+        std::string cmdLine = cmd + " >> " + log + " 2>&1";
+
+        LOG(DEBUG) << "runProcess system(): '" << cmdLine << "'";
+        ret = std::system(cmdLine.c_str());
+    }
+    else
+    {
+        std::string cmdLine = cmd + " >> /dev/null" + " 2>&1";
+        LOG(DEBUG) << "runProcess system(): '" << cmdLine << "'";
+        ret = std::system(cmdLine.c_str());
+    }
+
+    return ret;
 }
 
 void Model::processDone(std::pair<unsigned int, int> idRetPair)
@@ -543,7 +581,7 @@ void Model::startSpring()
         std::ostringstream oss;
         oss << springPath_ << " " << scriptPath;
 
-        springId_ = controller_.startProcess(oss.str());
+        springId_ = controller_.startThread( boost::bind(&Model::runProcess, this, oss.str(), false) );
     }
     meInGame(true);
 }
@@ -1681,22 +1719,96 @@ void Model::ring(std::string const & userName)
 
 }
 
-bool Model::download(std::string const & name, DownloadType type)
+void Model::testThread()
 {
-    if (name.empty())
+    for (int i=0; i<10; ++i)
     {
-        LOG(ERROR)<< "download name empty";
-        return false;
+        controller_.startThread( []() -> int { LOG(ERROR)<< "HEJ"; ::sleep(2); return 0; } );
     }
+}
 
-    // only start pr-downloader if its not running
+
+bool Model::download(std::string const& name, DownloadType type)
+{
     if (downloaderId_ != 0)
     {
         LOG(WARNING)<< "downloader already running (" << downloadName_ << ")";
         return false;
     }
 
+    if (name.empty())
+    {
+        LOG(ERROR)<< "download name empty";
+        return false;
+    }
+
     downloadName_ = name;
+
+    if (useExternalPrDownloader_)
+    {
+        return downloadExternal(name, type);
+    }
+    else
+    {
+        downloaderId_ = controller_.startThread( boost::bind(&Model::downloadInternal, this, name, type) );
+        return true;
+    }
+}
+
+int Model::downloadInternal(std::string const& name, DownloadType type)
+{
+    category prdType;
+
+    switch (type)
+    {
+    case DT_MAP:
+        prdType = CAT_MAP;
+        break;
+
+    case DT_GAME:
+        prdType = CAT_GAME;
+        break;
+
+    default:
+        LOG(ERROR)<< "unknown DownloadType " << type;
+        return 1;
+    }
+
+    int cnt = DownloadSearch(DL_ANY, prdType, name.c_str());
+    LOG(INFO)<< "DownloadSearch returned " << cnt;
+
+    if (cnt == 1)
+    {
+        bool res;
+        if (!DownloadAdd(0))
+        {
+            LOG(ERROR)<< "DownloadAdd failed"<<" ("<<name<<","<<type<<")";
+            return 1;
+        }
+        if (!DownloadStart())
+        {
+            LOG(ERROR)<< "DownloadStart failed"<<" ("<<name<<","<<type<<")";
+            return 1;
+        }
+    }
+    else
+    {
+        LOG(ERROR)<< "DownloadSearch returned !=1: " << cnt <<" ("<<name<<","<<type<<")";
+        return 1;
+    }
+
+    LOG(INFO)<< "Download finished";
+    return 0;
+}
+
+bool Model::downloadExternal(std::string const& name, DownloadType type)
+{
+    if (prDownloaderCmd_.empty())
+    {
+        LOG(ERROR)<< "pr-downloader path empty";
+        return false;
+    }
+
     std::ostringstream oss;
     oss << prDownloaderCmd_ << " ";
     switch (type)
@@ -1714,7 +1826,9 @@ bool Model::download(std::string const & name, DownloadType type)
         return false;
     }
     oss << "\"" << name << "\"";
-    downloaderId_ = controller_.startProcess(oss.str(), true);
+
+    downloaderId_ = controller_.startThread( boost::bind(&Model::runProcess, this, oss.str(), true) );
+
     return true;
 }
 

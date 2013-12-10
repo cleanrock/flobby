@@ -24,6 +24,7 @@ class Tabs;
 class ChatSettingsDialog;
 class SoundSettingsDialog;
 class FontSettingsDialog;
+class DownloadSettingsDialog;
 
 class Fl_Double_Window;
 class Fl_Browser;
@@ -84,6 +85,7 @@ private:
     ChatSettingsDialog * chatSettingsDialog_;
     SoundSettingsDialog * soundSettingsDialog_;
     FontSettingsDialog * fontSettingsDialog_;
+    DownloadSettingsDialog * downloadSettingsDialog_;
 
     Fl_Tile * tile_; // whole app window client area
     Fl_Tile * tileLeft_; // chat and battle list
@@ -116,6 +118,7 @@ private:
     static void menuGenerateCacheFiles(Fl_Widget *w, void* d);
     static void menuMaps(Fl_Widget *w, void* d);
     static void menuSpring(Fl_Widget *w, void* d);
+    static void menuDownloader(Fl_Widget *w, void* d);
     static void menuLogging(Fl_Widget *w, void* d);
     static void menuJoinChannel(Fl_Widget *w, void* d);
     static void menuChannels(Fl_Widget *w, void* d);

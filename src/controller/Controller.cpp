@@ -14,15 +14,18 @@ using namespace boost::chrono;
 
 static time_point<steady_clock> timeStart_ = steady_clock::now();
 static time_point<steady_clock> timeLastSend_ = timeStart_;
-
+static Controller* controller_ = nullptr;
 
 Controller::Controller():
     client_(0),
     model_(0),
     ui_(0),
     connected_(false),
-    processId_(0)
+    nextThreadId_(1)
 {
+    // ugly singleton
+    assert(controller == 0);
+    controller_ = this;
 }
 
 Controller::~Controller()
@@ -61,88 +64,55 @@ uint64_t Controller::timeNow() const
     return duration_cast<milliseconds>(diff).count();
 }
 
-unsigned int Controller::startProcess(std::string const& cmd, bool logToFile)
+unsigned int Controller::startThread(boost::function<int()> function)
 {
-    ++processId_;
-    processId_ = std::max(processId_, 1U); // make sure it doesn't wrap to zero (not very likely though)
+    unsigned int threadId = nextThreadId_;
+    LOG(DEBUG) << "startThread " << threadId;
 
-    boost::thread * t = new boost::thread(boost::bind(&Controller::runProcess, this, cmd, logToFile, processId_));
-    procs_[processId_] = t;
+    boost::lock_guard<boost::mutex> lock(mutexThreads_); // protect threads_
 
-    return processId_;
+    boost::thread* t = new boost::thread(boost::bind(&Controller::runThread, this, function, threadId));
+    threads_[threadId] = ThreadInfo(t);
+
+    ++nextThreadId_;
+    nextThreadId_ = std::max(nextThreadId_, 1U); // make sure it doesn't wrap to zero
+
+    return threadId;
 }
 
-void Controller::runProcess(std::string const& cmd, bool logToFile, unsigned int id)
+void Controller::runThread(boost::function<int()> function, unsigned int id)
 {
-    LOG(DEBUG) << "runProcess: '" << cmd << "'";
+    LOG(DEBUG) << "runThread " << id;
 
-    int ret;
-    if (logToFile)
-    {
-        // create log filename
-        std::string const first = cmd.substr(0, cmd.find(' '));
-        boost::filesystem::path const path(first);
-        std::string const log = cacheDir() + "flobby_process_" + path.stem().string() + ".log";
-        LOG(DEBUG) << "runProcess logFile: '" << log << "'";
-
-        // redirect stdout and stderr to log file
-        std::string cmdLine = cmd + " >> " + log + " 2>&1";
-
-        LOG(DEBUG) << "runProcess system(): '" << cmdLine << "'";
-        ret = std::system(cmdLine.c_str());
-
-        // TODO remove this when i know pr-downloader returns sane value
-        std::ostringstream oss;
-        oss << "echo \"system returned " << ret << "\" >> " << log;
-        std::system(oss.str().c_str());
-    }
-    else
-    {
-        std::string cmdLine = cmd + " >> /dev/null" + " 2>&1";
-        LOG(DEBUG) << "runProcess system(): '" << cmdLine << "'";
-        ret = std::system(cmdLine.c_str());
-    }
-
-//    FILE * f = ::popen(cmd.c_str(), "re"); // e = close-on-exec
-//    if (f != NULL)
-//    {
-//        int const bufSize = 256;
-//        char buf[bufSize];
-//        while (::fgets(buf, bufSize, f) != NULL)
-//        {
-//            // TODO write to file ???
-//        }
-//        ::pclose(f);
-//    }
+    int const res = function();
 
     {
-        boost::lock_guard<boost::mutex> lock(mutexProcess_);
-        procsDone_.push_back(std::make_pair(id, ret));
+        boost::lock_guard<boost::mutex> lock(mutexThreads_);
+        Threads::iterator it = threads_.find(id);
+        LOG_IF(FATAL, it == threads_.end())<< "thread " << id << "not found";
+        it->second.result_ = res;
     }
-    ui_->addCallbackEvent(&processDoneCallback, this);
+
+    ui_->addCallbackEvent(&threadDoneCallback, reinterpret_cast<void*>(static_cast<uintptr_t>(id)) );
 }
 
-void Controller::processDoneCallback(void * data)
+void Controller::threadDoneCallback(void* data)
 {
-    Controller* c = static_cast<Controller*>(data);
+    unsigned int id = reinterpret_cast<uintptr_t>(data);
 
-    boost::lock_guard<boost::mutex> lock(c->mutexProcess_);
-    for (std::pair<unsigned int, int> const & idRetPair : c->procsDone_)
-    {
-        c->client_->processDone(idRetPair);
-        std::map<unsigned int, boost::thread*>::iterator it = c->procs_.find(idRetPair.first);
-        if (it != c->procs_.end())
-        {
-            it->second->join();
-            delete it->second;
-            // TODO delete entry in procs_
-        }
-        else
-        {
-            LOG(WARNING) << "thread not found:" << idRetPair.first;
-        }
-    }
-    c->procsDone_.clear();
+    boost::lock_guard<boost::mutex> lock(controller_->mutexThreads_); // protect threads_
+
+    Threads::iterator it = controller_->threads_.find(id);
+    LOG_IF(FATAL, it == controller_->threads_.end())<< "thread " << id << "not found";
+
+    ThreadInfo& ti = it->second;
+
+    ti.thread_->join();
+    delete ti.thread_;
+
+    controller_->client_->processDone(std::make_pair(id, ti.result_));
+
+    controller_->threads_.erase(it);
 }
 
 void Controller::connected(bool connected)

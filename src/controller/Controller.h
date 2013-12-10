@@ -31,7 +31,8 @@ public:
     void send(std::string const& msg);
     uint64_t lastSendTime() const;
     uint64_t timeNow() const;
-    unsigned int startProcess(std::string const & cmd, bool logToFile = false); // e.g. "/usr/bin/spring script.txt"
+    unsigned int startThread(boost::function<int()> function);
+    void runThread(boost::function<int()> function, unsigned int id);
 
 private:
     IControllerEvent * client_;
@@ -48,7 +49,7 @@ private:
 
     boost::mutex mutexConnected_;
     boost::mutex mutexRecv_;
-    boost::mutex mutexProcess_;
+    boost::mutex mutexThreads_;
 
     // IServerEvent (called by server_ from its own thread)
     //
@@ -60,9 +61,16 @@ private:
     static void connectedCallback(void * data);
     static void messageCallback(void * data);
 
-    unsigned int processId_;
-    void runProcess(std::string const & cmd, bool logToFile, unsigned int id);
-    static void processDoneCallback(void * data);
-    std::map<unsigned int, boost::thread*> procs_;
-    std::vector<std::pair<unsigned int,int>> procsDone_; // procId, process (system) return value
+    unsigned int nextThreadId_;
+    static void threadDoneCallback(void * data);
+
+    struct ThreadInfo
+    {
+        boost::thread* thread_;
+        int result_;
+        ThreadInfo(): thread_(nullptr), result_(-1) {}
+        ThreadInfo(boost::thread* thread): thread_(thread), result_(-1) {}
+    };
+    typedef std::map<unsigned int, ThreadInfo> Threads;
+    Threads threads_;
 };

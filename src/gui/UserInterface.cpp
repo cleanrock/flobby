@@ -18,9 +18,12 @@
 #include "ChatSettingsDialog.h"
 #include "SoundSettingsDialog.h"
 #include "FontSettingsDialog.h"
+#include "DownloadSettingsDialog.h"
 
 #include "log/Log.h"
 #include "model/Model.h"
+
+#include <pr-downloader.h>
 
 #include <X11/xpm.h>
 #include <X11/extensions/scrnsaver.h>
@@ -91,9 +94,10 @@ UserInterface::UserInterface(Model & model) :
             { 0 },
         { "Se&ttings",              0, 0, 0, FL_SUBMENU },
                 { "&Spring...", FL_COMMAND +'s', (Fl_Callback *)&menuSpring, this },
+                { "&Downloader...", 0, (Fl_Callback *)&menuDownloader, this },
                 { "&Battle list filter...", FL_COMMAND +'b', (Fl_Callback *)&menuBattleListFilter, this },
                 { "Channels to &auto-join...", 0, (Fl_Callback *)&menuChannelsAutoJoin, this },
-                { "Soun&d...", 0, (Fl_Callback *)&menuSoundSettings, this },
+                { "S&ound...", 0, (Fl_Callback *)&menuSoundSettings, this },
                 { "&Chat...", 0, (Fl_Callback *)&menuChatSettings, this },
                 { "&Font ...", 0, (Fl_Callback *)&menuFontSettings, this },
                 { "&Logging...", 0, (Fl_Callback *)&menuLogging, this },
@@ -141,6 +145,7 @@ UserInterface::UserInterface(Model & model) :
     soundSettingsDialog_ = new SoundSettingsDialog();
     chatSettingsDialog_ = new ChatSettingsDialog();
     fontSettingsDialog_ = new FontSettingsDialog();
+    downloadSettingsDialog_ = new DownloadSettingsDialog(model_);
     tabs_->setChatSettingsDialog(chatSettingsDialog_); // ugly dependency injection
 
 
@@ -230,7 +235,7 @@ int UserInterface::run(int argc, char** argv)
 
     mainWindow_->show(argc, argv);
 
-    // set paths to spring, unitsync and pr-downloader
+    // set paths to spring and unitsync
     bool const pathsOk = springDialog_->setPaths();
 
     if (!pathsOk)
@@ -293,8 +298,28 @@ void UserInterface::menuChannels(Fl_Widget *w, void* d)
 // TODO remove
 void UserInterface::onTest(Fl_Widget *w, void* d)
 {
-//    UserInterface * ui = static_cast<UserInterface*>(d);
-//    Model & m = ui->model_;
+    UserInterface* ui = static_cast<UserInterface*>(d);
+    Model& m = ui->model_;
+
+    //m.testThread();
+    //m.download("asda asdasd dsa", Model::DT_MAP);
+    m.download("Red Comet", Model::DT_MAP);
+    //m.download("aksdgh", Model::DT_GAME);
+
+#if 0
+    LOG(INFO)<< "DownloadSearch...";
+    int cnt = DownloadSearch(DL_ANY, CAT_MAP, "Red Comet");
+    LOG(INFO)<< "DownloadSearch cnt:"<<cnt;
+
+    if (cnt == 1)
+    {
+        bool res;
+        res = DownloadAdd(0);
+        LOG(INFO)<< "DownloadAdd res:"<<res;
+        res = DownloadStart();
+        LOG(INFO)<< "DownloadStart res:"<<res;
+    }
+#endif
 
 //     Sound::beep();
 //     ui->sound_->play();
@@ -511,6 +536,12 @@ void UserInterface::menuSpring(Fl_Widget *w, void* d)
 {
     UserInterface * ui = static_cast<UserInterface*>(d);
     ui->springDialog_->show();
+}
+
+void UserInterface::menuDownloader(Fl_Widget *w, void* d)
+{
+    UserInterface * ui = static_cast<UserInterface*>(d);
+    ui->downloadSettingsDialog_->show();
 }
 
 void UserInterface::menuChannelsAutoJoin(Fl_Widget *w, void* d)

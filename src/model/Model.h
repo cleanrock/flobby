@@ -35,6 +35,7 @@ public:
 
     void setSpringPath(std::string const & path) { springPath_ = path; }
     void setUnitSyncPath(std::string const & path);
+    void useExternalPrDownloader(bool useExternal);
     void setPrDownloaderCmd(std::string const & cmd);
     std::string const & getSpringPath() const { return springPath_; }
     std::string const & getUnitSyncPath() const { return unitSyncPath_; }
@@ -101,6 +102,8 @@ public:
 
     enum DownloadType { DT_MAP, DT_GAME };
     bool download(std::string const & name, DownloadType type); // returns true if download attempt is done
+
+    void testThread(); // TODO remove some day
 
     // mod
     bool gameExist(std::string const & gameName);
@@ -278,14 +281,20 @@ private:
     User * me_;
     std::string downloadName_; // what is being downloaded
 
-    // process ids (0 if not running)
+    // thread ids (0 if not running)
     unsigned int springId_;
     unsigned int downloaderId_;
 
     std::string springPath_;
     std::string unitSyncPath_;
+    bool useExternalPrDownloader_;
     std::string prDownloaderCmd_;
     Script script_;
+
+    int runProcess(std::string const& cmd, bool logToFile);
+
+    bool downloadExternal(std::string const& name, DownloadType type); // returns true if download attempt is done
+    int downloadInternal(std::string const& name, DownloadType type); // returns true if download attempt is done
 
     // IControllerEvent
     //

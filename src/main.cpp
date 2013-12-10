@@ -2,6 +2,7 @@
 #include "controller/Controller.h"
 #include "model/Model.h"
 #include "gui/UserInterface.h"
+#include <pr-downloader.h>
 
 // TODO #include <boost/program_options.hpp>
 // #include <iostream>
@@ -25,6 +26,10 @@ int main(int argc, char * argv[])
 
     initDirs();
 
+    // init pr-downloader
+    DownloadInit();
+    DownloadDisableLogging(true);
+
     // extra scope to be able to check destruction
     {
         // setup
@@ -40,6 +45,10 @@ int main(int argc, char * argv[])
         ui.run(argc, argv);
         // TODO ui.run(argcRest, argvRest);
     }
+
+    // shutdown pr-downloader
+    DownloadShutdown();
+
     return 0;
 }
 

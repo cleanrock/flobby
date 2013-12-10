@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <boost/function/function_fwd.hpp>
 
 class IControllerEvent;
 
@@ -13,7 +14,8 @@ public:
     virtual void send(std::string const& msg) = 0;
     virtual uint64_t lastSendTime() const = 0; // milliseconds since start
     virtual uint64_t timeNow() const = 0; // milliseconds since start
-    virtual unsigned int startProcess(std::string const & cmd, bool logToFile = false) = 0; // e.g. "/usr/bin/spring script.txt"
+
+    virtual unsigned int startThread(boost::function<int()> function) = 0;
 
 protected:
     ~IController() {}

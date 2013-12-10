@@ -35,7 +35,6 @@ private:
     Fl_Input * name_;
     Fl_File_Input * springPath_;
     Fl_File_Input * unitSyncPath_;
-    Fl_File_Input * prDownloaderCmd_;
     Fl_Button * save_;
     Fl_Button * delete_;
     Fl_Return_Button * select_;
@@ -46,7 +45,6 @@ private:
     static void callbackSelect(Fl_Widget*, void*);
     static void callbackBrowseSpring(Fl_Widget*, void*);
     static void callbackBrowseUnitSync(Fl_Widget*, void*);
-    static void callbackBrowsePrDownloader(Fl_Widget*, void*);
 
     void initList(bool selectCurrent = false);
     void clearInputFields();
@@ -57,6 +55,5 @@ private:
     void onSelect();
     void onBrowseSpring();
     void onBrowseUnitSync();
-    void onBrowsePrDownloader();
     bool openFileDialog(char const * title, char const * fileName, std::string & result); // returns false on cancel
 };

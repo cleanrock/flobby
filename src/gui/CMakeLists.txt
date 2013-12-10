@@ -53,6 +53,7 @@ add_library (gui STATIC
     TextFunctions.cpp
     FontSettingsDialog.cpp
     MapsWindow.cpp
+    DownloadSettingsDialog.cpp
 )
 
 target_link_libraries (gui

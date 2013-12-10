@@ -1,18 +1,16 @@
-project(FLOBBY)
-
 add_definitions(${CMAKE_CXX_FLAGS} "-std=c++0x")
 
 find_package(Boost COMPONENTS system filesystem regex chrono signals thread REQUIRED)
 
 
 include_directories (
-    ${PROJECT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/src
     ${Boost_INCLUDE_DIRS}
 )
 
 add_executable (flobby
     main.cpp
-	FlobbyDirs.cpp
+    FlobbyDirs.cpp
 )
 
 target_link_libraries (flobby
@@ -20,6 +18,7 @@ target_link_libraries (flobby
     gui
     model
     log
+    pr-downloader_static
     ${Boost_LIBRARIES}
     pthread
 ) 
