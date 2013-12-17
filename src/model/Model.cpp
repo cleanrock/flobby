@@ -1777,10 +1777,10 @@ int Model::downloadInternal(std::string const& name, DownloadType type)
     int cnt = DownloadSearch(DL_ANY, prdType, name.c_str());
     LOG(INFO)<< "DownloadSearch returned " << cnt;
 
-    if (cnt == 1)
+    if (cnt > 0)
     {
         bool res;
-        if (!DownloadAdd(0))
+        if (!DownloadAdd(0)) // i hope pr-d puts the best dl alt first
         {
             LOG(ERROR)<< "DownloadAdd failed"<<" ("<<name<<","<<type<<")";
             return 1;
@@ -1793,7 +1793,7 @@ int Model::downloadInternal(std::string const& name, DownloadType type)
     }
     else
     {
-        LOG(ERROR)<< "DownloadSearch returned !=1: " << cnt <<" ("<<name<<","<<type<<")";
+        LOG(ERROR)<< "DownloadSearch failed ("<<name<<","<<type<<")";
         return 1;
     }
 
