@@ -9,6 +9,7 @@
 #include "TextFunctions.h"
 
 #include "model/Model.h"
+#include "log/Log.h"
 
 #include <FL/Fl.H>
 #include <boost/algorithm/string.hpp>
@@ -117,7 +118,15 @@ void ChannelChatTab::clients(std::string const & channelName, std::vector<std::s
     {
         for (std::string const & userName : clients)
         {
-            userList_->add(userName);
+            // catch non-existing user exception here (uberserver bug) to not skip the rest of users in channel
+            try
+            {
+                userList_->add(userName);
+            }
+            catch (std::invalid_argument const& ex)
+            {
+                LOG(WARNING)<< ex.what();
+            }
         }
     }
 }
