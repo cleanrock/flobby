@@ -6,7 +6,7 @@
 #include <map>
 #include <string>
 
-class LogUsersTab;
+class ServerTab;
 class ChannelChatTab;
 class PrivateChatTab;
 class ChatSettingsDialog;
@@ -26,7 +26,7 @@ private:
     Model & model_;
     ChatSettingsDialog * chatSettingsDialog_;
 
-    LogUsersTab * logUsersTab_;
+    ServerTab * logUsersTab_;
 
     typedef std::map<std::string, PrivateChatTab*> PrivateChatTabs;
     PrivateChatTabs privateChatTabs_;

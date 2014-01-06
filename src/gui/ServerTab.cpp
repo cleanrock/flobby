@@ -1,4 +1,4 @@
-#include "LogUsersTab.h"
+#include "ServerTab.h"
 #include "TextDisplay2.h"
 #include "ChatInput.h"
 #include "UserList.h"
@@ -6,6 +6,7 @@
 #include "ITabs.h"
 #include "PopupMenu.h"
 #include "Sound.h"
+#include "TextFunctions.h"
 
 #include "model/Model.h"
 
@@ -15,7 +16,7 @@
 
 static char const * PrefServerMessagesSplitH = "ServerMessagesSplitH";
 
-LogUsersTab::LogUsersTab(int x, int y, int w, int h,
+ServerTab::ServerTab(int x, int y, int w, int h,
                                ITabs& iTabs, Model & model):
     Fl_Tile(x,y,w,h, "Server"),
     iTabs_(iTabs),
@@ -28,8 +29,8 @@ LogUsersTab::LogUsersTab(int x, int y, int w, int h,
     int const ih = FL_NORMAL_SIZE*2; // input height
     text_ = new TextDisplay2(x, y, leftW, h-ih);
     input_ = new ChatInput(x, y+h-ih, leftW, ih);
-    input_->connectText( boost::bind(&LogUsersTab::onInput, this, _1) );
-    input_->connectComplete( boost::bind(&LogUsersTab::onComplete, this, _1, _2, _3) );
+    input_->connectText( boost::bind(&ServerTab::onInput, this, _1) );
+    input_->connectComplete( boost::bind(&ServerTab::onComplete, this, _1, _2, _3) );
     left->resizable(text_);
     left->end();
 
@@ -43,22 +44,22 @@ LogUsersTab::LogUsersTab(int x, int y, int w, int h,
     text_->append("lines entered not starting with / will be sent to lobby server");
 
     // model signals
-    model_.connectConnected( boost::bind(&LogUsersTab::connected, this, _1) );
-    model_.connectServerInfo( boost::bind(&LogUsersTab::serverInfo, this, _1) );
-    model_.connectLoginResult( boost::bind(&LogUsersTab::loginResult, this, _1, _2) );
-    model_.connectServerMsg( boost::bind(&LogUsersTab::message, this, _1) );
-    model_.connectUserJoined( boost::bind(&LogUsersTab::userJoined, this, _1) );
-    model_.connectUserLeft( boost::bind(&LogUsersTab::userLeft, this, _1) );
-    model_.connectRing( boost::bind(&LogUsersTab::ring, this, _1) );
-    model_.connectDownloadDone( boost::bind(&LogUsersTab::downloadDone, this, _1, _2) );
+    model_.connectConnected( boost::bind(&ServerTab::connected, this, _1) );
+    model_.connectServerInfo( boost::bind(&ServerTab::serverInfo, this, _1) );
+    model_.connectLoginResult( boost::bind(&ServerTab::loginResult, this, _1, _2) );
+    model_.connectServerMsg( boost::bind(&ServerTab::message, this, _1) );
+    model_.connectUserJoined( boost::bind(&ServerTab::userJoined, this, _1) );
+    model_.connectUserLeft( boost::bind(&ServerTab::userLeft, this, _1) );
+    model_.connectRing( boost::bind(&ServerTab::ring, this, _1) );
+    model_.connectDownloadDone( boost::bind(&ServerTab::downloadDone, this, _1, _2) );
 }
 
-LogUsersTab::~LogUsersTab()
+ServerTab::~ServerTab()
 {
     prefs().set(PrefServerMessagesSplitH, userList_->x());
 }
 
-void LogUsersTab::initTiles()
+void ServerTab::initTiles()
 {
     int x;
     prefs().get(PrefServerMessagesSplitH, x, 0);
@@ -68,14 +69,14 @@ void LogUsersTab::initTiles()
     }
 }
 
-void LogUsersTab::serverInfo(ServerInfo const & si)
+void ServerTab::serverInfo(ServerInfo const & si)
 {
     std::ostringstream oss;
     oss << "ServerInfo: " << si;
     append(oss.str());
 }
 
-void LogUsersTab::loginResult(bool success, std::string const & info)
+void ServerTab::loginResult(bool success, std::string const & info)
 {
     if (success)
     {
@@ -93,7 +94,7 @@ void LogUsersTab::loginResult(bool success, std::string const & info)
     }
 }
 
-void LogUsersTab::connected(bool connected)
+void ServerTab::connected(bool connected)
 {
     if (!connected)
     {
@@ -102,28 +103,28 @@ void LogUsersTab::connected(bool connected)
     }
 }
 
-void LogUsersTab::message(std::string const & msg)
+void ServerTab::message(std::string const & msg)
 {
     append(msg, true);
 }
 
-void LogUsersTab::userJoined(User const & user)
+void ServerTab::userJoined(User const & user)
 {
     userList_->add(user);
 }
 
-void LogUsersTab::userLeft(User const & user)
+void ServerTab::userLeft(User const & user)
 {
     userList_->remove(user.name());
 }
 
-void LogUsersTab::ring(std::string const & userName)
+void ServerTab::ring(std::string const & userName)
 {
     append("ring from " + userName, true);
     Sound::beep();
 }
 
-int LogUsersTab::handle(int event)
+int ServerTab::handle(int event)
 {
     switch (event)
     {
@@ -135,7 +136,7 @@ int LogUsersTab::handle(int event)
     return Fl_Tile::handle(event);
 }
 
-void LogUsersTab::append(std::string const & msg, bool interesting)
+void ServerTab::append(std::string const & msg, bool interesting)
 {
     logFile_.log(msg);
 
@@ -149,7 +150,7 @@ void LogUsersTab::append(std::string const & msg, bool interesting)
 
 }
 
-void LogUsersTab::downloadDone(std::string const & name, bool success)
+void ServerTab::downloadDone(std::string const & name, bool success)
 {
     if (success)
     {
@@ -161,7 +162,7 @@ void LogUsersTab::downloadDone(std::string const & name, bool success)
     }
 }
 
-void LogUsersTab::onInput(std::string const & text)
+void ServerTab::onInput(std::string const & text)
 {
     std::string textTrimmed = text;
     boost::trim(textTrimmed);
@@ -173,7 +174,15 @@ void LogUsersTab::onInput(std::string const & text)
     }
 }
 
-void LogUsersTab::onComplete(std::string const & text, std::size_t pos, std::pair<std::string, std::size_t>& result)
+void ServerTab::onComplete(std::string const & text, std::size_t pos, std::pair<std::string, std::size_t>& result)
 {
-    // TODO
+    auto const pairWordPos = getLastWord(text, pos);
+
+    std::string const userName = userList_->completeUserName(pairWordPos.first);
+
+    if (!userName.empty())
+    {
+        result.first = text.substr(0, pairWordPos.second) + userName + text.substr(pos);
+        result.second = pairWordPos.second + userName.length();
+    }
 }

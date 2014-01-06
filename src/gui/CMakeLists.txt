@@ -21,7 +21,7 @@ add_library (gui STATIC
     BattleList.cpp
     BattleRoom.cpp
     Tabs.cpp
-    LogUsersTab.cpp
+    ServerTab.cpp
     PrivateChatTab.cpp
     ChannelChatTab.cpp
     Cache.cpp

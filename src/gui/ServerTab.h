@@ -13,12 +13,12 @@ class ChatInput;
 class UserList;
 class ServerInfo;
 
-class LogUsersTab: public Fl_Tile
+class ServerTab: public Fl_Tile
 {
 public:
-    LogUsersTab(int x, int y, int w, int h,
+    ServerTab(int x, int y, int w, int h,
                    ITabs & iTabs, Model & model);
-    virtual ~LogUsersTab();
+    virtual ~ServerTab();
 
     void initTiles();
 

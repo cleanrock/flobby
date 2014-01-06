@@ -1,6 +1,6 @@
 #include "Tabs.h"
 #include "Prefs.h"
-#include "LogUsersTab.h"
+#include "ServerTab.h"
 #include "ChannelChatTab.h"
 #include "PrivateChatTab.h"
 #include "PopupMenu.h"
@@ -30,7 +30,7 @@ Tabs::Tabs(int x, int y, int w, int h, Model & model):
     selection_color(FL_BACKGROUND2_COLOR);
 
     client_area(x,y,w,h);
-    logUsersTab_ = new LogUsersTab(x,y,w,h, *this, model_);
+    logUsersTab_ = new ServerTab(x,y,w,h, *this, model_);
 
     resizable(logUsersTab_);
 

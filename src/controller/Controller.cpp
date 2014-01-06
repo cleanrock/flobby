@@ -24,7 +24,7 @@ Controller::Controller():
     nextThreadId_(1)
 {
     // ugly singleton
-    assert(controller == 0);
+    assert(controller_ == 0);
     controller_ = this;
 }
 
