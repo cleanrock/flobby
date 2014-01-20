@@ -5,7 +5,7 @@ commands in all chat windows
 single player game
 implement game hosting
 
-? freeimage instead of imagemagick
+? graphicsmagick or freeimage instead of imagemagick
 ? load chat history
 ? quick find in StringTable, e.g. press C key to show first entry beginning with a C, ignore ^[.*] also maybe
 ? handle FORCEQUITBATTLE
