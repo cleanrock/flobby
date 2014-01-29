@@ -1,5 +1,5 @@
 #include "TextDisplay2.h"
-
+#include "PopupMenu.h"
 #include "log/Log.h"
 
 #include <FL/filename.H>
@@ -158,6 +158,20 @@ int TextDisplay2::handle(int event)
                         return 1;
                     }
                 }
+            }
+        }
+        else if (Fl::event_button() == FL_RIGHT_MOUSE && Fl::event_clicks() == 0)
+        {
+            PopupMenu menu;
+            menu.add("Clear", 1);
+
+            int const id = menu.show();
+            switch (id)
+            {
+            case 1:
+                text_->remove(0, text_->length());
+                style_->remove(0, style_->length());
+                return 1;
             }
         }
         break;
