@@ -4,7 +4,6 @@
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 
-
 ChatInput::ChatInput(int x, int y, int w, int h, size_t historySize):
     Fl_Input(x, y, w, h),
     historySize_(historySize),
@@ -57,15 +56,16 @@ int ChatInput::handle(int event)
 {
     switch (event)
     {
-        case FL_KEYDOWN:
-            return handleKeyDown();
-            break;
+    case FL_KEYDOWN:
+        return handleKeyDown();
     }
     return Fl_Input::handle(event);
 }
 
 int ChatInput::handleKeyDown()
 {
+    int const mods = Fl::event_state() & (FL_META|FL_CTRL|FL_ALT);
+
     switch (Fl::event_key())
     {
         case FL_Down:
@@ -77,8 +77,8 @@ int ChatInput::handleKeyDown()
             return 1;
 
         case FL_Tab:
-            // do tab completion
-            if ( (Fl::event_state() & (FL_SHIFT | FL_CTRL | FL_ALT | FL_META)) == 0)
+            // do tab completion if unmodified tab
+            if (mods == 0)
             {
                 std::pair<std::string, std::size_t> result;
                 completeSignal_(value(), position(), result);
@@ -94,6 +94,21 @@ int ChatInput::handleKeyDown()
         default:
             break;
     }
+
+    // skip the Ctrl+[HIJLM] handling in FL_Input to not hide command shortcuts
+    if (mods & FL_CTRL)
+    {
+        switch (Fl::event_key())
+        {
+        case 'h':
+        case 'i':
+        case 'j':
+        case 'l':
+        case 'm':
+            return 0;
+        }
+    }
+
     return Fl_Input::handle(FL_KEYDOWN);
 }
 
