@@ -25,14 +25,7 @@ void ChatInput::onText()
     std::string msg(value());
     if (!msg.empty())
     {
-        if (history_.empty() || msg != history_.front()) // avoid adding duplicates
-        {
-            history_.push_front(msg);
-            if (history_.size() > historySize_)
-            {
-                history_.pop_back();
-            }
-        }
+        pushHistory(msg);
         pos_ = -1;
 
         // split into multiple messages if newlines
@@ -50,6 +43,18 @@ void ChatInput::onText()
     }
 
     value(0);
+}
+
+void ChatInput::pushHistory(std::string const& text)
+{
+    if (history_.empty() || text != history_.front()) // avoid adding duplicates
+    {
+        history_.push_front(text);
+        if (history_.size() > historySize_)
+        {
+            history_.pop_back();
+        }
+    }
 }
 
 int ChatInput::handle(int event)
@@ -122,13 +127,20 @@ void ChatInput::historyDown()
     else
     {
         pos_ = -1;
-        value(0);
+        value(msg_.c_str());
     }
 }
 
 void ChatInput::historyUp()
 {
+    // save current line
+    if (pos_ == -1)
+    {
+        msg_ = value();
+    }
+
     ++pos_;
+
     if (pos_ >= history_.size())
     {
         pos_ = history_.size() - 1;

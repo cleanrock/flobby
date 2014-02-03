@@ -24,6 +24,7 @@ private:
     size_t historySize_;
     std::deque<std::string> history_;
     int pos_;
+    std::string msg_; // stores unsent message when browsing history
 
     TextSignal textSignal_;
     CompleteSignal completeSignal_;
@@ -33,6 +34,7 @@ private:
     void onText();
     int handle(int event);
     int handleKeyDown();
+    void pushHistory(std::string const& text);
     void historyDown();
     void historyUp();
 
