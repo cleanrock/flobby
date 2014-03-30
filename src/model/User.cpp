@@ -1,3 +1,5 @@
+// This file is part of flobby (GPL v2 or later), see the LICENSE file
+
 #include "User.h"
 #include "LobbyProtocol.h"
 #include "Battle.h"

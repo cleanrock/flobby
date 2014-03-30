@@ -1,3 +1,5 @@
+// This file is part of flobby (GPL v2 or later), see the LICENSE file
+
 #include "DownloadSettingsDialog.h"
 #include "Prefs.h"
 #include "model/Model.h"

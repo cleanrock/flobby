@@ -1,3 +1,5 @@
+// This file is part of flobby (GPL v2 or later), see the LICENSE file
+
 #include "ChannelChatTab.h"
 #include "UserList.h"
 #include "TextDisplay2.h"
