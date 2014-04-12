@@ -104,9 +104,7 @@ void Model::setUnitSyncPath(std::string const & path)
     unitSyncPath_ = path;
     unitSync_.reset( new UnitSync(unitSyncPath_) );
 
-    unitSync_->Init(true, 1);
-    unitSync_->GetPrimaryModCount();
-    initMapIndex();
+    refresh();
 
     writeableDataDir_ = unitSync_->GetWritableDataDirectory();
     assert(!writeableDataDir_.empty());
