@@ -66,43 +66,46 @@ void SpringDialog::initList(bool selectCurrent)
     // setup default if no entries exist
     if (prefs_.groups() == 0)
     {
-        std::string springDefault;
-        std::string unitsyncDefault;
+        std::string springDistro;
+        std::string unitsyncDistro;
 
         using namespace boost::filesystem;
 
         // test a few default paths
 
         // arch, fedora
-        if (springDefault.empty())
+        if (springDistro.empty())
         {
             std::string spring("/usr/bin/spring");
             std::string unitsync("/usr/lib/libunitsync.so");
             if (is_regular_file(spring) &&
                 is_regular_file(unitsync) )
             {
-                springDefault = spring;
-                unitsyncDefault = unitsync;
+                springDistro = spring;
+                unitsyncDistro = unitsync;
             }
         }
 
         // ubuntu
-        if (springDefault.empty())
+        if (springDistro.empty())
         {
             std::string spring("/usr/games/spring");
             std::string unitsync("/usr/lib/spring/libunitsync.so");
             if (is_regular_file(spring) &&
                 is_regular_file(unitsync) )
             {
-                springDefault = spring;
-                unitsyncDefault = unitsync;
+                springDistro = spring;
+                unitsyncDistro = unitsync;
             }
         }
 
-        Fl_Preferences p(prefs_, "default");
-        p.set(PrefSpringPath, springDefault.c_str());
-        p.set(PrefUnitSyncPath, unitsyncDefault.c_str());
-        prefs_.set(PrefSpringProfile, p.name());
+        if (!springDistro.empty())
+        {
+            Fl_Preferences p(prefs_, "distro");
+            p.set(PrefSpringPath, springDistro.c_str());
+            p.set(PrefUnitSyncPath, unitsyncDistro.c_str());
+            prefs_.set(PrefSpringProfile, p.name());
+        }
     }
 
     for (int i = 0; i < prefs_.groups(); ++i)

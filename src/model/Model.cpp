@@ -683,6 +683,8 @@ void Model::getMapSize(std::string const & mapName, int & w, int & h)
 
 void Model::refresh()
 {
+    if (!unitSync_) return;
+
     unitSync_->Init(true, 1);
     unitSync_->GetPrimaryModCount();
     initMapIndex();
@@ -794,11 +796,15 @@ void Model::sendMyInitialBattleStatus(Battle const & battle)
 
 bool Model::gameExist(std::string const & gameName)
 {
+    if (!unitSync_) return false;
+
     return (unitSync_->GetPrimaryModChecksumFromName( gameName.c_str()) != 0 );
 }
 
 int Model::calcSync(Battle const & battle)
 {
+    if (!unitSync_) return 2;
+
     unsigned int const modChecksum = unitSync_->GetPrimaryModChecksumFromName( battle.modName().c_str() );
     unsigned int const mapChecksum = unitSync_->GetMapChecksumFromName( battle.mapName().c_str() );
 
@@ -1427,6 +1433,8 @@ std::vector<std::string> Model::getMaps()
 
 unsigned int Model::getMapChecksum(std::string const & mapName)
 {
+    if (!unitSync_) return 0;
+
     return unitSync_->GetMapChecksumFromName(mapName.c_str());
 }
 
@@ -1578,6 +1586,8 @@ void Model::handle_PONG(std::istream & is)
 std::vector<AI> Model::getModAIs(std::string const & modName)
 {
     std::vector<AI> ais;
+
+    if (!unitSync_) return ais;
 
     int modIndex = unitSync_->GetPrimaryModIndex(modName.c_str());
     LOG(DEBUG) << "modIndex " << modIndex;

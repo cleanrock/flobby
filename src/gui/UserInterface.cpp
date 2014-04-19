@@ -240,12 +240,7 @@ int UserInterface::run(int argc, char** argv)
     // set paths to spring and unitsync
     bool const pathsOk = springDialog_->setPaths();
 
-    if (!pathsOk)
-    {
-        fl_alert("flobby is broken if paths to spring and unitsync are not set.\nSet them now or exit.");
-    }
-
-    if (pathsOk && loginDialog_->autoLogin())
+    if (loginDialog_->autoLogin())
     {
         loginDialog_->attemptLogin();
     }
