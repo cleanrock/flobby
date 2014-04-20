@@ -237,7 +237,14 @@ int UserInterface::run(int argc, char** argv)
 
     mainWindow_->show(argc, argv);
 
-    // set paths to spring and unitsync
+    char const* prdWritePath;
+    if ( !DownloadGetConfig(CONFIG_FILESYSTEM_WRITEPATH, reinterpret_cast<void const**>(&prdWritePath)) )
+    {
+        throw std::runtime_error("failed to get pr-downloader write dir");
+    }
+
+    springDialog_->addFoundProfiles(prdWritePath);
+    // select current spring profile (spring and unitsync)
     bool const pathsOk = springDialog_->setPaths();
 
     if (loginDialog_->autoLogin())

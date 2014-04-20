@@ -3,6 +3,7 @@
 #include "SpringDialog.h"
 #include "Prefs.h"
 #include "model/Model.h"
+#include "log/Log.h"
 
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_File_Input.H>
@@ -60,16 +61,15 @@ SpringDialog::~SpringDialog()
 {
 }
 
-void SpringDialog::initList(bool selectCurrent)
+void SpringDialog::addFoundProfiles(std::string const& prdWriteDir)
 {
-    list_->clear();
-    // setup default if no entries exist
+    using namespace boost::filesystem;
+
+    // look for distro install if no entries exist
     if (prefs_.groups() == 0)
     {
         std::string springDistro;
         std::string unitsyncDistro;
-
-        using namespace boost::filesystem;
 
         // test a few default paths
 
@@ -108,6 +108,42 @@ void SpringDialog::initList(bool selectCurrent)
         }
     }
 
+    // check for downloaded (static) spring engines
+    path engineDir(prdWriteDir);
+    engineDir /= "engine";
+    if (is_directory(engineDir))
+    {
+        for (directory_iterator de(engineDir); de != directory_iterator(); ++de)
+        {
+            if (is_directory(*de))
+            {
+                std::string const dir = de->path().filename().string();
+                if (!prefs_.groupExists(dir.c_str()))
+                {
+                    path pathSpring(*de);
+                    pathSpring /= "spring";
+                    path pathUnitSync(*de);
+                    pathUnitSync /= "libunitsync.so";
+                    if (is_regular_file(pathSpring) && is_regular_file(pathUnitSync))
+                    {
+                        LOG(INFO)<< "adding spring profile '"<< dir<< "' SpringPath="<< pathSpring.string() << " UnitSyncPath="<< pathUnitSync.string();
+                        Fl_Preferences p(prefs_, dir.c_str());
+                        p.set(PrefSpringPath, pathSpring.string().c_str());
+                        p.set(PrefUnitSyncPath, pathUnitSync.string().c_str());
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        LOG(WARNING)<< prdWriteDir<< " do not exist";
+    }
+}
+
+void SpringDialog::initList(bool selectCurrent)
+{
+    list_->clear();
     for (int i = 0; i < prefs_.groups(); ++i)
     {
         list_->add(prefs_.group(i));

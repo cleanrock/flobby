@@ -20,6 +20,7 @@ public:
     SpringDialog(Model & model);
     virtual ~SpringDialog();
 
+    void addFoundProfiles(std::string const& prdWriteDir);
     void show();
     bool setPaths(); // returns true on success
 
