@@ -12,6 +12,7 @@
 #include "PopupMenu.h"
 #include "GameSettings.h"
 #include "TextFunctions.h"
+#include "SpringDialog.h"
 
 #include "log/Log.h"
 #include "model/Model.h"
@@ -31,11 +32,12 @@
 
 static char const * PrefBattleRoomSplitV = "BattleRoomSplitV";
 
-BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache, ITabs & iTabs):
+BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache, ITabs & iTabs, SpringDialog& springDialog):
     Fl_Tile(x,y,w,h),
     model_(model),
     cache_(cache),
     iTabs_(iTabs),
+    springDialog_(springDialog),
     battleId_(-1),
     lastRunning_(false)
 {
@@ -295,6 +297,13 @@ void BattleRoom::battleClosed(const Battle & battle)
 
 void BattleRoom::userJoinedBattle(User const & user, const Battle & battle)
 {
+    // try to change spring profile if current profile do not contain engine version
+    // a bit ugly to have switch here but we want to switch engine before calculating sync
+    if (user == model_.me() && springProfile_.find(battle.engineVersion()) == std::string::npos)
+    {
+        springDialog_.setProfile(battle.engineVersion());
+    }
+
     if (battle.id() == battleId_)
     {
         playerList_->addRow(makeRow(user));

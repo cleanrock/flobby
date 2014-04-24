@@ -77,6 +77,9 @@ UserInterface::UserInterface(Model & model) :
     int const mH = FL_NORMAL_SIZE*1.5;
     int const cH = H-mH;
 
+    springDialog_ = new SpringDialog(model_);
+    springDialog_->connectProfileSet(boost::bind(&UserInterface::springProfileSet, this, _1));
+
     mainWindow_ = new Fl_Double_Window(W, H, "flobby");
     mainWindow_->user_data(this);
     mainWindow_->callback(UserInterface::mainWindowCallback);
@@ -125,7 +128,7 @@ UserInterface::UserInterface(Model & model) :
     battleList_ = new BattleList(0, mH+tabsH, leftW, cH-tabsH, model_, *cache_);
     tileLeft_->end();
 
-    battleRoom_ = new BattleRoom(leftW, mH, rightW, cH, model_, *cache_, *tabs_);
+    battleRoom_ = new BattleRoom(leftW, mH, rightW, cH, model_, *cache_, *tabs_, *springDialog_);
 
     tile_->end();
 
@@ -136,8 +139,6 @@ UserInterface::UserInterface(Model & model) :
     channelsWindow_ = new ChannelsWindow(model_);
     mapsWindow_ = new MapsWindow(model_, *cache_);
 
-    springDialog_ = new SpringDialog(model_);
-    springDialog_->connectProfileSet(boost::bind(&UserInterface::springProfileSet, this, _1));
     loginDialog_ = new LoginDialog(model_);
     registerDialog_ = new RegisterDialog(model_);
     agreementDialog_ = new AgreementDialog(model_, *loginDialog_);
@@ -644,6 +645,7 @@ void UserInterface::springProfileSet(std::string const & profile)
 {
     std::string title = "flobby - " + profile;
     mainWindow_->copy_label(title.c_str());
+    battleRoom_->springProfile(profile);
 }
 
 void UserInterface::loadAppIcon()

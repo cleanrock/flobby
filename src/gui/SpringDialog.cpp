@@ -316,6 +316,18 @@ void SpringDialog::onBrowseUnitSync()
     }
 }
 
+void SpringDialog::setProfile(std::string const& engineVersion)
+{
+    if (prefs_.groupExists(engineVersion.c_str()))
+    {
+        prefs_.set(PrefSpringProfile, engineVersion.c_str());
+        if (setPaths())
+        {
+            hide();
+        }
+    }
+}
+
 bool SpringDialog::setPaths()
 {
     char * str;

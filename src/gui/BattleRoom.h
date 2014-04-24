@@ -19,6 +19,7 @@ class ITabs;
 class MapImage;
 class AddBotDialog;
 class GameSettings;
+class SpringDialog;
 
 class Fl_Widget;
 class Fl_Button;
@@ -30,10 +31,11 @@ class Fl_Multiline_Output;
 class BattleRoom: public Fl_Tile
 {
 public:
-    BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache, ITabs & iTabs);
+    BattleRoom(int x, int y, int w, int h, Model& model, Cache& cache, ITabs& iTabs, SpringDialog& springDialog);
     virtual ~BattleRoom();
 
     void initTiles();
+    void springProfile(std::string const& springProfile) { springProfile_ = springProfile; }
 
     void joined(Battle const & battle); // call when user joins a battle
     void userLeft(User const & user, Battle const & battle);
@@ -57,12 +59,14 @@ public:
     void refresh();
 
 private:
-    Model & model_;
-    Cache & cache_;
-    ITabs & iTabs_;
+    Model& model_;
+    Cache& cache_;
+    ITabs& iTabs_;
+    SpringDialog& springDialog_;
     int battleId_;
     std::string founder_;
     bool lastRunning_;
+    std::string springProfile_;
 
     Fl_Group * top_;
     Fl_Group * header_;
