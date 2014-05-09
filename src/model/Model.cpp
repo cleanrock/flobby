@@ -179,7 +179,7 @@ void Model::attemptLogin()
     uint32_t const userId = UserId::get();
 
     std::ostringstream oss;
-    oss << "LOGIN " << userName_ << " " << password_ << " 0 * flobby 0.2\t" << userId << "\tcl sp";
+    oss << "LOGIN " << userName_ << " " << password_ << " 0 * flobby 0.2\t" << userId << "\tcl sp p";
     controller_.send(oss.str());
 }
 
@@ -1501,77 +1501,8 @@ void Model::handle_AGREEMENT(std::istream & is) // {text}
 
 void Model::handle_AGREEMENTEND(std::istream & is)
 {
-    // try to remove all RTF stuff since we can't display it with FLTK
-
     std::string a = agreementStream_.str();
     agreementStream_.str("");
-
-    std::string::size_type pos;
-
-    // remove all up to and first '{'
-    if ( (pos = a.find_first_of('{')) != std::string::npos)
-    {
-        a.replace(0, pos+1, "");
-    }
-    // remove all after last '}'
-    if ( (pos = a.find_last_of('}')) != std::string::npos)
-    {
-        a.replace(pos, std::string::npos, "");
-    }
-
-    // remove everything contained in {}
-    pos = 0;
-    while ( (pos = a.find_first_of('{', pos)) != std::string::npos)
-    {
-        int level = 1;
-        std::string::size_type posNext = pos;
-        while ( (posNext = a.find_first_of("{}", posNext+1)) != std::string::npos)
-        {
-            if (a[posNext] == '{')
-            {
-                ++level;
-            }
-            else
-            {
-                --level;
-                if (level == 0)
-                {
-                    a.replace(pos, posNext-pos+1, "");
-                    break;
-                }
-            }
-        }
-        if (level != 0)
-        {
-            // should not happen, we keep it unchanged
-            LOG(WARNING)<< "end of '{' not found:" << a.substr(pos);
-            break;
-        }
-    }
-
-    // remove all "\... " and "\...\n"
-    pos = 0;
-    while ((pos = a.find_first_of('\\', pos)) != std::string::npos)
-    {
-            std::string::size_type posEnd;
-            if ( (posEnd = a.find_first_of(" \n", pos+1)) != std::string::npos)
-            {
-                if (a[posEnd] == ' ')
-                {
-                    a.replace(pos, posEnd-pos+1, "");
-                }
-                else
-                {
-                    a.replace(pos, posEnd-pos, "");
-                }
-            }
-            else
-            {
-                // should not happen, we keep it unchanged
-                LOG(WARNING)<< "end of backslash content not found:" << a.substr(pos);
-                break;
-            }
-    }
 
     agreementSignal_(a);
 }
