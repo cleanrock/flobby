@@ -54,7 +54,7 @@ ServerTab::ServerTab(int x, int y, int w, int h,
     model_.connectUserJoined( boost::bind(&ServerTab::userJoined, this, _1) );
     model_.connectUserLeft( boost::bind(&ServerTab::userLeft, this, _1) );
     model_.connectRing( boost::bind(&ServerTab::ring, this, _1) );
-    model_.connectDownloadDone( boost::bind(&ServerTab::downloadDone, this, _1, _2) );
+    model_.connectDownloadDone( boost::bind(&ServerTab::downloadDone, this, _1, _2, _3) );
 }
 
 ServerTab::~ServerTab()
@@ -153,7 +153,7 @@ void ServerTab::append(std::string const & msg, bool interesting)
 
 }
 
-void ServerTab::downloadDone(std::string const & name, bool success)
+void ServerTab::downloadDone(Model::DownloadType downloadType, std::string const & name, bool success)
 {
     if (success)
     {

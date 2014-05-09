@@ -3,6 +3,8 @@
 #pragma once
 
 #include "LogFile.h"
+#include "model/Model.h"
+
 #include <FL/Fl_Tile.H>
 #include <string>
 
@@ -46,5 +48,5 @@ private:
     void userJoined(User const & user);
     void userLeft(User const & user);
     void ring(std::string const & userName);
-    void downloadDone(std::string const & name, bool success);
+    void downloadDone(Model::DownloadType downloadType, std::string const & name, bool success);
 };

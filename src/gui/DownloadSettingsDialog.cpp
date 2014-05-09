@@ -8,7 +8,6 @@
 #include <FL/Fl_Return_Button.H>
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/fl_ask.H>
-//#include <boost/filesystem.hpp>
 
 // prefs
 char const * const PrefPrDownloaderExternal = "PrDownloaderExternal";
@@ -19,10 +18,10 @@ DownloadSettingsDialog::DownloadSettingsDialog(Model & model) :
 {
     set_modal();
 
-    useExternalPrDownloader_ = new Fl_Check_Button(10, 30, 380, 30, "Use external pr-downloader");
+    useExternalPrDownloader_ = new Fl_Check_Button(10, 30, 380, 30, "Use external pr-downloader (forced atm)");
     useExternalPrDownloader_->callback(DownloadSettingsDialog::callbackExternal, this);
 
-    prDownloaderCmd_ = new Fl_File_Input(10, 90, 360, 40, "External pr-downloader");
+    prDownloaderCmd_ = new Fl_File_Input(10, 90, 360, 40, "External pr-downloader command");
     prDownloaderCmd_->align(FL_ALIGN_TOP_LEFT);
 
     prDownloaderCmdBrowse_ = new Fl_Button(370, 90, 20, 40, "...");
@@ -44,6 +43,10 @@ void DownloadSettingsDialog::init()
     int useExternalPrd;
     prefs().get(PrefPrDownloaderExternal, useExternalPrd, 0);
     useExternalPrDownloader_->value(useExternalPrd);
+
+    // TODO use external pr-d until 91.0 unitsync is gone ?
+    useExternalPrDownloader_->value(1);
+    useExternalPrDownloader_->deactivate();
 
     char* str;
     prefs().get(PrefPrDownloaderCmd, str, "pr-downloader");

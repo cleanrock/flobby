@@ -62,7 +62,7 @@ SpringDialog::~SpringDialog()
 {
 }
 
-void SpringDialog::addFoundProfiles(std::string const& prdWriteDir)
+void SpringDialog::addFoundProfiles()
 {
     using namespace boost::filesystem;
 
@@ -110,8 +110,12 @@ void SpringDialog::addFoundProfiles(std::string const& prdWriteDir)
     }
 
     // check for downloaded (static) spring engines
-    path engineDir(prdWriteDir);
+    const char* home = ::getenv("HOME");
+    assert(home);
+    path engineDir(home);
+    engineDir /= ".spring";
     engineDir /= "engine";
+
     if (is_directory(engineDir))
     {
         for (directory_iterator de(engineDir); de != directory_iterator(); ++de)
@@ -138,8 +142,48 @@ void SpringDialog::addFoundProfiles(std::string const& prdWriteDir)
     }
     else
     {
-        LOG(WARNING)<< prdWriteDir<< " do not exist";
+        LOG(WARNING)<< engineDir<< " do not exist";
     }
+}
+
+bool SpringDialog::addProfile(std::string const& engineVersion)
+{
+    if (prefs_.groupExists(engineVersion.c_str()))
+    {
+        LOG(WARNING)<< "profile already exist: "<< engineVersion;
+        return false;
+    }
+
+    using namespace boost::filesystem;
+
+    const char* home = ::getenv("HOME");
+    assert(home);
+
+    path engineDir(home);
+    engineDir /= ".spring";
+    engineDir /= "engine";
+    engineDir /= engineVersion;
+    if (is_directory(engineDir))
+    {
+        path pathSpring(engineDir);
+        pathSpring /= "spring";
+        path pathUnitSync(engineDir);
+        pathUnitSync /= "libunitsync.so";
+        if (is_regular_file(pathSpring) && is_regular_file(pathUnitSync))
+        {
+            LOG(INFO)<< "adding spring profile '"<< engineVersion<< "' SpringPath="<< pathSpring.string() << " UnitSyncPath="<< pathUnitSync.string();
+            Fl_Preferences p(prefs_, engineVersion.c_str());
+            p.set(PrefSpringPath, pathSpring.string().c_str());
+            p.set(PrefUnitSyncPath, pathUnitSync.string().c_str());
+            prefs().flush();
+            return true;
+        }
+    }
+    else
+    {
+        LOG(WARNING)<< engineDir<< " do not exist";
+    }
+    return false;
 }
 
 void SpringDialog::initList(bool selectCurrent)

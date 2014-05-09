@@ -4,7 +4,7 @@
 #include "controller/Controller.h"
 #include "model/Model.h"
 #include "gui/UserInterface.h"
-#include <pr-downloader.h>
+// TODO #include <pr-downloader.h>
 
 // TODO #include <boost/program_options.hpp>
 // #include <iostream>
@@ -28,9 +28,11 @@ int main(int argc, char * argv[])
 
     initDirs();
 
+    /* TODO disable static pr-d for now (91.0 unitsync cause crash when trying engine download)
     // init pr-downloader
     DownloadInit();
     DownloadDisableLogging(true);
+    */
 
     // extra scope to be able to check destruction
     {
@@ -49,7 +51,7 @@ int main(int argc, char * argv[])
     }
 
     // shutdown pr-downloader
-    DownloadShutdown();
+    // TODO DownloadShutdown();
 
     return 0;
 }

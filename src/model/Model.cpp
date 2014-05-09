@@ -17,7 +17,7 @@
 #include "log/Log.h"
 #include "FlobbyDirs.h"
 
-#include <pr-downloader.h>
+// TODO #include <pr-downloader.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/bind.hpp>
@@ -231,7 +231,7 @@ void Model::processDone(std::pair<unsigned int, int> idRetPair)
     }
     else if (idRetPair.first == downloaderId_)
     {
-        downloadDoneSignal_(downloadName_, idRetPair.second == 0 ? true : false);
+        downloadDoneSignal_(downloadType_, downloadName_, idRetPair.second == 0 ? true : false);
         downloaderId_ = 0;
     }
 
@@ -1684,6 +1684,7 @@ bool Model::download(std::string const& name, DownloadType type)
         return false;
     }
 
+    downloadType_ = type;
     downloadName_ = name;
 
     if (useExternalPrDownloader_)
@@ -1692,11 +1693,14 @@ bool Model::download(std::string const& name, DownloadType type)
     }
     else
     {
-        downloaderId_ = controller_.startThread( boost::bind(&Model::downloadInternal, this, name, type) );
+        // TODO pr-d static disabled for now
+        assert(false);
+        //downloaderId_ = controller_.startThread( boost::bind(&Model::downloadInternal, this, name, type) );
         return true;
     }
 }
 
+/* TODO disable pr-d static for now
 int Model::downloadInternal(std::string const& name, DownloadType type)
 {
     category prdType;
@@ -1709,6 +1713,10 @@ int Model::downloadInternal(std::string const& name, DownloadType type)
 
     case DT_GAME:
         prdType = CAT_GAME;
+        break;
+
+    case DT_ENGINE:
+        prdType = CAT_ENGINE;
         break;
 
     default:
@@ -1742,6 +1750,7 @@ int Model::downloadInternal(std::string const& name, DownloadType type)
     LOG(INFO)<< "Download finished";
     return 0;
 }
+*/
 
 bool Model::downloadExternal(std::string const& name, DownloadType type)
 {
@@ -1761,6 +1770,10 @@ bool Model::downloadExternal(std::string const& name, DownloadType type)
 
     case DT_GAME:
         oss << "--download-game ";
+        break;
+
+    case DT_ENGINE:
+        oss << "--download-engine ";
         break;
 
     default:

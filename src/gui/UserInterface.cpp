@@ -25,7 +25,7 @@
 #include "log/Log.h"
 #include "model/Model.h"
 
-#include <pr-downloader.h>
+// TODO #include <pr-downloader.h>
 
 #include <X11/xpm.h>
 #include <X11/extensions/scrnsaver.h>
@@ -156,7 +156,7 @@ UserInterface::UserInterface(Model & model) :
     model.connectConnected( boost::bind(&UserInterface::connected, this, _1) );
     model.connectLoginResult( boost::bind(&UserInterface::loginResult, this, _1, _2) );
     model.connectJoinBattleFailed( boost::bind(&UserInterface::joinBattleFailed, this, _1) );
-    model.connectDownloadDone( boost::bind(&UserInterface::downloadDone, this, _1, _2) );
+    model.connectDownloadDone( boost::bind(&UserInterface::downloadDone, this, _1, _2, _3) );
 
     Magick::InitializeMagick(0);
 }
@@ -238,13 +238,7 @@ int UserInterface::run(int argc, char** argv)
 
     mainWindow_->show(argc, argv);
 
-    char const* prdWritePath;
-    if ( !DownloadGetConfig(CONFIG_FILESYSTEM_WRITEPATH, reinterpret_cast<void const**>(&prdWritePath)) )
-    {
-        throw std::runtime_error("failed to get pr-downloader write dir");
-    }
-
-    springDialog_->addFoundProfiles(prdWritePath);
+    springDialog_->addFoundProfiles();
     // select current spring profile (spring and unitsync)
     bool const pathsOk = springDialog_->setPaths();
 
@@ -617,8 +611,19 @@ void UserInterface::reloadMapsMods()
     battleRoom_->refresh();
 }
 
-void UserInterface::downloadDone(std::string const & name, bool success)
+void UserInterface::downloadDone(Model::DownloadType downloadType, std::string const& name, bool success)
 {
+    if (success && downloadType == Model::DT_ENGINE)
+    {
+        if (springDialog_->addProfile(name))
+        {
+            int const battleId = battleRoom_->battleId();
+            if (battleId != -1 && model_.getBattle(battleId).engineVersion() == name)
+            {
+                springDialog_->setProfile(name);
+            }
+        }
+    }
     reloadMapsMods();
 }
 

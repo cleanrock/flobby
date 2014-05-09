@@ -3,6 +3,7 @@
 #pragma once
 
 #include "StringTable.h"
+#include "model/Model.h"
 #include "FL/Fl_Tile.H"
 #include <vector>
 #include <string>
@@ -114,7 +115,7 @@ private:
     void handleOnMapImage();
     void handleOnDownloadGame();
     void hideDownloadGameButton();
-    void showDownloadGameButton();
+    void showDownloadGameButton(Model::DownloadType downloadType);
 
     void playerClicked(int rowIndex, int button);
     void playerDoubleClicked(int rowIndex, int button);

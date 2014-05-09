@@ -18,10 +18,12 @@ target_link_libraries (flobby
     gui
     model
     log
-    pr-downloader_static
     ${Boost_LIBRARIES}
     pthread
 ) 
+
+# TODO link pr-d static when it is safe (91.0 unitsync)
+#    pr-downloader_static
 
 add_subdirectory (md5)
 add_subdirectory (log)

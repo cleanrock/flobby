@@ -33,6 +33,9 @@
 
 static char const * PrefBattleRoomSplitV = "BattleRoomSplitV";
 
+static char const* DL_GAME = "Download\nGame";
+static char const* DL_ENGINE = "Download\nEngine";
+
 BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache, ITabs & iTabs, SpringDialog& springDialog):
     Fl_Tile(x,y,w,h),
     model_(model),
@@ -213,8 +216,12 @@ void BattleRoom::joined(Battle const & battle)
 
     if ( !model_.gameExist(battle.modName()) )
     {
-        showDownloadGameButton();
+        showDownloadGameButton(Model::DT_GAME);
         sideNames_.clear();
+    }
+    else if (springProfile_.find(battle.engineVersion()) == std::string::npos)
+    {
+        showDownloadGameButton(Model::DT_ENGINE);
     }
     else
     {
@@ -849,16 +856,36 @@ void BattleRoom::handleOnDownloadGame()
         return;
     }
 
-    std::string const gameName = model_.getBattle(battleId_).modName();
-    if (gameName.empty())
+    std::string const btnText = downloadGameBtn_->label();
+
+    Model::DownloadType downloadType;
+    std::string downloadName;
+    if (btnText == DL_GAME)
     {
-        LOG(WARNING)<< "gameName empty";
+        downloadType = Model::DT_GAME;
+        downloadName = model_.getBattle(battleId_).modName();
+    }
+    else if (btnText == DL_ENGINE)
+    {
+        downloadType = Model::DT_ENGINE;
+        downloadName = model_.getBattle(battleId_).engineVersion();
+    }
+    else
+    {
+        LOG(WARNING)<< "unknown downloadType: '" << btnText << "'";
         return;
     }
 
-    if (model_.download(gameName, Model::DT_GAME))
+
+    if (downloadName.empty())
     {
-        downloadGameBtn_->label("Downloading\nGame...");
+        LOG(WARNING)<< "downloadName empty";
+        return;
+    }
+
+    if (model_.download(downloadName, downloadType))
+    {
+        downloadGameBtn_->label("Downloading...");
         downloadGameBtn_->deactivate();
         if (mapImageBox_->image() == 0)
         {
@@ -874,11 +901,11 @@ void BattleRoom::hideDownloadGameButton()
     header_->init_sizes();
 }
 
-void BattleRoom::showDownloadGameButton()
+void BattleRoom::showDownloadGameButton(Model::DownloadType downloadType)
 {
     headerText_->size(header_->w() - 2*header_->h(), header_->h());
     downloadGameBtn_->resize(header_->x() + headerText_->w(), header_->y(), 2*header_->h(), header_->h());
-    downloadGameBtn_->label("Download\nGame");
+    downloadGameBtn_->label( downloadType == Model::DT_GAME ? DL_GAME : DL_ENGINE);
     downloadGameBtn_->show();
     downloadGameBtn_->activate();
     header_->init_sizes();

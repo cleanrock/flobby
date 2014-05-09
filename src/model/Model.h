@@ -102,7 +102,7 @@ public:
     std::unique_ptr<uint8_t[]> getMetalMap(std::string const & mapName, int & w, int & h); // returns single component data
     std::unique_ptr<uint8_t[]> getHeightMap(std::string const & mapName, int & w, int & h); // returns single component data
 
-    enum DownloadType { DT_MAP, DT_GAME };
+    enum DownloadType { DT_MAP, DT_GAME, DT_ENGINE };
     bool download(std::string const & name, DownloadType type); // returns true if download attempt is done
 
     void testThread(); // TODO remove some day
@@ -197,7 +197,7 @@ public:
     boost::signals2::connection connectSpringExit(SpringExitSignal::slot_type subscriber)
     { return springExitSignal_.connect(subscriber); }
 
-    typedef boost::signals2::signal<void (std::string const & name, bool success)> DownloadDoneSignal;
+    typedef boost::signals2::signal<void (DownloadType downloadType, std::string const & name, bool success)> DownloadDoneSignal;
     boost::signals2::connection connectDownloadDone(DownloadDoneSignal::slot_type subscriber)
     { return downloadDoneSignal_.connect(subscriber); }
 
@@ -281,7 +281,10 @@ private:
     std::string myScriptPassword_;
     int joinedBattleId_;
     User * me_;
-    std::string downloadName_; // what is being downloaded
+
+    // what is being downloaded
+    DownloadType downloadType_;
+    std::string downloadName_;
 
     // thread ids (0 if not running)
     unsigned int springId_;
@@ -296,6 +299,8 @@ private:
     int runProcess(std::string const& cmd, bool logToFile);
 
     bool downloadExternal(std::string const& name, DownloadType type); // returns true if download attempt is done
+
+    // TODO disabled for now
     int downloadInternal(std::string const& name, DownloadType type); // returns true if download attempt is done
 
     // IControllerEvent
