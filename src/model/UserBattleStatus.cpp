@@ -1,6 +1,7 @@
 // This file is part of flobby (GPL v2 or later), see the LICENSE file
 
 #include "UserBattleStatus.h"
+#include "assert.h"
 
 #include <boost/lexical_cast.hpp>
 
