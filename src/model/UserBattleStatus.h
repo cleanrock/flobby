@@ -4,6 +4,7 @@
 
 #include <string>
 #include <ostream>
+#include "assert.h""
 
 class UserBattleStatus
 {
