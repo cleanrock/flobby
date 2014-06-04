@@ -1,11 +1,12 @@
 // This file is part of flobby (GPL v2 or later), see the LICENSE file
 
-#pragma ocne
+#pragma once
 
 #include <FL/Fl_Input.H>
 #include <boost/signals2/signal.hpp>
 #include <deque>
 #include <string>
+#include <cassert>
 
 class ChatInput: public Fl_Input
 {

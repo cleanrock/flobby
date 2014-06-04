@@ -11,6 +11,7 @@
 #include <FL/Fl_Native_File_Chooser.H>
 #include <FL/fl_ask.H>
 #include <boost/filesystem.hpp>
+#include <cassert>
 
 // prefs
 char const * const PrefSpringProfile = "SpringProfile";

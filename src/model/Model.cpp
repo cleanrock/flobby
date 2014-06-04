@@ -24,6 +24,7 @@
 #include <boost/filesystem.hpp>
 #include <stdexcept>
 #include <sstream>
+#include <cassert>
 
 #define ADD_MSG_HANDLER(MSG) \
     messageHandlers_[#MSG] = std::bind(&Model::handle_##MSG, this, std::placeholders::_1);

@@ -23,6 +23,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <sstream>
+#include <cassert>
 
 Tabs::Tabs(int x, int y, int w, int h, Model & model):
     Fl_Tabs(x,y,w,h),

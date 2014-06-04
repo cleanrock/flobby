@@ -29,6 +29,7 @@
 #include <boost/format.hpp>
 #include <boost/algorithm/string.hpp>
 #include <sstream>
+#include <cassert>
 
 static char const * PrefBattleRoomSplitV = "BattleRoomSplitV";
 

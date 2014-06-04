@@ -14,6 +14,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
 #include <sstream>
+#include <cassert>
 
 BattleInfo::BattleInfo(int x, int y, int w, int h, Model & model, Cache & cache):
     Fl_Group(x,y,w,h),

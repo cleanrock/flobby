@@ -6,6 +6,7 @@
 #include <boost/filesystem.hpp>
 #include <stdexcept>
 #include <ctime>
+#include <cassert>
 
 static std::string dir_;
 static bool enabled_ = false;

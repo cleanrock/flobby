@@ -11,6 +11,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/chrono.hpp>
 #include <cstdlib>
+#include <cassert>
 
 using namespace boost::chrono;
 

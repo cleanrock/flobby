@@ -15,6 +15,7 @@
 #include <FL/fl_ask.H>
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
+#include <cassert>
 
 static char const * PrefServerMessagesSplitH = "ServerMessagesSplitH";
 

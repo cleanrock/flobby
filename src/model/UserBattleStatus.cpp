@@ -3,6 +3,7 @@
 #include "UserBattleStatus.h"
 
 #include <boost/lexical_cast.hpp>
+#include <cassert>
 
 UserBattleStatus::UserBattleStatus(std::string const & s)
 {
