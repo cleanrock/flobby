@@ -31,7 +31,7 @@ void initDirs()
     const char* cacheHome = ::getenv("XDG_CACHE_HOME");
     if (cacheHome && ::strlen(cacheHome) > 0)
     {
-        configDir_ = cacheHome;
+        cacheDir_ = cacheHome;
     }
     else
     {
