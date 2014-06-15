@@ -348,14 +348,30 @@ void Tabs::connected(bool connected)
     {
         for (auto & pair : privateChatTabs_)
         {
-            remove(pair.second);
+            PrivateChatTab * pc = pair.second;
+            pc->append("Disconnected from server", -1);
         }
 
         for (auto & pair : channelChatTabs_)
         {
-            remove(pair.second);
-            ChannelChatTab * cc = static_cast<ChannelChatTab*>(pair.second);
+            ChannelChatTab * cc = pair.second;
+            cc->append("Disconnected from server", -1);
             cc->leave();
+        }
+        redraw();
+    }
+    else // connected
+    {
+        for (auto & pair : privateChatTabs_)
+        {
+            PrivateChatTab * pc = pair.second;
+            pc->append("Connected to server", -1);
+        }
+
+        for (auto & pair : channelChatTabs_)
+        {
+            ChannelChatTab * cc = pair.second;
+            cc->append("Connected to server", -1);
         }
         redraw();
     }

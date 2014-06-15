@@ -508,14 +508,13 @@ void Model::sayBattle(std::string const & msg)
 
 void Model::sayPrivate(std::string const & userName, std::string const & msg)
 {
+    if (msg.empty() || !connected_)
+    {
+        return;
+    }
     if (userName.empty())
     {
         LOG(WARNING)<< "userName.empty()";
-        return;
-    }
-    if (msg.empty())
-    {
-        // ignore empty messages
         return;
     }
     std::ostringstream oss;
@@ -1291,7 +1290,7 @@ void Model::joinChannel(std::string const & channelName)
 
 void Model::sayChannel(std::string const & channelName, std::string const & message)
 {
-    if (!channelName.empty() && !message.empty())
+    if (!channelName.empty() && !message.empty() && connected_)
     {
         std::ostringstream oss;
         oss << "SAY " << channelName << " " << message;

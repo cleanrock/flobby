@@ -23,6 +23,7 @@ public:
                 ITabs& iTabs, Model & model, ChatSettingsDialog & chatSettingsDialog);
     virtual ~ChannelChatTab();
     void leave();
+    void append(std::string const & msg, int interest = -1);
 
 private:
     ITabs & iTabs_;
@@ -39,7 +40,6 @@ private:
     void onInput(std::string const & text);
     void onComplete(std::string const& text, std::size_t pos, std::pair<std::string, std::size_t>& result);
     int handle(int event);
-    void append(std::string const & msg, int interest = -1);
 
     void initChatSettings();
 

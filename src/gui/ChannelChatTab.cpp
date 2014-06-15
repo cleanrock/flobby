@@ -191,7 +191,6 @@ void ChannelChatTab::said(std::string const & channelName, std::string const & u
 void ChannelChatTab::leave()
 {
     model_.leaveChannel(channelName_);
-    text_->append("", -1); // add empty line when leaving
     userList_->clear();
 }
 
