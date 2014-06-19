@@ -12,7 +12,7 @@ target_link_libraries (unittest
     ${Boost_LIBRARIES}
 ) 
 
-add_custom_target(test
+add_custom_target(runtest
     DEPENDS unittest
     COMMAND unittest
 )

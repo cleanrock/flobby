@@ -229,7 +229,8 @@ void Test::testBattle()
                 "8235 0 0 Founder " // id, replay, nat, founder
                 "94.23.170.70 8463 32 " // ip, port, maxPlayers
                 "0 0 -112462944 " // passw, rank, mapHash
-                "engineName engineVersion "
+                "engineName\t"
+                "engineVersion\t"
                 "Map name\t"
                 "Battle title\t"
                 "Mod name";
