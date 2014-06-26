@@ -272,7 +272,7 @@ private:
     bool loginInProgress_;
     bool loggedIn_; // set to true when we get LOGININFOEND
     uint64_t timePingSent_;
-    bool waitingForPong_;
+    int waitingForPong_;
     std::unique_ptr<UnitSync> unitSync_;
 
     std::string writeableDataDir_;

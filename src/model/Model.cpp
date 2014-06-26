@@ -37,7 +37,7 @@ Model::Model(IController & controller):
     checkFirstMsg_(false),
     loggedIn_(false),
     timePingSent_(0),
-    waitingForPong_(false),
+    waitingForPong_(0),
     joinedBattleId_(-1),
     me_(0),
     springId_(0),
@@ -155,7 +155,7 @@ void Model::connected(bool connected)
     {
         // reset model on disconnect
         loggedIn_ = false;
-        waitingForPong_ = false;
+        waitingForPong_ = 0;
         userName_.clear();
         password_.clear();
         myScriptPassword_.clear();
@@ -1511,7 +1511,7 @@ void Model::handle_PONG(std::istream & is)
 {
     using namespace LobbyProtocol;
 
-    waitingForPong_ = false;
+    waitingForPong_ = 0;
 }
 
 std::vector<AI> Model::getModAIs(std::string const & modName)
@@ -1792,7 +1792,7 @@ void Model::checkPing()
 
     if (timeNow > timePingSent_ + 30000)
     {
-        if (waitingForPong_)
+        if (waitingForPong_ > 2)
         {
             std::string const msg = "PONG not received in time, disconnecting";
             LOG(WARNING) << msg;
@@ -1803,7 +1803,7 @@ void Model::checkPing()
         {
             controller_.send("PING");
             timePingSent_ = timeNow;
-            waitingForPong_ = true;
+            ++waitingForPong_;
         }
     }
 }
