@@ -180,7 +180,7 @@ void Model::attemptLogin()
     uint32_t const userId = UserId::get();
 
     std::ostringstream oss;
-    oss << "LOGIN " << userName_ << " " << password_ << " 0 * flobby 0.2\t" << userId << "\tcl sp p";
+    oss << "LOGIN " << userName_ << " " << password_ << " " << 0x464C4C /*FLL*/ << " * flobby 0.2\t" << userId << "\tcl sp p";
     controller_.send(oss.str());
 }
 

@@ -3,7 +3,9 @@
 #include "User.h"
 #include "LobbyProtocol.h"
 #include "Battle.h"
-
+#include "log/Log.h"
+#include <boost/lexical_cast.hpp>
+#include <sstream>
 #include <iostream>
 #include <stdexcept>
 
@@ -25,6 +27,50 @@ User::User(std::istream & is):
 
 User::~User()
 {
+}
+
+std::string const User::info() const
+{
+    std::ostringstream oss;
+    oss << name_ << " ";
+    oss << "country:" << country_ << " ";
+    oss << "lobby:";
+    try
+    {
+        int const lobby = boost::lexical_cast<int>(cpu_);
+        switch (lobby)
+        {
+        case 6666:
+        case 6667:
+            oss << "Zero-K";
+            break;
+        case 7777:
+            oss << "WebLobbyWin";
+            break;
+        case 7778:
+            oss << "WebLobbyLin";
+            break;
+        case 7779:
+            oss << "WebLobbyMac";
+            break;
+        case -1525630178:
+            oss << "MUSLCE";
+            break;
+        case 0x464C4C: // FLL
+            oss << "FlobbyLin";
+            break;
+        default:
+            oss << cpu_;
+            break;
+        }
+    }
+    catch (const boost::bad_lexical_cast &)
+    {
+        LOG(WARNING)<< "failed to convert '"<< cpu_<< "' to int";
+        oss << cpu_;
+    }
+
+    return oss.str();
 }
 
 void User::joinedBattle(Battle const& battle)

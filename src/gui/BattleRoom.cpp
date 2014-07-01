@@ -658,6 +658,7 @@ void BattleRoom::menuUser(User const& user)
 {
     PopupMenu menu;
 
+    menu.add(user.info());
     menu.add("Open chat", 1);
 
     if (user == model_.me())

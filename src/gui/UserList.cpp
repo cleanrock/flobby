@@ -89,6 +89,7 @@ void UserList::userClicked(int rowIndex, int button)
             return;
         }
 
+        menu.add(user->info());
         menu.add("Open chat", 1);
 
         int const battleId = user->joinedBattle();

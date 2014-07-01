@@ -21,6 +21,8 @@ public:
     std::string const & country() const;
     std::string const & cpu() const;
 
+    std::string const info() const; // name, country, lobby
+
     int color() const;
     void color(int color);
 
