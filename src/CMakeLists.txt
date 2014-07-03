@@ -4,7 +4,7 @@ find_package(Boost COMPONENTS system filesystem regex chrono signals thread REQU
 
 
 include_directories (
-    ${PROJECT_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src
     ${Boost_INCLUDE_DIRS}
 )
 

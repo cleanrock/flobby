@@ -9,6 +9,7 @@
 #include "PopupMenu.h"
 #include "Sound.h"
 #include "TextFunctions.h"
+#include "FlobbyConfig.h"
 
 #include "model/Model.h"
 
@@ -43,6 +44,7 @@ ServerTab::ServerTab(int x, int y, int w, int h,
 
     end();
 
+    text_->append("flobby " FLOBBY_VERSION);
     text_->append("type /help to see built-in commands");
     text_->append("lines entered not starting with / will be sent to lobby server");
 

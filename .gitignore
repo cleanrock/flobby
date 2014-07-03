@@ -11,3 +11,4 @@ callgrind.out.*
 src/flobby
 src/test/unittest
 src/test/script.txt
+src/FlobbyConfig.h
