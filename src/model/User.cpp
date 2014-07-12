@@ -41,23 +41,28 @@ std::string const User::info() const
         switch (lobby)
         {
         case 6666:
+            oss << "ZeroK-Springie";
+            break;
         case 6667:
-            oss << "Zero-K";
+            oss << "ZeroK-Win";
+            break;
+        case 6668:
+            oss << "ZeroK-Lin";
             break;
         case 7777:
-            oss << "WebLobbyWin";
+            oss << "WebLobby-Win";
             break;
         case 7778:
-            oss << "WebLobbyLin";
+            oss << "WebLobby-Lin";
             break;
         case 7779:
-            oss << "WebLobbyMac";
+            oss << "WebLobby-Mac";
             break;
         case -1525630178:
             oss << "MUSLCE";
             break;
         case 0x464C4C: // FLL
-            oss << "FlobbyLin";
+            oss << "Flobby-Lin";
             break;
         default:
             oss << cpu_;
