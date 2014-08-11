@@ -22,6 +22,7 @@ public:
     std::string const & founder() const;
     std::string const & ip() const;
     std::string const & port() const;
+    void setPort(std::string const& port); // used with NAT hole punching (HOSTPORT message)
     int maxPlayers() const;
     bool passworded() const;
     int rank() const;
@@ -114,6 +115,11 @@ inline std::string const & Battle::ip() const
 inline std::string const & Battle::port() const
 {
     return port_;
+}
+
+inline void Battle::setPort(std::string const& port)
+{
+    port_ = port;
 }
 
 inline int Battle::maxPlayers() const

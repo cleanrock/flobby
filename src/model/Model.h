@@ -423,5 +423,6 @@ private:
     void handle_AGREEMENT(std::istream & is);
     void handle_AGREEMENTEND(std::istream & is);
     void handle_PONG(std::istream & is);
+    void handle_HOSTPORT(std::istream & is);
 
 };

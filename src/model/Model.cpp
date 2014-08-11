@@ -94,6 +94,7 @@ Model::Model(IController & controller):
     ADD_MSG_HANDLER(SETSCRIPTTAGS)
     ADD_MSG_HANDLER(REMOVESCRIPTTAGS)
     ADD_MSG_HANDLER(PONG)
+    ADD_MSG_HANDLER(HOSTPORT)
 
 }
 
@@ -1513,6 +1514,24 @@ void Model::handle_PONG(std::istream & is)
     using namespace LobbyProtocol;
 
     waitingForPong_ = 0;
+}
+
+void Model::handle_HOSTPORT(std::istream & is)
+{
+    using namespace LobbyProtocol;
+
+    std::string port;
+    extractWord(is, port);
+
+    if (joinedBattleId_ != -1)
+    {
+        Battle& b = battle(joinedBattleId_);
+        b.setPort(port);
+    }
+    else
+    {
+        LOG(WARNING)<< "ignoring HOSTPORT since we are not in a battle";
+    }
 }
 
 std::vector<AI> Model::getModAIs(std::string const & modName)
