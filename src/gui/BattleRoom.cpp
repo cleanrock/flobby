@@ -232,7 +232,7 @@ void BattleRoom::joined(Battle const & battle)
     setMapImage(battle);
 
     lastRunning_ = battle.running();
-    if (battle.running() && model_.me().battleStatus().sync() == 1)
+    if (battle.running())
     {
         startBtn_->activate();
     }
@@ -273,10 +273,10 @@ void BattleRoom::battleChanged(const Battle & battle)
         {
             User const & me = model_.me();
             UserBattleStatus const& ubs = me.battleStatus();
-            if (ubs.sync() == 1 && !me.status().inGame())
+            if (!me.status().inGame())
             {
-                // start spring if game started, except if we are spectator and not ready
-                if ( lastRunning_ == false && ( !ubs.spectator() || (ubs.spectator() && ubs.ready()) ) )
+                // start spring if game started and we are synced, except if we are spectator and not ready
+                if ( lastRunning_ == false && ubs.sync() == 1 && ( !ubs.spectator() || (ubs.spectator() && ubs.ready()) ) )
                 {
                     model_.startSpring();
                     startBtn_->deactivate();
@@ -351,7 +351,7 @@ void BattleRoom::userChanged(User const & user)
             teamBtn_->value(user.battleStatus().allyTeam());
             mapImageBox_->setAlly( user.battleStatus().spectator() ? -1 : user.battleStatus().allyTeam());
             Battle const& battle = model_.getBattle(battleId);
-            if (battle.running() && me.battleStatus().sync() == 1 && !me.status().inGame())
+            if (battle.running() && !me.status().inGame())
             {
                 startBtn_->activate();
             }
