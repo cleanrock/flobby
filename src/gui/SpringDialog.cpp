@@ -411,10 +411,8 @@ bool SpringDialog::setPaths()
     }
     else
     {
-        show();
         return false;
     }
-
 }
 
 void SpringDialog::show()

@@ -214,7 +214,8 @@ void BattleRoom::joined(Battle const & battle)
     playerList_->clear();
     top_->activate();
 
-    if ( !model_.gameExist(battle.modName()) )
+    // prio download of engine if unitsync is not loaded (we need unitsync to detect game properly)
+    if ( !model_.gameExist(battle.modName()) && !model_.getUnitSyncPath().empty())
     {
         showDownloadGameButton(Model::DT_GAME);
         sideNames_.clear();
