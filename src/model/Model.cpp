@@ -95,6 +95,7 @@ Model::Model(IController & controller):
     ADD_MSG_HANDLER(REMOVESCRIPTTAGS)
     ADD_MSG_HANDLER(PONG)
     ADD_MSG_HANDLER(HOSTPORT)
+    ADD_MSG_HANDLER(FORCEJOINBATTLE)
 
 }
 
@@ -182,7 +183,7 @@ void Model::attemptLogin()
     uint32_t const userId = UserId::get();
 
     std::ostringstream oss;
-    oss << "LOGIN " << userName_ << " " << password_ << " " << 0x464C4C /*FLL*/ << " * flobby "<< FLOBBY_VERSION <<"\t" << userId << "\tcl sp p";
+    oss << "LOGIN " << userName_ << " " << password_ << " " << 0x464C4C /*FLL*/ << " * flobby "<< FLOBBY_VERSION <<"\t" << userId << "\tcl sp p m";
     controller_.send(oss.str());
 }
 
@@ -1532,6 +1533,27 @@ void Model::handle_HOSTPORT(std::istream & is)
     {
         LOG(WARNING)<< "ignoring HOSTPORT since we are not in a battle";
     }
+}
+
+void Model::handle_FORCEJOINBATTLE(std::istream & is) // destinationBattleID [destinationBattlePassword]
+{
+    using namespace LobbyProtocol;
+
+    std::string ex;
+    extractWord(is, ex);
+    int const battleId = boost::lexical_cast<int>(ex);
+
+    std::string password;
+    try
+    {
+        extractWord(is, password);
+    }
+    catch (std::invalid_argument const & e)
+    {
+        // ignore non-existing optional password
+    }
+
+    joinBattle(battleId, password);
 }
 
 std::vector<AI> Model::getModAIs(std::string const & modName)
