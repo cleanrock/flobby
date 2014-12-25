@@ -48,33 +48,73 @@ void VoteLine::onYes(Fl_Widget * w, void * data)
 {
     VoteLine * o = static_cast<VoteLine*>(data);
 
-    o->model_.sayBattle("!vote 1");
+    o->model_.sayBattle("!y");
 }
 
 void VoteLine::onNo(Fl_Widget * w, void * data)
 {
     VoteLine * o = static_cast<VoteLine*>(data);
 
-    o->model_.sayBattle("!vote 2");
+    o->model_.sayBattle("!n");
 }
 
 void VoteLine::processHostMessage(std::string const & msg)
 {
-    size_t const pos = msg.find("Poll: ");
-
-    if (pos == 0)
+    // check for Springie poll
     {
-        // Poll line
-        text_->copy_label(msg.substr(6).c_str());
-        if (msg.find("[END:") == std::string::npos)
+        size_t const pos = msg.find("Poll: ");
+        if (pos == 0)
         {
-            activate();
-        }
-        else
-        {
-            deactivate();
+            // Poll line
+            text_->copy_label(msg.substr(6).c_str());
+            if (msg.find("[END:") == std::string::npos)
+            {
+                activate();
+            }
+            else
+            {
+                deactivate();
+            }
+            return;
         }
     }
+
+    // check for SPADS poll
+    {
+        const std::vector<std::string> enablers =
+        {
+            "called a vote for command",
+            "Vote in progress:",
+        };
+
+        for (const std::string& text : enablers)
+        {
+            if (std::string::npos != msg.find(text))
+            {
+                text_->copy_label(msg.c_str());
+                activate();
+                return;
+            }
+        }
+
+        const std::vector<std::string> disablers =
+        {
+            "Vote for command",
+            "Vote cancelled",
+        };
+
+        for (const std::string& text : disablers)
+        {
+            if (std::string::npos != msg.find(text))
+            {
+                text_->copy_label(msg.c_str());
+                deactivate();
+                return;
+            }
+        }
+
+    }
+
 }
 
 /*
