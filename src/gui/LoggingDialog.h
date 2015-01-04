@@ -6,7 +6,7 @@
 #include <string>
 
 class Fl_Check_Button;
-class Fl_File_Input;
+class Fl_Output;
 
 class LoggingDialog: public Fl_Window
 {
@@ -17,10 +17,11 @@ public:
     void show();
 
 private:
-    Fl_Check_Button * logDebug_;
-    Fl_File_Input * logFilePath_;
-    Fl_Check_Button * logChats_;
+    Fl_Output* flobbyLogPath_;
+    Fl_Check_Button* logDebug_;
+
+    Fl_Output* chatLogDir_;
+    Fl_Check_Button* logChats_;
 
     static void callbackApply(Fl_Widget*, void*);
-    void badFilePath(std::string const & msg);
 };

@@ -1,6 +1,7 @@
 // This file is part of flobby (GPL v2 or later), see the LICENSE file
 
 #include "UserInterface.h"
+#include "FlobbyDirs.h"
 #include "LogFile.h"
 #include "LoginDialog.h"
 #include "RegisterDialog.h"
@@ -194,16 +195,11 @@ void UserInterface::setupLogging()
     int logDebug;
     prefs().get(PrefLogDebug, logDebug, 0);
 
-    char * logFilePath; // freed below
-    prefs().get(PrefLogFilePath, logFilePath, "/tmp/flobby.log");
-
     if (logDebug != 0)
     {
         Log::minSeverity(DEBUG);
     }
-    Log::logFile(logFilePath);
-
-    ::free(logFilePath);
+    Log::logFile(cacheDir()+"flobby.log");
 
     int logChats;
     prefs().get(PrefLogChats, logChats, 1);

@@ -17,5 +17,4 @@ char const * const PrefLoginUser = "User";
 char const * const PrefLoginPassword = "Password";
 
 char const * const PrefLogDebug = "LogDebug";
-char const * const PrefLogFilePath = "LogFilePath";
 char const * const PrefLogChats = "LogChats";
