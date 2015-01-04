@@ -31,7 +31,7 @@ BattleList::BattleList(int x, int y, int w, int h, Model & model, Cache & cache)
 {
     int const h1 = h-128;
     battleList_ = new StringTable(x, y, w, h1, "BattleList",
-            { "status", "title / host", "engine", "game", "map", "players" });
+            { {"status",4}, {"title / host",15}, {"engine",4}, {"game",10}, {"map",15}, {"players",4} }, -5 /* sort on players by default */);
 
     battleInfo_ = new BattleInfo(x, y+h1, w, h-h1, model_, cache);
 

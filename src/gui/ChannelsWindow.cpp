@@ -22,7 +22,7 @@ ChannelsWindow::ChannelsWindow(Model & model):
     channelsRetrieved_(false)
 {
     channelList_ = new StringTable(0, 0, 100, 100, "ChannelList",
-            { "name", "users", "topic" });
+            { {"name",10}, {"users",4}, {"topic",30} }, 0 /* sort on name by default */);
 
     model_.connectChannels( boost::bind(&ChannelsWindow::onChannels, this, _1) );
 

@@ -17,7 +17,10 @@ static char const * PrefColWidth = "ColWidth";
 static char const * PrefSortCol = "SortCol";
 static char const * PrefSortReverse = "SortReverse";
 
-StringTable::StringTable(int x, int y, int w, int h, std::string const & name, std::vector<std::string> const & headers, bool savePrefs) :
+StringTable::StringTable(int x, int y, int w, int h, std::string const & name,
+        std::vector<StringTableColumnDef> const & headers,
+        int defaultSortColumn,
+        bool savePrefs) :
     Fl_Table_Row(x,y,w,h, name.c_str()),
     selectedRow_(-1),
     headers_(headers),
@@ -39,19 +42,18 @@ StringTable::StringTable(int x, int y, int w, int h, std::string const & name, s
     type(Fl_Table_Row::SELECT_NONE);
 
     // setup column widths
-    int const defaultColWidth = w/headers_.size();
     for (int c = 0; c < cols(); ++c)
     {
         std::ostringstream oss;
         oss << PrefColWidth << c;
         int val;
-        prefs_.get(oss.str().c_str(), val, defaultColWidth);
+        prefs_.get(oss.str().c_str(), val, headers[c].defaultWidth_*FL_NORMAL_SIZE);
         col_width(c, val);
     }
 
     // setup sorting
-    prefs_.get(PrefSortCol, sort_lastcol_, 0);
-    prefs_.get(PrefSortReverse, sort_reverse_, 0);
+    prefs_.get(PrefSortCol, sort_lastcol_, std::abs(defaultSortColumn));
+    prefs_.get(PrefSortReverse, sort_reverse_, defaultSortColumn < 0 ? 1 : 0);
 
     // adjust linesize
     vscrollbar->linesize(col_header_height()+2);
@@ -132,7 +134,7 @@ void StringTable::draw_cell(TableContext context, int R, int C, int X, int Y, in
                 fl_draw_box(FL_THIN_UP_BOX, X,Y,W,H, FL_BACKGROUND_COLOR);
                 fl_font(FL_HELVETICA, FL_NORMAL_SIZE);
                 fl_color(active_r() ? FL_FOREGROUND_COLOR : FL_INACTIVE_COLOR);
-                fl_draw(headers_[C].c_str(), X+2,Y,W,H, FL_ALIGN_LEFT, 0, 0); // +2=pad left
+                fl_draw(headers_[C].name_.c_str(), X+2,Y,W,H, FL_ALIGN_LEFT, 0, 0); // +2=pad left
 
                 // Draw sort arrow
                 if ( C == sort_lastcol_ ) {
@@ -157,7 +159,7 @@ void StringTable::draw_cell(TableContext context, int R, int C, int X, int Y, in
                 fl_color(bgcolor); fl_rectf(X,Y,W,H); 
 
                 // text or color
-                if (headers_[C] == "color")
+                if (headers_[C].name_ == "color")
                 {
                     fl_color(fltkColor(rows_[R].data_[C]));
                     fl_rectf(X+2, Y+2, W-4, H-4);

@@ -10,6 +10,17 @@
 #include <vector>
 #include <array>
 
+struct StringTableColumnDef
+{
+    std::string name_;
+    int defaultWidth_;
+    StringTableColumnDef(const std::string& name, int defaultWidth):
+        name_(name),
+        defaultWidth_(defaultWidth)
+    {
+    }
+};
+
 struct StringTableRow
 {
     StringTableRow(std::string const & id, std::vector<std::string> const & data): id_(id), data_(data) {}
@@ -31,7 +42,9 @@ class StringTable : public Fl_Table_Row
 {
 public:
     StringTable(int x, int y, int w, int h,
-            std::string const & name, std::vector<std::string> const & headers,
+            std::string const & name,
+            std::vector<StringTableColumnDef> const& headers,
+            int defaultSortColumn,
             bool savePrefs = true);
     virtual ~StringTable();
 
@@ -79,7 +92,7 @@ private:
         int col_, reverse_;
     };
 
-    std::vector<std::string> headers_;
+    std::vector<StringTableColumnDef> headers_;
     int sort_reverse_;
     int sort_lastcol_;
     Fl_Preferences prefs_;

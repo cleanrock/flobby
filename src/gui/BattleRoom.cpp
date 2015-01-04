@@ -123,7 +123,7 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
     int const playerH = topH - headerH;
 
     playerList_ = new StringTable(x, y, w - rightW, playerH, "PlayerList",
-            { "status", "sync", "name", "side", "ally", "team", "rank", "color", "country" });
+            { {"status",4}, {"sync",3}, {"name",10}, {"side",4}, {"ally",3}, {"team",4}, {"rank",3}, {"color",3}, {"country",4} }, 4 /* sort on ally by default */);
 
     top_->resizable(playerList_);
     top_->end();
@@ -169,11 +169,9 @@ BattleRoom::~BattleRoom()
 void BattleRoom::initTiles()
 {
     int y;
-    prefs().get(PrefBattleRoomSplitV, y, 0);
-    if (y != 0)
-    {
-        position(0, battleChat_->y(), 0, y);
-    }
+    y = h()/2;
+    prefs().get(PrefBattleRoomSplitV, y, y);
+    position(0, battleChat_->y(), 0, y);
 }
 
 void BattleRoom::setMapImage(Battle const & battle)

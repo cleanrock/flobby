@@ -12,7 +12,7 @@
 #include <boost/bind.hpp>
 
 UserList::UserList(int x, int y, int w, int h, Model & model, ITabs & iTabs, bool savePrefs):
-    StringTable(x, y, w, h, "UserList", {"name", "status"}, savePrefs),
+    StringTable(x, y, w, h, "UserList", { {"name",10}, {"status",4} }, 0 /* sort on name by default */, savePrefs),
     model_(model),
     iTabs_(iTabs)
 {

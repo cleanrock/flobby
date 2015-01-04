@@ -67,11 +67,9 @@ ServerTab::~ServerTab()
 void ServerTab::initTiles()
 {
     int x;
-    prefs().get(PrefServerMessagesSplitH, x, 0);
-    if (x != 0)
-    {
-        position(userList_->x(), 0, x, 0);
-    }
+    x = std::max(w()-200, 100);
+    prefs().get(PrefServerMessagesSplitH, x, x);
+    position(userList_->x(), 0, x, 0);
 }
 
 void ServerTab::serverInfo(ServerInfo const & si)

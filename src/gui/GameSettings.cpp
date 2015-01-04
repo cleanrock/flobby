@@ -8,7 +8,7 @@
 #include <boost/algorithm/string.hpp>
 
 GameSettings::GameSettings(int x, int y, int w, int h, Model & model):
-    StringTable(x, y, w, h, "GameSettings", {"setting", "value"}),
+    StringTable(x, y, w, h, "GameSettings", { {"setting",12}, {"value",6} }, 0 /* sort on setting by default */),
     model_(model)
 {
 //    connectRowClicked( boost::bind(&GameSettings::rowClicked, this, _1, _2) );

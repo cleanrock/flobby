@@ -210,23 +210,19 @@ int UserInterface::run(int argc, char** argv)
 {
     {
         int x, y, w, h;
-        prefs().get(PrefAppWindowX, x, 0);
-        prefs().get(PrefAppWindowY, y, 0);
-        prefs().get(PrefAppWindowW, w, 1000);
-        prefs().get(PrefAppWindowH, h, 1000);
+        Fl::screen_work_area(x, y, w, h);
+
+        prefs().get(PrefAppWindowX, x, x);
+        prefs().get(PrefAppWindowY, y, y);
+        prefs().get(PrefAppWindowW, w, w);
+        prefs().get(PrefAppWindowH, h, h);
         mainWindow_->resize(x,y,w,h);
 
-        prefs().get(PrefAppWindowSplitH, x, 0);
-        if (x != 0)
-        {
-            tile_->position(battleRoom_->x(), 0, x, 0);
-        }
+        prefs().get(PrefAppWindowSplitH, x, w/2);
+        tile_->position(battleRoom_->x(), 0, x, 0);
 
-        prefs().get(PrefLeftSplitV, y, 0);
-        if (y != 0)
-        {
-            tileLeft_->position(0, battleList_->y(), 0, y);
-        }
+        prefs().get(PrefLeftSplitV, y, h/2);
+        tileLeft_->position(0, battleList_->y(), 0, y);
     }
 
     tabs_->initTiles();
