@@ -709,6 +709,7 @@ void Model::refresh()
 
 void Model::sendMyInitialBattleStatus(Battle const & battle)
 {
+/* skip reset/change of my battle status when joining new game, this is to not break matchmaking hosts
     UserBattleStatus ubs;
 
     // select next free team
@@ -793,7 +794,7 @@ void Model::sendMyInitialBattleStatus(Battle const & battle)
     // update myself
     User & u = me();
     u.battleStatus(ubs);
-
+*/
     sendMyBattleStatus();
 }
 
