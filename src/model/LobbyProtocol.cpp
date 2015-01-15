@@ -15,6 +15,9 @@ void extractWord(std::istream & is, std::string & ex)
     {
         throw std::invalid_argument("extractWord failed");
     }
+
+    // consume extra spaces, fix for zk uberserver sending 'TASServer 1.3.1.12  * 8201 0')
+    skipSpaces(is);
 }
 
 

@@ -25,8 +25,8 @@ Directories and files
     ~/.config/flobby/  # can be changed with XDG_CONFIG_HOME
         flobby.prefs  # flobby settings, delete this file to reset all settings to default 
     ~/.cache/flobby/  # can be changed with XDG_CACHE_HOME
+        flobby.log  # flobby debug log
         flobby_script.txt  # spring script file, written on spring launch
         flobby_process_pr-downloader.log  # pr-downloader output
         map/  # map cache files
         log/  # logs of all chats, logging to files can be disabled in flobby
-    /tmp/flobby.log  # flobby debug log, path can be changed in flobby
