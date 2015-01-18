@@ -1,32 +1,68 @@
 // This file is part of flobby (GPL v2 or later), see the LICENSE file
 
 #include "FlobbyDirs.h"
+#include "FlobbyConfig.h"
 #include "controller/Controller.h"
 #include "model/Model.h"
 #include "gui/UserInterface.h"
+#include <FL/Fl.H>
 // TODO #include <pr-downloader.h>
 
-// TODO #include <boost/program_options.hpp>
-// #include <iostream>
-//#include <cstdlib>
-// TODO std::vector<std::string> parseOptions(int argc, char * argv[]);
+static std::string dir_;
+
+static
+void printUsage(char const* argv0, std::string const& errorMsg = "")
+{
+    char const* usage =
+        "%s" // errorMsg
+        "usage: %s [options]\n"
+        " -d | --dir <dir> : use <dir> for flobby config and cache instead of XDG\n"
+        " -v | --version   : print flobby version\n"
+        " -h | --help      : print help message\n"
+        " plus standard fltk options:\n"
+        "%s\n";
+
+    Fl::fatal(usage, errorMsg.c_str(), argv0, Fl::help);
+}
+
+static
+int parseArgs(int argc, char** argv, int& i)
+{
+    if (strcmp("-h", argv[i]) == 0 || strcmp("--help", argv[i]) == 0)
+    {
+        printUsage(argv[0]);
+    }
+
+    if (strcmp("-d", argv[i]) == 0 || strcmp("--dir", argv[i]) == 0)
+    {
+        if (i < argc-1 && argv[i+1] != 0)
+        {
+            dir_ = argv[i+1];
+            i += 2;
+            return 2;
+        }
+    }
+
+    if (strcmp("-v", argv[i]) == 0 || strcmp("--version", argv[i]) == 0)
+    {
+        Fl::fatal("flobby version %s\n", FLOBBY_VERSION);
+    }
+
+    return 0;
+}
 
 int main(int argc, char * argv[])
 {
-    /* TODO using prefs instead of commandline for now
-        std::vector<std::string> rest = parseOptions(argc, argv);
+    int i = 1;
+    if (Fl::args(argc, argv, i, parseArgs) < argc)
+    {
+        std::string errorMsg = "error: unknown option: ";
+        errorMsg += argv[i];
+        errorMsg += "\n";
+        printUsage(argv[0], errorMsg);
+    }
 
-        // build remaining argc and argv (for fltk)
-        int argcRest = 1+rest.size();
-        char * argvRest[argcRest];
-        argvRest[0] = argv[0];
-        for (int i=0; i<rest.size(); ++i)
-        {
-            argvRest[i+1] = (char*)rest[i].c_str();
-        }
-    */
-
-    initDirs();
+    initDirs(dir_);
 
     /* TODO disable static pr-d for now (91.0 unitsync cause crash when trying engine download)
     // init pr-downloader
@@ -47,7 +83,6 @@ int main(int argc, char * argv[])
 
         // start
         ui.run(argc, argv);
-        // TODO ui.run(argcRest, argvRest);
     }
 
     // shutdown pr-downloader
@@ -55,37 +90,3 @@ int main(int argc, char * argv[])
 
     return 0;
 }
-
-/* TODO
-std::vector<std::string> parseOptions(int argc, char * argv[])
-{
-    namespace po = boost::program_options;
-
-    std::string logFile;
-    po::options_description desc("Options");
-    desc.add_options()
-        ("help,h", "produce help message")
-        ("logfile,f", po::value<std::string>(&logFile)->default_value("/tmp/flobby.log"), "log file")
-        ("debug,d", "enable debug log messages")
-    ;
-
-    po::parsed_options parsed = po::command_line_parser(argc, argv).options(desc).allow_unregistered().run();
-
-    po::variables_map vm;
-    po::store(parsed, vm);
-    po::notify(vm);
-
-    if (vm.count("help")) {
-        std::cout << desc << "\n";
-        ::exit(0);
-    }
-
-    if (vm.count("debug"))
-    {
-        Log::minSeverity(DEBUG);
-    }
-    Log::logFile(logFile);
-
-    return po::collect_unrecognized(parsed.options, po::include_positional);
-}
-*/

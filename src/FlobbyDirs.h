@@ -4,7 +4,7 @@
 
 #include <string>
 
-void initDirs();
+void initDirs(std::string const& dirOverride);
 
 // return values below ends with '/'
 std::string const& configDir();

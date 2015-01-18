@@ -74,6 +74,7 @@ private:
     bool openMapsWindow_; // used for showing maps windows after map image files generation is done
 
     Fl_Double_Window * mainWindow_;
+    std::string startTitle_;
     Fl_Menu_Bar * menuBar_;
 
     ProgressDialog * progressDialog_;

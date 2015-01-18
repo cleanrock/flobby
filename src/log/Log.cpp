@@ -34,7 +34,7 @@ Log::~Log()
 {
     std::lock_guard<std::mutex> lock(m);
 
-    if (sev_ > Log::Info)
+    if (sev_ >= Log::Info)
     {
         std::cout << oss_.str() << std::endl;
     }

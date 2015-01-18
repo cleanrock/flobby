@@ -229,7 +229,7 @@ int UserInterface::run(int argc, char** argv)
     battleRoom_->initTiles();
 
     mainWindow_->show(argc, argv);
-
+    startTitle_ = mainWindow_->label();
     springDialog_->addFoundProfiles();
     // select current spring profile (spring and unitsync)
     bool const pathsOk = springDialog_->setPaths();
@@ -640,7 +640,7 @@ void UserInterface::autoJoinChannels(std::string const & text)
 
 void UserInterface::springProfileSet(std::string const & profile)
 {
-    std::string title = "flobby - " + profile;
+    std::string title = startTitle_ + " - " + profile;
     mainWindow_->copy_label(title.c_str());
     battleRoom_->springProfile(profile);
 }
