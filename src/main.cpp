@@ -2,6 +2,7 @@
 
 #include "FlobbyDirs.h"
 #include "FlobbyConfig.h"
+#include "log/Log.h"
 #include "controller/Controller.h"
 #include "model/Model.h"
 #include "gui/UserInterface.h"
@@ -62,6 +63,7 @@ int main(int argc, char * argv[])
         printUsage(argv[0], errorMsg);
     }
 
+    LOG(INFO)<< "starting flobby "<< FLOBBY_VERSION;
     initDirs(dir_);
 
     /* TODO disable static pr-d for now (91.0 unitsync cause crash when trying engine download)

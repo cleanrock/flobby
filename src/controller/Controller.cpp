@@ -138,7 +138,7 @@ void Controller::message(std::string const & msg)
     {
         boost::lock_guard<boost::mutex> lock(mutexRecv_);
         recvQueue_.push_back(msg);
-        LOG_IF(DEBUG, recvQueue_.size() > 1) << "recvQueue_.size():" << recvQueue_.size();
+        LOG_IF(DEBUG, recvQueue_.size() > 10) << "recvQueue_.size():" << recvQueue_.size();
     }
 
     ui_->addCallbackEvent(&messageCallback, this);

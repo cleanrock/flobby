@@ -4,6 +4,7 @@
 
 #include <sstream>
 #include <fstream>
+#include <ctime>
 
 class Log
 {
@@ -31,10 +32,12 @@ public:
     static Severity minSeverity() { return minSev_; }
 
 private:
+    static std::ostringstream earlyLogs_; // things logged before logfile is opened
     static std::ofstream ofs_;
     static std::string fileName_;
     static Severity minSev_;
 
+    std::tm tm_;
     Severity sev_;
     std::ostringstream oss_;
 

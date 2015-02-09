@@ -4,9 +4,9 @@
 
 #include <mutex>
 #include <iostream>
-#include <ctime>
 #include <cstring>
 
+std::ostringstream Log::earlyLogs_;
 std::ofstream Log::ofs_;
 std::string Log::fileName_;
 Log::Severity Log::minSev_ = Log::Info;
@@ -24,8 +24,8 @@ Log::Log(Severity sev, char const * loc, int line)
     // time stamp
     char buf[16];
     std::time_t t = std::time(0);
-    std::tm tm = *std::localtime(&t);
-    std::strftime(buf, 16, "%H:%M:%S", &tm);
+    tm_ = *std::localtime(&t);
+    std::strftime(buf, 16, "%H:%M:%S", &tm_);
 
     oss_ << severityStrings[sev_] << buf << "-" << basename(loc) << ":" << line << "] ";
 }
@@ -39,23 +39,35 @@ Log::~Log()
         std::cout << oss_.str() << std::endl;
     }
 
-    if (!ofs_.is_open() && !fileName_.empty())
+    if (!ofs_.is_open())
     {
-        ofs_.open(fileName_);
-        if (!ofs_.good())
+        if (0 == earlyLogs_.tellp())
         {
-            std::cout << "failed to open log file: " << fileName_ << std::endl;
-            std::abort();
+            char bufFirst[32];
+            std::strftime(bufFirst, 32, "%F %T %z", &tm_);
+            earlyLogs_ << "NEW LOG SESSION " << bufFirst << std::endl;
         }
 
-        char buf[32];
-        std::time_t t = std::time(0);
-        std::tm tm = *std::localtime(&t);
-        std::strftime(buf, 32, "%F %T", &tm);
-
-        ofs_ << "\nNEW LOG SESSION " << buf << std::endl;
+        if (fileName_.empty())
+        {
+            earlyLogs_ << oss_.str() << std::endl;
+        }
+        else
+        {
+            ofs_.open(fileName_);
+            if (!ofs_.good())
+            {
+                std::cout << "failed to open log file: " << fileName_ << std::endl;
+                std::abort();
+            }
+            ofs_ << earlyLogs_.str();
+            ofs_ << oss_.str() << std::endl;
+        }
     }
-    ofs_ << oss_.str() << std::endl;
+    else
+    {
+        ofs_ << oss_.str() << std::endl;
+    }
 
     if (sev_ == Fatal)
     {
