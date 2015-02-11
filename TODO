@@ -1,7 +1,7 @@
-auto-remove deleted ~/.spring/engine/* from spring profiles
+improve spring profiles dialog with add new profile (this is not possible if list is full)
 fix download of engine:
-    use only first word of "98.0.1-258-gab1948e develop" and require first word to be 4 chars
-    ?append " *" if >4chars (e.g. "98.0.1-360-g0fc313a *") to be able to download from non-default branches, make sure extract path is found
+  use only first word of "98.0.1-258-gab1948e develop" and require first word to be 4 chars
+  ? append " *" if >4chars (e.g. "98.0.1-360-g0fc313a *") to be able to download from non-default branches, make sure extract path is found
 auto reconnect to lobby server
 friend list
 map window showing big map image, 512x512

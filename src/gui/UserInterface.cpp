@@ -230,6 +230,7 @@ int UserInterface::run(int argc, char** argv)
 
     mainWindow_->show(argc, argv);
     startTitle_ = mainWindow_->label();
+    springDialog_->removeNonExistingProfiles();
     springDialog_->addFoundProfiles();
     // select current spring profile (spring and unitsync)
     bool const pathsOk = springDialog_->setPaths();

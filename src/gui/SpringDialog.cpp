@@ -62,6 +62,35 @@ SpringDialog::~SpringDialog()
 {
 }
 
+void SpringDialog::removeNonExistingProfiles()
+{
+    using namespace boost::filesystem;
+
+    // remove all profiles if spring or unitsync file do not exist
+    for (int gi = 0; gi < prefs_.groups(); ++gi)
+    {
+        std::string const profileName = prefs_.group(gi);
+        Fl_Preferences profile(prefs_, profileName.c_str());
+
+        char* buf;
+
+        profile.get("SpringPath", buf, "");
+        std::string const springPath(buf);
+        ::free(buf);
+
+        profile.get("UnitSyncPath", buf, "");
+        std::string const unitSyncPath(buf);
+        ::free(buf);
+
+        if ( !is_regular_file(springPath) || !is_regular_file(unitSyncPath) )
+        {
+            LOG(INFO)<< "deleting profile '" << profileName << "'";
+            prefs_.deleteGroup(profileName.c_str());
+            --gi;
+        }
+    }
+}
+
 void SpringDialog::addFoundProfiles()
 {
     using namespace boost::filesystem;

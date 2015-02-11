@@ -20,6 +20,7 @@ public:
     SpringDialog(Model & model);
     virtual ~SpringDialog();
 
+    void removeNonExistingProfiles();
     void addFoundProfiles();
     bool addProfile(std::string const& engineVersion); // returns true if new profile was added successfully
 
