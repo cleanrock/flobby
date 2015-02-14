@@ -304,9 +304,9 @@ void BattleRoom::battleClosed(const Battle & battle)
 
 void BattleRoom::userJoinedBattle(User const & user, const Battle & battle)
 {
-    // try to change spring profile if current profile do not contain engine version
+    // try to change spring profile if current profile do not match
     // a bit ugly to have switch here but we want to switch engine before calculating sync
-    if (user == model_.me() && springProfile_.find(battle.engineVersion()) == std::string::npos)
+    if (user == model_.me() && springProfile_ != battle.engineVersion())
     {
         springDialog_.setProfile(battle.engineVersion());
     }
@@ -586,7 +586,7 @@ void BattleRoom::setHeaderText(Battle const & battle)
     }
 
     std::ostringstream oss;
-    oss << battle.title() << " / " << battle.founder() << " / " << battle.engineVersion() << "\n"
+    oss << battle.title() << " / " << battle.founder() << " / " << battle.engineVersionLong() << "\n"
         << battle.mapName() << "  " << ossBalance.str() << "\n"
         << battle.modName();
     headerText_->value(oss.str().c_str());
@@ -868,7 +868,14 @@ void BattleRoom::handleOnDownloadGame()
     else if (btnText == DL_ENGINE)
     {
         downloadType = Model::DT_ENGINE;
+        // Make it possible to download development engines from other branches than develop.
+        // Non-develop branch engines contain branch name in springname (see http://api.springfiles.com/).
+        // I add a * to be able to download these, git hash should make it unique.
         downloadName = model_.getBattle(battleId_).engineVersion();
+        if (downloadName.size() > 6)
+        {
+            downloadName += "*";
+        }
     }
     else
     {

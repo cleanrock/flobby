@@ -5,6 +5,7 @@
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Preferences.H>
 #include <boost/signals2/signal.hpp>
+#include <boost/filesystem.hpp>
 #include <string>
 
 class Model;
@@ -44,11 +45,13 @@ private:
     Fl_File_Input * unitSyncPath_;
     Fl_Button * save_;
     Fl_Button * delete_;
+    Fl_Button * add_;
     Fl_Return_Button * select_;
 
     static void callbackList(Fl_Widget*, void*);
     static void callbackSave(Fl_Widget*, void*);
     static void callbackDelete(Fl_Widget*, void*);
+    static void callbackAdd(Fl_Widget*, void*);
     static void callbackSelect(Fl_Widget*, void*);
     static void callbackBrowseSpring(Fl_Widget*, void*);
     static void callbackBrowseUnitSync(Fl_Widget*, void*);
@@ -59,8 +62,10 @@ private:
     void onList();
     void onSave();
     void onDelete();
+    void onAdd();
     void onSelect();
     void onBrowseSpring();
     void onBrowseUnitSync();
     bool openFileDialog(char const * title, char const * fileName, std::string & result); // returns false on cancel
+    boost::filesystem::path findEngineDir(boost::filesystem::path const& engineDir, std::string const& engineVersion);
 };

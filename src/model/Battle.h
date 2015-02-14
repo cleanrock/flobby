@@ -29,6 +29,8 @@ public:
     unsigned int mapHash() const;
     std::string const & engineName() const;
     std::string const & engineVersion() const;
+    std::string const & engineBranch() const;
+    std::string const & engineVersionLong() const;
     std::string const & mapName() const;
     std::string const & title() const;
     std::string const & modName() const;
@@ -73,6 +75,8 @@ private:
     unsigned int mapHash_;
     std::string engineName_;
     std::string engineVersion_;
+    std::string engineBranch_;
+    std::string engineVersionLong_;
     std::string mapName_;
     std::string title_;
     std::string modName_;
@@ -150,6 +154,16 @@ inline std::string const & Battle::engineName() const
 inline std::string const & Battle::engineVersion() const
 {
     return engineVersion_;
+}
+
+inline std::string const & Battle::engineBranch() const
+{
+    return engineBranch_;
+}
+
+inline std::string const & Battle::engineVersionLong() const
+{
+    return engineVersionLong_;
 }
 
 inline std::string const & Battle::mapName() const

@@ -234,6 +234,12 @@ void Model::processDone(std::pair<unsigned int, int> idRetPair)
     }
     else if (idRetPair.first == downloaderId_)
     {
+        // remove possible * at end of engine downloads
+        if (downloadName_.back() == '*')
+        {
+            downloadName_.pop_back();
+        }
+
         downloadDoneSignal_(downloadType_, downloadName_, idRetPair.second == 0 ? true : false);
         downloaderId_ = 0;
     }

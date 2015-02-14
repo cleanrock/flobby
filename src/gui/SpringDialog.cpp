@@ -20,13 +20,13 @@ char const * const PrefUnitSyncPath = "UnitSyncPath";
 
 SpringDialog::SpringDialog(Model & model) :
         model_(model), prefs_(prefs(), "SpringProfiles"), Fl_Window(600, 400,
-                "Spring")
+                "Spring engines")
 {
     set_modal();
 
     Fl_Button * btn; // used for anonymous buttons below
 
-    list_ = new Fl_Hold_Browser(10, 30, 200, 360, "Spring profiles");
+    list_ = new Fl_Hold_Browser(10, 30, 200, 360, "Spring engines");
     list_->align(FL_ALIGN_TOP_LEFT);
     list_->callback(SpringDialog::callbackList, this);
 
@@ -50,6 +50,9 @@ SpringDialog::SpringDialog(Model & model) :
 
     delete_ = new Fl_Button(400, 290, 90, 30, "Delete");
     delete_->callback(SpringDialog::callbackDelete, this);
+
+    add_ = new Fl_Button(300, 290, 90, 30, "Add new");
+    add_->callback(SpringDialog::callbackAdd, this);
 
     select_ = new Fl_Return_Button(500, 350, 90, 30, "Select");
     select_->callback(SpringDialog::callbackSelect, this);
@@ -152,7 +155,12 @@ void SpringDialog::addFoundProfiles()
             if (is_directory(*de))
             {
                 std::string const dir = de->path().filename().string();
-                if (!prefs_.groupExists(dir.c_str()))
+                // only use first word (engine version) for profile name
+                std::istringstream iss(dir);
+                std::string profileName;
+                iss >> profileName;
+
+                if (!prefs_.groupExists(profileName.c_str()))
                 {
                     path pathSpring(*de);
                     pathSpring /= "spring";
@@ -160,8 +168,8 @@ void SpringDialog::addFoundProfiles()
                     pathUnitSync /= "libunitsync.so";
                     if (is_regular_file(pathSpring) && is_regular_file(pathUnitSync))
                     {
-                        LOG(INFO)<< "adding spring profile '"<< dir<< "' SpringPath="<< pathSpring.string() << " UnitSyncPath="<< pathUnitSync.string();
-                        Fl_Preferences p(prefs_, dir.c_str());
+                        LOG(INFO)<< "adding spring profile '"<< profileName<< "' SpringPath="<< pathSpring.string() << " UnitSyncPath="<< pathUnitSync.string();
+                        Fl_Preferences p(prefs_, profileName.c_str());
                         p.set(PrefSpringPath, pathSpring.string().c_str());
                         p.set(PrefUnitSyncPath, pathUnitSync.string().c_str());
                     }
@@ -173,6 +181,39 @@ void SpringDialog::addFoundProfiles()
     {
         LOG(WARNING)<< engineDir<< " do not exist";
     }
+}
+
+boost::filesystem::path SpringDialog::findEngineDir(boost::filesystem::path const& engineDir, std::string const& engineVersion)
+{
+    using namespace boost::filesystem;
+
+    path result;
+
+    // check for exact match first
+    path exact(engineDir);
+    exact /= engineVersion;
+
+    if (is_directory(exact))
+    {
+        result = exact;
+    }
+    else if (is_directory(engineDir))
+    {
+        for (directory_iterator de(engineDir); de != directory_iterator(); ++de)
+        {
+            if (is_directory(*de))
+            {
+                std::string const dir = de->path().filename().string();
+                if (dir.find(engineVersion) == 0)
+                {
+                    result = *de;
+                    break;
+                }
+            }
+        }
+    }
+
+    return result;
 }
 
 bool SpringDialog::addProfile(std::string const& engineVersion)
@@ -191,16 +232,16 @@ bool SpringDialog::addProfile(std::string const& engineVersion)
     path engineDir(home);
     engineDir /= ".spring";
     engineDir /= "engine";
-    engineDir /= engineVersion;
-    if (is_directory(engineDir))
+    path const dir = findEngineDir(engineDir, engineVersion);
+    if (!dir.empty())
     {
-        path pathSpring(engineDir);
+        path pathSpring(dir);
         pathSpring /= "spring";
-        path pathUnitSync(engineDir);
+        path pathUnitSync(dir);
         pathUnitSync /= "libunitsync.so";
         if (is_regular_file(pathSpring) && is_regular_file(pathUnitSync))
         {
-            LOG(INFO)<< "adding spring profile '"<< engineVersion<< "' SpringPath="<< pathSpring.string() << " UnitSyncPath="<< pathUnitSync.string();
+            LOG(INFO)<< "adding spring profile '"<< engineVersion << "' SpringPath="<< pathSpring.string() << " UnitSyncPath="<< pathUnitSync.string();
             Fl_Preferences p(prefs_, engineVersion.c_str());
             p.set(PrefSpringPath, pathSpring.string().c_str());
             p.set(PrefUnitSyncPath, pathUnitSync.string().c_str());
@@ -210,7 +251,7 @@ bool SpringDialog::addProfile(std::string const& engineVersion)
     }
     else
     {
-        LOG(WARNING)<< engineDir<< " do not exist";
+        LOG(WARNING)<< "engine dir for '"<< engineVersion << "' not found";
     }
     return false;
 }
@@ -286,6 +327,12 @@ void SpringDialog::callbackDelete(Fl_Widget*, void *data)
     o->onDelete();
 }
 
+void SpringDialog::callbackAdd(Fl_Widget*, void *data)
+{
+    SpringDialog * o = static_cast<SpringDialog*>(data);
+    o->onAdd();
+}
+
 void SpringDialog::callbackSelect(Fl_Widget*, void *data)
 {
     SpringDialog * o = static_cast<SpringDialog*>(data);
@@ -357,6 +404,13 @@ void SpringDialog::onDelete()
         clearInputFields();
         initList();
     }
+}
+
+void SpringDialog::onAdd()
+{
+    clearInputFields();
+    list_->deselect(1);
+    focus(name_);
 }
 
 void SpringDialog::onSelect()

@@ -99,7 +99,7 @@ UserInterface::UserInterface(Model & model) :
             { "E&xit", FL_COMMAND +'q', (Fl_Callback *)&onQuit, this },
             { 0 },
         { "Se&ttings",              0, 0, 0, FL_SUBMENU },
-                { "&Spring...", FL_COMMAND +'s', (Fl_Callback *)&menuSpring, this },
+                { "&Spring engines...", FL_COMMAND +'s', (Fl_Callback *)&menuSpring, this },
                 { "&Downloader...", 0, (Fl_Callback *)&menuDownloader, this },
                 { "&Battle list filter...", FL_COMMAND +'b', (Fl_Callback *)&menuBattleListFilter, this },
                 { "Channels to &auto-join...", 0, (Fl_Callback *)&menuChannelsAutoJoin, this },
@@ -611,6 +611,7 @@ void UserInterface::downloadDone(Model::DownloadType downloadType, std::string c
         if (springDialog_->addProfile(name))
         {
             int const battleId = battleRoom_->battleId();
+
             if (battleId != -1 && model_.getBattle(battleId).engineVersion() == name)
             {
                 springDialog_->setProfile(name);

@@ -48,6 +48,19 @@ Battle::Battle(std::istream & is): // battleId type natType founder IP port maxP
     extractSentence(is, engineName_);
     extractSentence(is, engineVersion_);
 
+    // separate engine version and branch
+    std::istringstream iss(engineVersion_);
+    iss >> engineVersion_;
+    iss >> engineBranch_;
+
+    engineVersionLong_ = engineVersion_;
+    if (!engineBranch_.empty())
+    {
+        engineVersionLong_ += " (";
+        engineVersionLong_ += engineBranch_;
+        engineVersionLong_ += ")";
+    }
+
     extractSentence(is, mapName_);
     extractSentence(is, title_);
     extractSentence(is, modName_);

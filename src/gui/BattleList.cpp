@@ -239,7 +239,7 @@ StringTableRow BattleList::makeRow(Battle const & battle)
     return StringTableRow( boost::lexical_cast<std::string>(battle.id()),
             { statusString(battle),
               battle.title() + " / " + battle.founder(),
-              battle.engineVersion(),
+              battle.engineVersionLong(),
               battle.modName(),
               battle.mapName(),
               players.str() } );

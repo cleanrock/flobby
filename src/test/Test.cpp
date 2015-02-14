@@ -252,6 +252,67 @@ void Test::testBattle()
         CPPUNIT_ASSERT(b.mapHash() == static_cast<unsigned int>(-112462944));
         CPPUNIT_ASSERT(b.engineName() == "engineName");
         CPPUNIT_ASSERT(b.engineVersion() == "engineVersion");
+        CPPUNIT_ASSERT(b.engineBranch() == "");
+        CPPUNIT_ASSERT(b.engineVersionLong() == "engineVersion");
+        CPPUNIT_ASSERT(b.mapName() == "Map name");
+        CPPUNIT_ASSERT(b.title() == "Battle title");
+        CPPUNIT_ASSERT(b.modName() == "Mod name");
+        CPPUNIT_ASSERT(b.spectators() == 0);
+        CPPUNIT_ASSERT(b.locked() == false);
+        CPPUNIT_ASSERT(b.modHash() == 0);
+
+
+        std::string const updated =
+                "3 1 " // specs, locked
+                "-1517218254 " // mapHash
+                "New map name";
+
+        std::stringstream ssUpdated(updated);
+
+        b.updateBattleInfo(ssUpdated);
+        b.modHash(9786);
+
+        CPPUNIT_ASSERT(b.spectators() == 3);
+        CPPUNIT_ASSERT(b.locked() == true);
+        CPPUNIT_ASSERT(b.mapHash() == -1517218254);
+        CPPUNIT_ASSERT(b.mapName() == "New map name");
+        CPPUNIT_ASSERT(b.modHash() == 9786);
+
+        // print for ocular inspection
+        std::cout << b << std::endl;
+    }
+
+    // engine with branch name
+    {
+        std::string const opened =
+                "8235 0 0 Founder " // id, replay, nat, founder
+                "94.23.170.70 8463 32 " // ip, port, maxPlayers
+                "0 0 -112462944 " // passw, rank, mapHash
+                "engineName\t"
+                "engineVersion  develop\t" // extra space
+                "Map name\t"
+                "Battle title\t"
+                "Mod name";
+
+        std::stringstream ssOpened(opened);
+
+        Battle b(ssOpened);
+
+        CPPUNIT_ASSERT(b.id() == 8235);
+        CPPUNIT_ASSERT(b.replay() == false);
+        CPPUNIT_ASSERT(b.natType() == 0);
+        CPPUNIT_ASSERT(b.founder() == "Founder");
+        CPPUNIT_ASSERT(b.ip() == "94.23.170.70");
+        CPPUNIT_ASSERT(b.port() == "8463");
+        CPPUNIT_ASSERT(b.maxPlayers() == 32);
+        CPPUNIT_ASSERT(b.passworded() == false);
+        CPPUNIT_ASSERT(b.rank() == 0);
+        CPPUNIT_ASSERT(b.mapHash() == -112462944);
+        CPPUNIT_ASSERT(b.mapHash() == static_cast<unsigned int>(-112462944));
+        CPPUNIT_ASSERT(b.engineName() == "engineName");
+        CPPUNIT_ASSERT(b.engineVersion() == "engineVersion");
+        CPPUNIT_ASSERT(b.engineBranch() == "develop");
+        CPPUNIT_ASSERT(b.engineVersionLong() == "engineVersion (develop)");
         CPPUNIT_ASSERT(b.mapName() == "Map name");
         CPPUNIT_ASSERT(b.title() == "Battle title");
         CPPUNIT_ASSERT(b.modName() == "Mod name");
