@@ -2,6 +2,7 @@
 
 #include "UserStatus.h"
 
+#include <json/json.h>
 #include <boost/lexical_cast.hpp>
 
 UserStatus::UserStatus(const std::string & s)
@@ -55,8 +56,32 @@ bool UserStatus::moderator() const
     return (val_ & 0x20); // bit 5
 }
 
+void UserStatus::moderator(bool moderator)
+{
+    if (moderator)
+    {
+        val_ |= 0x20;
+    }
+    else
+    {
+        val_ &= ~0x20;
+    }
+}
+
 bool UserStatus::bot() const
 {
     return (val_ & 0x40); // bit 6
+}
+
+void UserStatus::bot(bool bot)
+{
+    if (bot)
+    {
+        val_ |= 0x40;
+    }
+    else
+    {
+        val_ &= ~0x40;
+    }
 }
 

@@ -63,7 +63,9 @@ void MapImage::addStartRect(StartRect const & startRect)
 
 void MapImage::removeStartRect(int ally)
 {
-    startRects_.erase(std::remove_if(startRects_.begin(), startRects_.end(), boost::bind(&StartRect::ally, _1) == ally));
+    startRects_.erase(
+            std::remove_if(startRects_.begin(), startRects_.end(), boost::bind(&StartRect::ally, _1) == ally),
+            startRects_.end());
     redraw();
 }
 

@@ -5,6 +5,10 @@
 #include <ostream>
 #include <string>
 
+namespace Json {
+    class Value;
+}
+
 class UserStatus
 {
 public:
@@ -17,7 +21,9 @@ public:
     void away(bool away);
     int rank() const;
     bool moderator() const;
+    void moderator(bool moderator);
     bool bot() const;
+    void bot(bool bot);
 
     bool operator==(UserStatus const & rh) const;
     bool operator!=(UserStatus const & rh) const;

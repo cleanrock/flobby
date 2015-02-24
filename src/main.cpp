@@ -10,6 +10,7 @@
 // TODO #include <pr-downloader.h>
 
 static std::string dir_;
+static bool zerok_ = false;
 
 static
 void printUsage(char const* argv0, std::string const& errorMsg = "")
@@ -18,6 +19,7 @@ void printUsage(char const* argv0, std::string const& errorMsg = "")
         "%s" // errorMsg
         "usage: %s [options]\n"
         " -d | --dir <dir> : use <dir> for flobby config and cache instead of XDG\n"
+        " -z | --zerok     : use zero-k lobby protocol\n"
         " -v | --version   : print flobby version\n"
         " -h | --help      : print help message\n"
         " plus standard fltk options:\n"
@@ -33,8 +35,7 @@ int parseArgs(int argc, char** argv, int& i)
     {
         printUsage(argv[0]);
     }
-
-    if (strcmp("-d", argv[i]) == 0 || strcmp("--dir", argv[i]) == 0)
+    else if (strcmp("-d", argv[i]) == 0 || strcmp("--dir", argv[i]) == 0)
     {
         if (i < argc-1 && argv[i+1] != 0)
         {
@@ -43,8 +44,13 @@ int parseArgs(int argc, char** argv, int& i)
             return 2;
         }
     }
-
-    if (strcmp("-v", argv[i]) == 0 || strcmp("--version", argv[i]) == 0)
+    else if (strcmp("-z", argv[i]) == 0 || strcmp("--zerok", argv[i]) == 0)
+    {
+        zerok_ = true;
+        i += 1;
+        return 1;
+    }
+    else if (strcmp("-v", argv[i]) == 0 || strcmp("--version", argv[i]) == 0)
     {
         Fl::fatal("flobby version %s\n", FLOBBY_VERSION);
     }
@@ -54,6 +60,16 @@ int parseArgs(int argc, char** argv, int& i)
 
 int main(int argc, char * argv[])
 {
+    std::string commandLine;
+    for (int i=0; i<argc; ++i)
+    {
+        commandLine += argv[i];
+        if (i < (argc-1))
+        {
+            commandLine += " ";
+        }
+    }
+
     int i = 1;
     if (Fl::args(argc, argv, i, parseArgs) < argc)
     {
@@ -63,7 +79,7 @@ int main(int argc, char * argv[])
         printUsage(argv[0], errorMsg);
     }
 
-    LOG(INFO)<< "starting flobby "<< FLOBBY_VERSION;
+    LOG(INFO)<< "starting flobby "<< FLOBBY_VERSION << ", command line '" << commandLine << "'";
     initDirs(dir_);
 
     /* TODO disable static pr-d for now (91.0 unitsync cause crash when trying engine download)
@@ -78,7 +94,7 @@ int main(int argc, char * argv[])
         UserInterface::setupEarlySettings();
 
         Controller controller;
-        Model model(controller);
+        Model model(controller, zerok_);
         UserInterface ui(model);
         controller.model(model);
         controller.userInterface(ui);

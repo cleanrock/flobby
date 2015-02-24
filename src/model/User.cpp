@@ -8,6 +8,7 @@
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
+#include <json/value.h>
 
 
 User::User(std::istream & is):
@@ -25,8 +26,57 @@ User::User(std::istream & is):
     // TODO extract accountID
 }
 
+User::User(Json::Value & jv):
+    color_(0),
+    joinedBattle_(-1)
+{
+    name_ = jv["Name"].asString();
+    country_ = jv["Country"].asString();
+    int const clientType = jv["ClientType"].asInt();
+    switch (clientType)
+    {
+    case 1:
+        zkClientType_ = "ZKL";
+        break;
+    case 2:
+        zkClientType_ = "Linux";
+        break;
+    case 3:
+        zkClientType_ = "ZKL-Linux";
+        break;
+    case 4:
+        zkClientType_ = "SpringieManaged";
+        break;
+    case 8:
+        zkClientType_ = "Springie";
+        break;
+    default:
+        zkClientType_ = "Unknown";
+        break;
+    }
+
+    status_.bot(jv["IsBot"].asBool());
+    status_.moderator(jv["IsAdmin"].asBool());
+
+    updateUser(jv);
+}
+
 User::~User()
 {
+}
+
+void User::updateUser(Json::Value& jv)
+{
+    if (jv.isMember("IsInGame")) status_.inGame(jv["IsInGame"].asBool());
+    if (jv.isMember("IsAway")) status_.away(jv["IsAway"].asBool());
+}
+
+void User::updateUserBattleStatus(Json::Value& jv)
+{
+    if (jv.isMember("AllyNumber")) battleStatus_.allyTeam(jv["AllyNumber"].asInt());
+    if (jv.isMember("IsSpectator")) battleStatus_.spectator(jv["IsSpectator"].asBool());
+    if (jv.isMember("Sync")) battleStatus_.sync(jv["Sync"].asInt());
+    if (jv.isMember("TeamNumber")) battleStatus_.team(jv["TeamNumber"].asInt());
 }
 
 std::string const User::info() const
@@ -35,44 +85,52 @@ std::string const User::info() const
     oss << name_ << " ";
     oss << "country:" << country_ << " ";
     oss << "lobby:";
-    try
+
+    if (!zkClientType_.empty())
     {
-        int const lobby = boost::lexical_cast<int>(cpu_);
-        switch (lobby)
-        {
-        case 6666:
-            oss << "ZeroK-Springie";
-            break;
-        case 6667:
-            oss << "ZeroK-Win";
-            break;
-        case 6668:
-            oss << "ZeroK-Lin";
-            break;
-        case 7777:
-            oss << "WebLobby-Win";
-            break;
-        case 7778:
-            oss << "WebLobby-Lin";
-            break;
-        case 7779:
-            oss << "WebLobby-Mac";
-            break;
-        case -1525630178:
-            oss << "MUSLCE";
-            break;
-        case 0x464C4C: // FLL
-            oss << "Flobby-Lin";
-            break;
-        default:
-            oss << cpu_;
-            break;
-        }
+        oss << zkClientType_;
     }
-    catch (const boost::bad_lexical_cast &)
+    else
     {
-        LOG(WARNING)<< "failed to convert '"<< cpu_<< "' to int";
-        oss << cpu_;
+        try
+        {
+            int const lobby = boost::lexical_cast<int>(cpu_); // throws bad_cast
+            switch (lobby)
+            {
+            case 6666:
+                oss << "ZeroK-Springie";
+                break;
+            case 6667:
+                oss << "ZeroK-Win";
+                break;
+            case 6668:
+                oss << "ZeroK-Lin";
+                break;
+            case 7777:
+                oss << "WebLobby-Win";
+                break;
+            case 7778:
+                oss << "WebLobby-Lin";
+                break;
+            case 7779:
+                oss << "WebLobby-Mac";
+                break;
+            case -1525630178:
+                oss << "MUSLCE";
+                break;
+            case 0x464C4C: // FLL
+                oss << "Flobby-Lin";
+                break;
+            default:
+                oss << cpu_;
+                break;
+            }
+        }
+        catch (const boost::bad_lexical_cast &)
+        {
+            LOG(WARNING)<< "failed to convert '"<< cpu_<< "' to int";
+            oss << cpu_;
+        }
     }
 
     return oss.str();

@@ -32,7 +32,7 @@ class UnitSync;
 class Model: public IControllerEvent
 {
 public:
-    Model(IController & controller);
+    Model(IController & controller, bool zerok);
     virtual ~Model();
 
     void setSpringPath(std::string const & path) { springPath_ = path; }
@@ -267,6 +267,7 @@ public:
 
 private:
     IController & controller_;
+    bool zerok_;
     bool connected_;
     bool checkFirstMsg_;
     bool loginInProgress_;
@@ -350,7 +351,8 @@ private:
     void attemptLogin();
     void processServerMsg(const std::string & msg);
 
-    std::map<std::string, std::shared_ptr<User>> users_;
+    typedef std::map<std::string, std::shared_ptr<User>> Users;
+    Users users_;
 
     std::map<int, std::shared_ptr<Battle>> battles_;
 
@@ -378,7 +380,10 @@ private:
 
     typedef std::unordered_map<std::string, std::function<void (std::istream &)>> MessageHandlers;
     MessageHandlers messageHandlers_;
-    void handle_TASSERVER(std::istream & is);
+    MessageHandlers messageHandlersZerok_;
+
+    // spring message handlers
+    void handle_TASServer(std::istream & is);
     void handle_ACCEPTED(std::istream & is);
     void handle_DENIED(std::istream & is);
     void handle_ADDUSER(std::istream & is);
@@ -425,4 +430,27 @@ private:
     void handle_PONG(std::istream & is);
     void handle_HOSTPORT(std::istream & is);
     void handle_FORCEJOINBATTLE(std::istream & is);
+
+    // zerok message handlers
+    void handle_Welcome(std::istream & is);
+    void handle_RegisterResponse(std::istream & is);
+    void handle_LoginResponse(std::istream & is);
+    void handle_Ping(std::istream & is);
+    void handle_User(std::istream & is);
+    void handle_UserDisconnected(std::istream & is);
+    void handle_BattleAdded(std::istream & is);
+    void handle_BattleRemoved(std::istream & is);
+    void handle_BattleUpdate(std::istream & is);
+    void handle_JoinedBattle(std::istream & is);
+    void handle_LeftBattle(std::istream & is);
+    void handle_JoinChannelResponse(std::istream & is);
+    void handle_ChannelUserAdded(std::istream & is);
+    void handle_ChannelUserRemoved(std::istream & is);
+    void handle_Say(std::istream & is);
+    void handle_UpdateUserBattleStatus(std::istream & is);
+    void handle_SetRectangle(std::istream & is);
+    void handle_UpdateBotStatus(std::istream & is);
+    void handle_RemoveBot(std::istream & is);
+
+
 };

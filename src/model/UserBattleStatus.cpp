@@ -2,6 +2,7 @@
 
 #include "UserBattleStatus.h"
 
+#include <json/json.h>
 #include <boost/lexical_cast.hpp>
 #include <cassert>
 

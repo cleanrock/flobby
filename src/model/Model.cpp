@@ -19,6 +19,7 @@
 #include "FlobbyConfig.h"
 
 // TODO #include <pr-downloader.h>
+#include <json/json.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/bind.hpp>
@@ -32,8 +33,12 @@
 #define ADD_MSG_HANDLER2(MSG, METHOD) \
     messageHandlers_[#MSG] = std::bind(&Model::handle_##METHOD, this, std::placeholders::_1);
 
-Model::Model(IController & controller):
+#define ADD_ZK_MSG_HANDLER(MSG) \
+    messageHandlersZerok_[#MSG] = std::bind(&Model::handle_##MSG, this, std::placeholders::_1);
+
+Model::Model(IController & controller, bool zerok):
     controller_(controller),
+    zerok_(zerok),
     connected_(false),
     checkFirstMsg_(false),
     loggedIn_(false),
@@ -47,7 +52,8 @@ Model::Model(IController & controller):
     controller_.setIControllerEvent(*this);
     ServerCommand::init(*this);
 
-    // setup message handlers
+    // setup spring message handlers
+    ADD_MSG_HANDLER(TASServer)
     ADD_MSG_HANDLER(ACCEPTED)
     ADD_MSG_HANDLER(DENIED)
     ADD_MSG_HANDLER(ADDUSER)
@@ -97,6 +103,26 @@ Model::Model(IController & controller):
     ADD_MSG_HANDLER(HOSTPORT)
     ADD_MSG_HANDLER(FORCEJOINBATTLE)
 
+    // setup zerok message handlers
+    ADD_ZK_MSG_HANDLER(Welcome)
+    ADD_ZK_MSG_HANDLER(RegisterResponse)
+    ADD_ZK_MSG_HANDLER(LoginResponse)
+    ADD_ZK_MSG_HANDLER(User)
+    ADD_ZK_MSG_HANDLER(UserDisconnected)
+    ADD_ZK_MSG_HANDLER(Ping)
+    ADD_ZK_MSG_HANDLER(BattleAdded)
+    ADD_ZK_MSG_HANDLER(BattleRemoved)
+    ADD_ZK_MSG_HANDLER(BattleUpdate)
+    ADD_ZK_MSG_HANDLER(JoinedBattle)
+    ADD_ZK_MSG_HANDLER(LeftBattle)
+    ADD_ZK_MSG_HANDLER(JoinChannelResponse)
+    ADD_ZK_MSG_HANDLER(ChannelUserAdded)
+    ADD_ZK_MSG_HANDLER(ChannelUserRemoved)
+    ADD_ZK_MSG_HANDLER(Say)
+    ADD_ZK_MSG_HANDLER(UpdateUserBattleStatus)
+    ADD_ZK_MSG_HANDLER(SetRectangle)
+    ADD_ZK_MSG_HANDLER(UpdateBotStatus)
+    ADD_ZK_MSG_HANDLER(RemoveBot)
 }
 
 Model::~Model()
@@ -151,7 +177,7 @@ void Model::connected(bool connected)
     connected_ = connected;
     if (connected_)
     {
-        checkFirstMsg_ = true; // check that first message is TASServer
+        checkFirstMsg_ = true; // check first message again
         timePingSent_ = controller_.timeNow();
     }
     else
@@ -183,7 +209,22 @@ void Model::attemptLogin()
     uint32_t const userId = UserId::get();
 
     std::ostringstream oss;
-    oss << "LOGIN " << userName_ << " " << password_ << " " << 0x464C4C /*FLL*/ << " * flobby "<< FLOBBY_VERSION <<"\t" << userId << "\tcl sp p m";
+    if (zerok_)
+    {
+        Json::Value login;
+        login["Name"] = userName_;
+        login["PasswordHash"] = password_;
+        login["UserID"] = userId;
+        login["LobbyVersion"] = "flobby";
+        login["ClientType"] = 2;
+
+        Json::FastWriter writer;
+        oss << "Login " << writer.write(login);
+    }
+    else
+    {
+        oss << "LOGIN " << userName_ << " " << password_ << " " << 0x464C4C /*FLL*/ << " * flobby "<< FLOBBY_VERSION <<"\t" << userId << "\tcl sp p m";
+    }
     controller_.send(oss.str());
 }
 
@@ -282,10 +323,22 @@ void Model::registerAccount(std::string const & userName, std::string const & pa
         LOG_IF(FATAL, passwordHash.empty())<< "passwordHash empty";
 
         std::ostringstream oss;
-        oss << "REGISTER " << userName << " " << passwordHash;
-        if (!email.empty())
+        if (zerok_)
         {
-            oss << " " << email;
+            Json::Value jv;
+            jv["Name"] = userName;
+            jv["PasswordHash"] = passwordHash;
+
+            Json::FastWriter writer;
+            oss << "Register " << writer.write(jv);
+        }
+        else
+        {
+            oss << "REGISTER " << userName << " " << passwordHash;
+            if (!email.empty())
+            {
+                oss << " " << email;
+            }
         }
         controller_.send(oss.str());
     }
@@ -298,7 +351,14 @@ void Model::registerAccount(std::string const & userName, std::string const & pa
 void Model::confirmAgreement()
 {
     std::ostringstream oss;
-    oss << "CONFIRMAGREEMENT";
+    if (zerok_)
+    {
+        LOG(FATAL)<< "confirmAgreement should not be needed";
+    }
+    else
+    {
+        oss << "CONFIRMAGREEMENT";
+    }
     controller_.send(oss.str());
 }
 
@@ -366,7 +426,7 @@ Model::Bots const & Model::getBots()
     return bots_;
 }
 
-User & Model::me()
+User& Model::me()
 {
     if (me_ == 0)
     {
@@ -423,7 +483,18 @@ void Model::meInGame(bool inGame)
     u.status(us);
 
     std::ostringstream oss;
-    oss << "MYSTATUS " << us;
+    if (zerok_)
+    {
+        Json::Value jv;
+        jv["IsInGame"] = us.inGame();
+
+        Json::FastWriter writer;
+        oss << "ChangeUserStatus " << writer.write(jv);
+    }
+    else
+    {
+        oss << "MYSTATUS " << us;
+    }
     controller_.send(oss.str());
 }
 
@@ -437,7 +508,18 @@ void Model::meAway(bool away)
         u.status(us);
 
         std::ostringstream oss;
-        oss << "MYSTATUS " << us;
+        if (zerok_)
+        {
+            Json::Value jv;
+            jv["IsAfk"] = us.away();
+
+            Json::FastWriter writer;
+            oss << "ChangeUserStatus " << writer.write(jv);
+        }
+        else
+        {
+            oss << "MYSTATUS " << us;
+        }
         controller_.send(oss.str());
     }
 }
@@ -453,29 +535,30 @@ void Model::processServerMsg(const std::string & msg)
 
         if (checkFirstMsg_)
         {
-            if (boost::iequals(ex, "TASSERVER"))
+            std::string const FirstMsg = (zerok_ ? "Welcome" : "TASServer");
+
+            if (FirstMsg == ex)
             {
-                handle_TASSERVER(iss);
                 checkFirstMsg_ = false;
             }
             else
             {
-                LOG(WARNING) << "Disconnecting, first message is not TASSERVER:" << msg;
+                LOG(WARNING) << "Disconnecting, first message is not "<< FirstMsg << ":" << msg;
                 serverMsgSignal_("Bad first msg from server: " + msg.substr(0, 32));
                 disconnect();
+                return;
             }
+        }
+
+        MessageHandlers& messageHandlers = zerok_ ? messageHandlersZerok_ : messageHandlers_;
+        auto res = messageHandlers.find(ex);
+        if (res != messageHandlers.end())
+        {
+            res->second(iss);
         }
         else
         {
-            auto res = messageHandlers_.find(ex);
-            if (res != messageHandlers_.end())
-            {
-                res->second(iss);
-            }
-            else
-            {
-                LOG(WARNING) << "Unhandled message:" << msg;
-            }
+            LOG(WARNING) << "Unhandled message:" << msg;
         }
     }
     catch (std::exception const & e)
@@ -495,14 +578,40 @@ void Model::joinBattle(int battleId, std::string const & password)
             leaveBattle();
         }
         std::ostringstream oss;
-        oss << "JOINBATTLE " << battleId << " " << password << " " << "scriptPassword" << std::rand();
+        if (zerok_)
+        {
+            Json::Value jv;
+            jv["BattleID"] = battleId;
+            jv["Password"] = password;
+
+            Json::FastWriter writer;
+            oss << "JoinBattle " << writer.write(jv);
+        }
+        else
+        {
+            oss << "JOINBATTLE " << battleId << " " << password << " " << "scriptPassword" << std::rand();
+        }
         controller_.send(oss.str());
     }
 }
 
 void Model::leaveBattle()
 {
-    controller_.send("LEAVEBATTLE");
+    if (zerok_)
+    {
+        /* TODO BattleID probably not needed
+        Json::Value jv;
+        jv["BattleID"] = joinedBattleId_;
+
+        Json::FastWriter writer;
+        oss << "LeaveBattle " << writer.write(jv);
+        */
+        controller_.send("LeaveBattle {}");
+    }
+    else
+    {
+        controller_.send("LEAVEBATTLE");
+    }
 }
 
 void Model::sayBattle(std::string const & msg)
@@ -510,7 +619,23 @@ void Model::sayBattle(std::string const & msg)
     if (!msg.empty())
     {
         std::ostringstream oss;
-        oss << "SAYBATTLE " << msg;
+        if (zerok_)
+        {
+            Json::Value jv;
+            jv["Place"] = 1;
+            // Target seem to be not needed
+            jv["User"] = userName_;
+            jv["IsEmote"] = false;
+            jv["Text"] = msg;
+            jv["Ring"] = false;
+
+            Json::FastWriter writer;
+            oss << "Say " << writer.write(jv);
+        }
+        else
+        {
+            oss << "SAYBATTLE " << msg;
+        }
         controller_.send(oss.str());
     }
 }
@@ -527,7 +652,23 @@ void Model::sayPrivate(std::string const & userName, std::string const & msg)
         return;
     }
     std::ostringstream oss;
-    oss << "SAYPRIVATE " << userName << " " << msg;
+    if (zerok_)
+    {
+        Json::Value jv;
+        jv["Place"] = 2;
+        jv["Target"] = userName;
+        jv["User"] = userName_;
+        jv["IsEmote"] = false;
+        jv["Text"] = msg;
+        jv["Ring"] = true;
+
+        Json::FastWriter writer;
+        oss << "Say " << writer.write(jv);
+    }
+    else
+    {
+        oss << "SAYPRIVATE " << userName << " " << msg;
+    }
     controller_.send(oss.str());
 }
 
@@ -573,7 +714,24 @@ void Model::startSpring()
 
     {
         std::ostringstream oss;
-        oss << "GAME/MyPasswd=" << myScriptPassword_;
+        oss << "GAME/MyPasswd=";
+        if (zerok_)
+        {
+            if (battle.passworded())
+            {
+                // TODO seems ZK requires the battle password here
+                oss << userName_;
+                LOG(WARNING)<< "probably wrong MyPasswd";
+            }
+            else
+            {
+                oss << userName_;
+            }
+        }
+        else
+        {
+            oss << myScriptPassword_;
+        }
         script_.add(oss.str());
     }
 
@@ -597,7 +755,10 @@ void Model::startSpring()
 
 void Model::disconnect()
 {
-    sendMessage("EXIT");
+    if (!zerok_)
+    {
+        sendMessage("EXIT");
+    }
     controller_.disconnect();
 }
 
@@ -843,12 +1004,27 @@ int Model::calcSync(Battle const & battle)
 void Model::sendMyBattleStatus()
 {
     std::ostringstream oss;
-    oss << "MYBATTLESTATUS " << me().battleStatus() << " 255"; // TODO color
+    if (zerok_)
+    {
+        Json::Value jv;
+        jv["AllyNumber"] = me().battleStatus().allyTeam();
+        jv["IsSpectator"] = me().battleStatus().spectator();
+        jv["Name"] = userName_;
+        jv["Sync"] = me().battleStatus().sync();
+        jv["TeamNumber"] = me().battleStatus().team();
+
+        Json::FastWriter writer;
+        oss << "UpdateUserBattleStatus " << writer.write(jv);
+    }
+    else
+    {
+        oss << "MYBATTLESTATUS " << me().battleStatus() << " 255"; // TODO color
+    }
     controller_.send(oss.str());
 
 }
 
-void Model::handle_TASSERVER(std::istream & is) // protocolVersion springVersion udpPort serverMode (e.g 0.35 88 8201 0)
+void Model::handle_TASServer(std::istream & is) // protocolVersion springVersion udpPort serverMode (e.g 0.35 88 8201 0)
 {
     using namespace LobbyProtocol;
 
@@ -868,6 +1044,138 @@ void Model::handle_TASSERVER(std::istream & is) // protocolVersion springVersion
     si.serverMode_ = boost::lexical_cast<unsigned short>(ex);
 
     serverInfoSignal_(si);
+}
+
+void Model::handle_Welcome(std::istream & is) // Engine Game Version
+{
+    using namespace LobbyProtocol;
+
+    Json::Value welcome;
+    is >> welcome;
+
+    ServerInfo si;
+
+    si.springVersion_ = welcome["Engine"].asString();
+    si.protocolVersion_ = welcome["Version"].asString();
+    si.serverMode_ = 0;
+    si.udpPort_ = 0;
+
+    serverInfoSignal_(si);
+}
+
+void Model::handle_LoginResponse(std::istream & is) // ResultCode Reason
+{
+    Json::Value val;
+    is >> val;
+
+    int const resultCode = val["ResultCode"].asInt();
+
+    bool loginSuccess = false;
+    std::string reason;
+
+    switch (resultCode)
+    {
+    case 0:
+        loginSuccess = true;
+        break;
+    case 1:
+        reason = "already connected";
+        break;
+    case 2:
+        reason = "invalid name";
+        break;
+    case 3:
+        reason = "invalid password";
+        break;
+    case 4:
+        reason = "banned";
+        break;
+
+    }
+    reason += val["Reason"].asString();
+
+    if (!loginSuccess)
+    {
+        loginInProgress_ = false;
+        loginResultSignal_(loginSuccess, reason);
+    }
+}
+
+void Model::handle_User(std::istream & is) // User content
+{
+    Json::Value jv;
+    is >> jv;
+
+    std::string const name = jv["Name"].asString();
+
+    Users::iterator it = users_.find(name);
+    if (it != users_.end())
+    {
+        // existing user, update
+        User& user = *it->second;
+        user.updateUser(jv);
+        if (loggedIn_)
+        {
+            userChangedSignal_(user);
+        }
+        updateBattleRunningStatus(user);
+    }
+    else
+    {
+        // new user, this logic depend on server sending "me" User first
+        std::shared_ptr<User> u(new User(jv));
+        users_[u->name()] = u;
+        if (me_ == 0 && loginInProgress_ && u->name() == userName_)
+        {
+            me_ = u.get();
+            loggedIn_ = true;
+            loginInProgress_ = false;
+            loginResultSignal_(true, "");
+        }
+        else if (loggedIn_)
+        {
+            userJoinedSignal_(*u);
+        }
+        else
+        {
+            LOG(WARNING)<< "unexpected User message:"<< u->name();
+        }
+    }
+}
+
+void Model::handle_UserDisconnected(std::istream & is) // Name Reason
+{
+    Json::Value jv;
+    is >> jv;
+
+    std::string const name = jv["Name"].asString();
+
+    User const & user = getUser(name);
+    userLeftSignal_(user);
+    users_.erase(name);
+}
+
+void Model::handle_BattleAdded(std::istream & is) // BattleAdded content
+{
+    Json::Value jv;
+    is >> jv;
+
+    std::shared_ptr<Battle> b(new Battle(jv["Header"]));
+    battles_[b->id()] = b;
+
+    // set running status
+    User& founder = user(b->founder());
+    b->running(founder.status().inGame());
+
+    founder.joinedBattle(*b);
+
+    if (loggedIn_)
+    {
+       battleOpenedSignal_(*b);
+       userJoinedBattleSignal_(founder, *b);
+       userChangedSignal_(founder);
+    }
+
 }
 
 void Model::handle_ACCEPTED(std::istream & is) // userName
@@ -958,6 +1266,22 @@ void Model::handle_BATTLECLOSED(std::istream & is) // battleId
     battles_.erase(battleId);
 }
 
+void Model::handle_BattleRemoved(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+
+    int const battleId = jv["BattleID"].asInt();
+
+    Battle const & battle = getBattle(battleId);
+
+    // TODO i probably don't need LEFTBATTLE workaround here
+
+    battleClosedSignal_(battle);
+
+    battles_.erase(battleId);
+}
+
 void Model::handle_UPDATEBATTLEINFO(std::istream & is) // battleId spectatorCount locked mapHash {mapName}
 {
     using namespace LobbyProtocol;
@@ -965,6 +1289,32 @@ void Model::handle_UPDATEBATTLEINFO(std::istream & is) // battleId spectatorCoun
     extractWord(is, ex);
     Battle & b = getBattle(ex);
     b.updateBattleInfo(is);
+
+    // update self sync
+    if (b.id() == joinedBattleId_)
+    {
+        int const sync = calcSync(b);
+        User & u = me();
+        if (sync != u.battleStatus().sync())
+        {
+            u.battleStatus_.sync(sync);
+            sendMyBattleStatus();
+        }
+    }
+
+    if (loggedIn_) // only inform ui after login sequence is complete
+    {
+        battleChangedSignal_(b);
+    }
+}
+
+void Model::handle_BattleUpdate(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+
+    Battle & b = getBattle(jv["Header"]["BattleID"].asString());
+    b.updateBattleUpdate(jv["Header"]);
 
     // update self sync
     if (b.id() == joinedBattleId_)
@@ -1013,6 +1363,29 @@ void Model::handle_JOINEDBATTLE(std::istream & is) // battleId username [scriptP
     }
 }
 
+void Model::handle_JoinedBattle(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+
+    Battle & b = getBattle(jv["BattleID"].asString());
+    User & u = user(jv["User"].asString());
+    b.joined(u);
+    u.joinedBattle(b);
+
+    assert(loggedIn_);
+
+    userJoinedBattleSignal_(u, b);
+    userChangedSignal_(u);
+
+    if (me() == u)
+    {
+        joinedBattleId_ = b.id();
+        sendMyInitialBattleStatus(b);
+        battleJoinedSignal_(b);
+    }
+}
+
 void Model::handle_LEFTBATTLE(std::istream & is) // battleId username
 {
     using namespace LobbyProtocol;
@@ -1021,6 +1394,28 @@ void Model::handle_LEFTBATTLE(std::istream & is) // battleId username
     Battle & b = getBattle(ex);
     extractWord(is, ex);
     User & u = user(ex);
+    b.left(u);
+    u.leftBattle(b);
+    if (loggedIn_)
+    {
+        userLeftBattleSignal_(u, b);
+        userChangedSignal_(u);
+    }
+    if (u == me() && b.id () == joinedBattleId_)
+    {
+        joinedBattleId_ = -1;
+        bots_.clear();
+    }
+}
+
+void Model::handle_LeftBattle(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+
+    Battle & b = getBattle(jv["BattleID"].asString());
+    User & u = user(jv["User"].asString());
+
     b.left(u);
     u.leftBattle(b);
     if (loggedIn_)
@@ -1127,6 +1522,16 @@ void Model::handle_CLIENTBATTLESTATUS(std::istream & is) // userName battleStatu
     userChangedSignal_(u);
 }
 
+void Model::handle_UpdateUserBattleStatus(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+
+    User& u = user(jv["Name"].asString());
+    u.updateUserBattleStatus(jv);
+    userChangedSignal_(u);
+}
+
 void Model::handle_REQUESTBATTLESTATUS(std::istream & is)
 {
     Battle const & b = getBattle(joinedBattleId_); // joinedBattleId_ set in JOINBATTLE above
@@ -1178,6 +1583,37 @@ void Model::handle_ADDBOT(std::istream & is) // battleId name owner battleStatus
     }
 }
 
+void Model::handle_UpdateBotStatus(std::istream & is)
+{
+    if (-1 != joinedBattleId_)
+    {
+        Json::Value jv;
+        is >> jv;
+
+        std::string const& botName = jv["Name"].asString();
+
+        Bots::iterator it = bots_.find(botName);
+        if (it != bots_.end())
+        {
+            // existing bot, update
+            Bot& bot = *it->second;
+            bot.updateBotStatus(jv);
+            botChangedSignal_(bot);
+        }
+        else
+        {
+            // new bot
+            Bot* b = new Bot(jv);
+            bots_[b->name()] = b;
+            botAddedSignal_(*b);
+        }
+    }
+    else
+    {
+        LOG(WARNING)<< "ignoring UpdateBotStatus since not joined a battle";
+    }
+}
+
 void Model::handle_REMOVEBOT(std::istream & is) // battleId name
 {
     using namespace LobbyProtocol;
@@ -1191,6 +1627,25 @@ void Model::handle_REMOVEBOT(std::istream & is) // battleId name
         botRemovedSignal_(b);
         bots_.erase(ex);
     }
+}
+
+void Model::handle_RemoveBot(std::istream & is)
+{
+    if (-1 != joinedBattleId_)
+    {
+        Json::Value jv;
+        is >> jv;
+
+        std::string const name = jv["Name"].asString();
+        Bot& b = getBot(name);
+        botRemovedSignal_(b);
+        bots_.erase(name);
+    }
+    else
+    {
+        LOG(WARNING)<< "ignoring RemoveBot since not joined a battle";
+    }
+
 }
 
 void Model::handle_UPDATEBOT(std::istream & is) // battleId name battleStatus teamColor
@@ -1260,6 +1715,30 @@ void Model::handle_JOIN(std::istream & is) // channelName
     channelJoinedSignal_(channelName);
 }
 
+void Model::handle_JoinChannelResponse(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+
+    std::string const channelName = jv["ChannelName"].asString();
+    if (jv["Success"].asBool())
+    {
+        // TODO add topic info
+        channelJoinedSignal_(channelName);
+
+        Json::Value const& jvUsers = jv["Channel"]["Users"];
+        for (Json::ValueConstIterator it = jvUsers.begin(); it != jvUsers.end(); ++it)
+        {
+            userJoinedChannelSignal_(channelName, it->asString());
+        }
+    }
+    else
+    {
+        // TODO
+        LOG(WARNING)<< "failed to join channel "<< channelName;
+    }
+}
+
 void Model::handle_CLIENTS(std::istream & is) // channelName {clients}
 {
     using namespace LobbyProtocol;
@@ -1285,7 +1764,14 @@ std::string const & Model::getWriteableDataDir() const
 void Model::getChannels()
 {
     channels_.clear();
-    controller_.send("CHANNELS");
+    if (zerok_)
+    {
+        // TODO zk do not support getting channels
+    }
+    else
+    {
+        controller_.send("CHANNELS");
+    }
 }
 
 void Model::joinChannel(std::string const & channelName)
@@ -1293,7 +1779,19 @@ void Model::joinChannel(std::string const & channelName)
     if (!channelName.empty() && connected_)
     {
         std::ostringstream oss;
-        oss << "JOIN " << channelName;
+        if (zerok_)
+        {
+            Json::Value jv;
+            jv["ChannelName"] = channelName;
+            // TODO Password
+
+            Json::FastWriter writer;
+            oss << "JoinChannel " << writer.write(jv);
+        }
+        else
+        {
+            oss << "JOIN " << channelName;
+        }
         controller_.send(oss.str());
     }
 }
@@ -1303,7 +1801,23 @@ void Model::sayChannel(std::string const & channelName, std::string const & mess
     if (!channelName.empty() && !message.empty() && connected_)
     {
         std::ostringstream oss;
-        oss << "SAY " << channelName << " " << message;
+        if (zerok_)
+        {
+            Json::Value jv;
+            jv["Place"] = 0;
+            jv["Target"] = channelName;
+            jv["User"] = userName_;
+            jv["IsEmote"] = false;
+            jv["Text"] = message;
+            jv["Ring"] = false;
+
+            Json::FastWriter writer;
+            oss << "Say " << writer.write(jv);
+        }
+        else
+        {
+            oss << "SAY " << channelName << " " << message;
+        }
         controller_.send(oss.str());
     }
 }
@@ -1313,7 +1827,18 @@ void Model::leaveChannel(std::string const & channelName)
     if (!channelName.empty() && connected_)
     {
         std::ostringstream oss;
-        oss << "LEAVE " << channelName;
+        if (zerok_)
+        {
+            Json::Value jv;
+            jv["ChannelName"] = channelName;
+
+            Json::FastWriter writer;
+            oss << "LeaveChannel " << writer.write(jv);
+        }
+        else
+        {
+            oss << "LEAVE " << channelName;
+        }
         controller_.send(oss.str());
     }
 }
@@ -1353,6 +1878,13 @@ void Model::handle_JOINED(std::istream & is) // channelName userName
     userJoinedChannelSignal_(channelName, userName);
 }
 
+void Model::handle_ChannelUserAdded(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+    userJoinedChannelSignal_(jv["ChannelName"].asString(), jv["UserName"].asString());
+}
+
 void Model::handle_LEFT(std::istream & is) // channelName userName [{reason}]
 {
     using namespace LobbyProtocol;
@@ -1370,6 +1902,13 @@ void Model::handle_LEFT(std::istream & is) // channelName userName [{reason}]
     }
 
     userLeftChannelSignal_(channelName, userName, reason);
+}
+
+void Model::handle_ChannelUserRemoved(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+    userLeftChannelSignal_(jv["ChannelName"].asString(), jv["UserName"].asString(), "");
 }
 
 void Model::handle_CHANNELTOPIC(std::istream & is) // channelName author changedTime {topic}
@@ -1418,6 +1957,57 @@ void Model::handle_SAID_SAIDEX(std::istream & is) // channelName userName {messa
     std::string msg;
     extractSentence(is, msg);
     saidChannelSignal_(channelName, userName, msg);
+}
+
+void Model::handle_Say(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+    int const place = jv["Place"].asInt();
+
+    switch (place)
+    {
+    case 0: // Channel
+        saidChannelSignal_(
+            jv["Target"].asString(),
+            jv["User"].asString(),
+            jv["Text"].asString() );
+        break;
+
+    case 2: // User
+    {
+        std::string const target = jv["Target"].asString();
+        std::string const user = jv["User"].asString();
+        if (target == userName_)
+        {
+            saidPrivateSignal_(
+                user,
+                jv["Text"].asString() );
+        }
+        else if (user == userName_)
+        {
+            sayPrivateSignal_(
+                target,
+                jv["Text"].asString() );
+        }
+        else
+        {
+            LOG(WARNING)<< "Say User with wrong Target:"<< target
+                        << ", User:"<< jv["User"].asString()
+                        << ", Text:"<< jv["Text"].asString();
+        }
+    }
+    break;
+
+    case 1: // Battle
+    case 3: // BattlePrivate
+        battleChatMsgSignal_(jv["User"].asString(), jv["Text"].asString());
+        break;
+
+    default:
+        LOG(WARNING)<< "unhandled Say Place "<< place ;
+        break;
+    }
 }
 
 void Model::handle_RING(std::istream & is) // userName
@@ -1472,6 +2062,29 @@ void Model::handle_ADDSTARTRECT(std::istream & is) // allyNo left top right bott
     addStartRectSignal_(StartRect(ally, left, top, right, bottom));
 }
 
+void Model::handle_SetRectangle(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+
+    int const number = jv["Number"].asInt();
+
+    if (jv.isMember("Rectangle"))
+    {
+        Json::Value const& rect = jv["Rectangle"];
+
+        int const left = rect["Left"].asInt();
+        int const top = rect["Top"].asInt();
+        int const right = rect["Right"].asInt();
+        int const bottom = rect["Bottom"].asInt();
+
+        addStartRectSignal_(StartRect(number, left, top, right, bottom));
+    }
+    else
+    {
+        removeStartRectSignal_(number);
+    }
+}
 
 void Model::handle_REMOVESTARTRECT(std::istream & is) // allyNo
 {
@@ -1500,6 +2113,56 @@ void Model::handle_REGISTRATIONDENIED(std::istream & is) // {reason}
     registerResultSignal_(false, reason);
 }
 
+void Model::handle_RegisterResponse(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+
+    int const resultCode = jv["ResultCode"].asInt();
+    bool success = false;
+    std::string reason;
+
+    switch (resultCode)
+    {
+    case 0: // Ok
+        success = true;
+        break;
+
+    case 1: // AlreadyConnected
+        reason = "already connected";
+        break;
+
+    case 2: // InvalidName
+        reason = "name already exists";
+        break;
+
+    case 3: // InvalidPassword
+        reason = "invalid password";
+        break;
+
+    case 4: // Banned
+        reason = "banned";
+        break;
+
+    case 5: // InvalidCharacters
+        reason = "invalid name characters";
+        break;
+
+    default:
+        LOG(ERROR)<< "unknown RegisterResponse ResultCode "<< resultCode;
+        reason = "unknown reason";
+        break;
+    }
+
+    std::string const zkReason = jv["Reason"].asString();
+    if (!zkReason.empty())
+    {
+        reason += " (" + zkReason + ")";
+    }
+
+    registerResultSignal_(success, reason);
+}
+
 void Model::handle_AGREEMENT(std::istream & is) // {text}
 {
     using namespace LobbyProtocol;
@@ -1518,6 +2181,13 @@ void Model::handle_AGREEMENTEND(std::istream & is)
 }
 
 void Model::handle_PONG(std::istream & is)
+{
+    using namespace LobbyProtocol;
+
+    waitingForPong_ = 0;
+}
+
+void Model::handle_Ping(std::istream & is)
 {
     using namespace LobbyProtocol;
 
@@ -1643,11 +2313,26 @@ std::vector<std::string> Model::getModSideNames(std::string const & modName)
 void Model::addBot(Bot const & bot)
 {
     std::ostringstream oss;
-    oss << "ADDBOT "
-        << bot.name() << " "
-        << bot.battleStatus() << " "
-        << bot.color() << " "
-        << bot.aiDll();
+    if (zerok_)
+    {
+        Json::Value jv;
+        jv["Name"] = bot.name();
+        jv["AllyNumber"] = bot.battleStatus().allyTeam();
+        jv["TeamNumber"] = bot.battleStatus().team();
+        jv["AiLib"] = bot.aiDll();
+        jv["Owner"] = userName_;
+
+        Json::FastWriter writer;
+        oss << "UpdateBotStatus " << writer.write(jv);
+    }
+    else
+    {
+        oss << "ADDBOT "
+            << bot.name() << " "
+            << bot.battleStatus() << " "
+            << bot.color() << " "
+            << bot.aiDll();
+    }
     controller_.send(oss.str());
 }
 
@@ -1658,8 +2343,24 @@ void Model::botAllyTeam(std::string const& name, int allyTeam)
         Bot const& bot = getBot(name); // throws if bot not found
         UserBattleStatus ubs = bot.battleStatus();
         ubs.allyTeam(allyTeam);
+        if (zerok_)
+        {
+            std::ostringstream oss;
+            Json::Value jv;
+            jv["Name"] = bot.name();
+            jv["AllyNumber"] = ubs.allyTeam();
+            jv["TeamNumber"] = bot.battleStatus().team();
+            jv["AiLib"] = bot.aiDll();
+            jv["Owner"] = userName_;
 
-        sendUpdateBot(name, ubs, bot.color());
+            Json::FastWriter writer;
+            oss << "UpdateBotStatus " << writer.write(jv);
+            controller_.send(oss.str());
+        }
+        else
+        {
+            sendUpdateBot(name, ubs, bot.color());
+        }
     }
     catch (std::invalid_argument const& e)
     {
@@ -1669,6 +2370,12 @@ void Model::botAllyTeam(std::string const& name, int allyTeam)
 
 void Model::botSide(std::string const& name, int side)
 {
+    if (zerok_)
+    {
+        // zerok protocol do not have side for bots
+        return;
+    }
+
     try
     {
         Bot const& bot = getBot(name); // throws if bot not found
@@ -1696,15 +2403,32 @@ void Model::sendUpdateBot(std::string const& name, UserBattleStatus const& ubs, 
 void Model::removeBot(std::string const & name)
 {
     std::ostringstream oss;
-    oss << "REMOVEBOT " << name;
-    controller_.send(oss.str());
+    if (zerok_)
+    {
+        Json::Value jv;
+        jv["Name"] = name;
 
+        Json::FastWriter writer;
+        oss << "RemoveBot " << writer.write(jv);
+    }
+    else
+    {
+        oss << "REMOVEBOT " << name;
+    }
+    controller_.send(oss.str());
 }
 
 void Model::ring(std::string const & userName)
 {
     std::ostringstream oss;
-    oss << "RING " << userName;
+    if (zerok_)
+    {
+        // TODO
+    }
+    else
+    {
+        oss << "RING " << userName;
+    }
     controller_.send(oss.str());
 
 }
@@ -1850,7 +2574,14 @@ void Model::checkPing()
         }
         else
         {
-            controller_.send("PING");
+            if (zerok_)
+            {
+                controller_.send("Ping {}");
+            }
+            else
+            {
+                controller_.send("PING");
+            }
             timePingSent_ = timeNow;
             ++waitingForPong_;
         }
@@ -1871,6 +2602,12 @@ std::string Model::calcPasswordHash(std::string const& str)
 
 void Model::sendMessage(std::string const& msg)
 {
+    if (zerok_)
+    {
+        // TODO
+        return;
+    }
+
     if (connected_)
     {
         controller_.send(msg);

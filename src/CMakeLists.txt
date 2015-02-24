@@ -2,7 +2,6 @@ add_definitions(${CMAKE_CXX_FLAGS} "-std=c++0x")
 
 find_package(Boost COMPONENTS system filesystem regex chrono signals thread REQUIRED)
 
-
 include_directories (
     ${CMAKE_SOURCE_DIR}/src
     ${Boost_INCLUDE_DIRS}

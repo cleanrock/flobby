@@ -47,6 +47,8 @@ void Controller::connect(std::string const& host, std::string const& service)
 
 void Controller::send(std::string const& msg)
 {
+    if (msg.empty()) return; // TODO remove when zerok fully implemented ?
+
     if (!server_)
     {
         throw std::runtime_error("not connected");

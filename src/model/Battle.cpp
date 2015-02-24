@@ -6,6 +6,7 @@
 
 #include "log/Log.h"
 
+#include <json/json.h>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 
@@ -71,6 +72,49 @@ Battle::Battle(std::istream & is): // battleId type natType founder IP port maxP
     }
 }
 
+Battle::Battle(Json::Value & jv):
+        locked_(false), // only set to true by UPDATEBATTLEINFO
+        running_(false), // set by founder status
+        modHash_(0)
+{
+    id_ = jv["BattleID"].asInt();
+
+    replay_ = false;
+
+    natType_ = 0;
+
+    founder_ = jv["Founder"].asString();
+
+    ip_ = jv["Ip"].asString();
+    port_ = jv["Port"].asString();
+
+    maxPlayers_ = jv["MaxPlayers"].asInt();
+
+    passworded_ = !jv["Password"].asString().empty();
+
+    rank_ = 0;
+
+    mapHash_ = 0;
+
+    engineName_ = "spring";
+    engineVersion_ = jv["Engine"].asString();
+
+    // separate engine version and branch
+    std::istringstream iss(engineVersion_);
+    iss >> engineVersion_;
+    iss >> engineBranch_;
+
+    engineVersionLong_ = engineVersion_;
+    if (!engineBranch_.empty())
+    {
+        engineVersionLong_ += " (";
+        engineVersionLong_ += engineBranch_;
+        engineVersionLong_ += ")";
+    }
+
+    updateBattleUpdate(jv);
+}
+
 bool Battle::running(bool running)
 {
     bool const changed = (running != running_);
@@ -98,6 +142,14 @@ void Battle::updateBattleInfo(std::istream & is)
     mapHash_ = static_cast<unsigned int>( boost::lexical_cast<int64_t>(ex) );
 
     extractSentence(is, mapName_);
+}
+
+void Battle::updateBattleUpdate(Json::Value & jv)
+{
+    if (jv.isMember("Map")) mapName_ = jv["Map"].asString();
+    if (jv.isMember("Title")) title_ = jv["Title"].asString();
+    if (jv.isMember("Game")) modName_ = jv["Game"].asString();
+    if (jv.isMember("SpectatorCount")) spectators_ = jv["SpectatorCount"].asInt();
 }
 
 void Battle::joined(User const & user)

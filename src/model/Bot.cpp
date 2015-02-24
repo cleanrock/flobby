@@ -3,6 +3,7 @@
 #include "Bot.h"
 #include "LobbyProtocol.h"
 
+#include <json/json.h>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <stdexcept>
@@ -26,6 +27,21 @@ Bot::Bot(std::istream & is)
     extractSentence(is, aiDll_);
 }
 
+Bot::Bot(Json::Value & jv)
+{
+    name_ = jv["Name"].asString();
+    owner_ = jv["Owner"].asString();
+
+    battleStatus_.allyTeam(jv["AllyNumber"].asInt());
+    battleStatus_.team(jv["TeamNumber"].asInt());
+    battleStatus_.spectator(false);
+    battleStatus_.sync(1);
+
+    color_ = 0;
+
+    aiDll_ = jv["AiLib"].asString();;
+}
+
 Bot::Bot(std::string const & name, std::string const & aiDll):
         name_(name),
         color_(0),
@@ -38,6 +54,12 @@ Bot::Bot(std::string const & name, std::string const & aiDll):
 
 Bot::~Bot()
 {
+}
+
+void Bot::updateBotStatus(Json::Value & jv)
+{
+    if (jv.isMember("AllyNumber")) battleStatus_.allyTeam(jv["AllyNumber"].asInt());
+    if (jv.isMember("TeamNumber")) battleStatus_.team(jv["TeamNumber"].asInt());
 }
 
 void Bot::print(std::ostream & os) const

@@ -6,6 +6,7 @@ flobby is developed and tested on archlinux.
 Dependencies worth noting
 -------------------------
 * FLTK 1.3
+* jsoncpp
 * libxpm
 * libxss
 * ImageMagick
@@ -36,6 +37,7 @@ Command line arguments
     $ flobby -h
     usage: flobby [options]
         -d | --dir <dir> : use <dir> for flobby config and cache instead of XDG
+        -z | --zerok     : use zero-k lobby protocol
         -v | --version   : print flobby version
         -h | --help      : print help message
     plus standard fltk options:

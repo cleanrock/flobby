@@ -5,6 +5,10 @@
 #include <string>
 #include <ostream>
 
+namespace Json {
+    class Value;
+}
+
 class UserBattleStatus
 {
 public:

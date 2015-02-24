@@ -8,14 +8,20 @@
 #include <string>
 
 class Battle;
+namespace Json {
+    class Value;
+}
 
 
 class Bot
 {
 public:
     Bot(std::istream & is); // ADDBOT content excluding initial battleId
+    Bot(Json::Value & jv); // UpdateBotStatus content
     Bot(std::string const & name, std::string const & aiDll); // used when adding bot to battle
     virtual ~Bot();
+
+    void updateBotStatus(Json::Value & jv); // UpdateBotStatus content
 
     std::string const & name() const;
     std::string const & owner() const;

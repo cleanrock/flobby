@@ -1,3 +1,7 @@
+find_package(Jsoncpp REQUIRED)
+
+include_directories(${JSONCPP_INCLUDE_DIR})
+
 add_library (model STATIC
     Battle.cpp
     Bot.cpp
@@ -19,4 +23,5 @@ add_library (model STATIC
 target_link_libraries (model
     md5
     dl
+    ${JSONCPP_LIBRARY}
 )

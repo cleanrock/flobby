@@ -9,13 +9,19 @@
 #include <string>
 
 class Battle;
-
+namespace Json {
+    class Value;
+}
 
 class User
 {
 public:
     User(std::istream & is); // ADDUSER content
+    User(Json::Value& jv); // User content
     virtual ~User();
+
+    void updateUser(Json::Value& jv); // User content
+    void updateUserBattleStatus(Json::Value& jv); // UpdateUserBattleStatus content
 
     std::string const & name() const;
     std::string const & country() const;
@@ -46,6 +52,7 @@ private:
     std::string name_;
     std::string country_;
     std::string cpu_;
+    std::string zkClientType_;
     int color_; // 0x00BBGGRR
     UserStatus status_;
     UserBattleStatus battleStatus_;

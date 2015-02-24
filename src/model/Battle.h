@@ -9,11 +9,16 @@
 
 // forwards
 class User;
+namespace Json {
+    class Value;
+}
+
 
 class Battle
 {
 public:
     Battle(std::istream & is); // BATTLEOPENED content
+    Battle(Json::Value & jv); // BattleAdded content
     virtual ~Battle();
 
     int id() const;
@@ -42,6 +47,7 @@ public:
     bool running(bool running); // returns true if running status changed
 
     void updateBattleInfo(std::istream & is); // UPDATEBATTLEINFO content excluding battle id
+    void updateBattleUpdate(Json::Value & jv);
     void joined(User const & user);
     void left(User const & user);
 
