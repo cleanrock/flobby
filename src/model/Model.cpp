@@ -215,7 +215,7 @@ void Model::attemptLogin()
         login["Name"] = userName_;
         login["PasswordHash"] = password_;
         login["UserID"] = userId;
-        login["LobbyVersion"] = "flobby";
+        login["LobbyVersion"] = "flobby " FLOBBY_VERSION;
         login["ClientType"] = 2;
 
         Json::FastWriter writer;
