@@ -123,6 +123,7 @@ Model::Model(IController & controller, bool zerok):
     ADD_ZK_MSG_HANDLER(SetRectangle)
     ADD_ZK_MSG_HANDLER(UpdateBotStatus)
     ADD_ZK_MSG_HANDLER(RemoveBot)
+    ADD_ZK_MSG_HANDLER(SetModOptions)
 }
 
 Model::~Model()
@@ -1505,6 +1506,22 @@ void Model::handle_REMOVESCRIPTTAGS(std::istream & is) // key [key ...]
             removeScriptTagSignal_(key);
         }
     }
+}
+
+void Model::handle_SetModOptions(std::istream & is)
+{
+    // zero-k seem to always send all options in this message, start by removing all
+    removeScriptTagSignal_("*");
+
+    Json::Value jv;
+    is >> jv;
+
+    Json::Value const& jvOptions = jv["Options"];
+    for (Json::ValueConstIterator it = jvOptions.begin(); it != jvOptions.end(); ++it)
+    {
+        setScriptTagSignal_(it.key().asString(), it->asString());
+    }
+
 }
 
 void Model::handle_CLIENTBATTLESTATUS(std::istream & is) // userName battleStatus color

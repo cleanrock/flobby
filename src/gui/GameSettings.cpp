@@ -36,10 +36,17 @@ void GameSettings::setScriptTag(std::string const & key, std::string const & val
 
 void GameSettings::removeScriptTag(std::string const & key)
 {
-    std::string key2 = key;
-    boost::to_lower(key2);
+    if (key == "*")
+    {
+        clear();
+    }
+    else
+    {
+        std::string key2 = key;
+        boost::to_lower(key2);
 
-    removeRow(key2);
+        removeRow(key2);
+    }
 }
 
 /* TODO

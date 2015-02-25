@@ -451,6 +451,6 @@ private:
     void handle_SetRectangle(std::istream & is);
     void handle_UpdateBotStatus(std::istream & is);
     void handle_RemoveBot(std::istream & is);
-
+    void handle_SetModOptions(std::istream & is);
 
 };
