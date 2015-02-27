@@ -2088,6 +2088,9 @@ void Model::handle_SetRectangle(std::istream & is)
 
     if (jv.isMember("Rectangle"))
     {
+        // SetRectangle message is a bit of a mess, it is hopefully good to always clear the rect first
+        removeStartRectSignal_(number);
+
         Json::Value const& rect = jv["Rectangle"];
 
         int const left = rect["Left"].asInt();
