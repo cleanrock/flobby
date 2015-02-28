@@ -192,11 +192,20 @@ void BattleRoom::setMapImage(Battle const & battle)
 
         mapInfo_->value(oss.str().c_str());
     }
-    else
+    else if (!model_.getUnitSyncPath().empty())
     {
         mapImageBox_->image(0);
         mapImageBox_->label("click to\ndownload map");
         mapImageBox_->activate();
+
+        mapInfo_->value(0);
+    }
+    else
+    {
+        // disable map download since we don't have unitsync yet
+        mapImageBox_->image(0);
+        mapImageBox_->label("");
+        mapImageBox_->deactivate();
 
         mapInfo_->value(0);
     }
