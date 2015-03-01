@@ -430,6 +430,11 @@ private:
     void handle_PONG(std::istream & is);
     void handle_HOSTPORT(std::istream & is);
     void handle_FORCEJOINBATTLE(std::istream & is);
+    void handle_STARTLISTSUBSCRIPTION(std::istream & is);
+    void handle_LISTSUBSCRIPTION(std::istream & is);
+    void handle_ENDLISTSUBSCRIPTION(std::istream & is);
+    void handle_OK(std::istream & is);
+    void handle_FAILED(std::istream & is);
 
     // zerok message handlers
     void handle_Welcome(std::istream & is);

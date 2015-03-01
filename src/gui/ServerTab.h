@@ -38,7 +38,7 @@ private:
     void onInput(std::string const & text);
     void onComplete(std::string const & text, std::size_t pos, std::pair<std::string, std::size_t>& result);
 
-    void append(std::string const & msg, bool interesting = false);
+    void append(std::string const & msg, int interest = 0);
 
     // model signals
     void connected(bool connected);

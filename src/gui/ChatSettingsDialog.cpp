@@ -145,10 +145,10 @@ void ChatSettingsDialog::loadPrefs()
         prefs().get(PrefNormalInterestColor, val, FL_FOREGROUND_COLOR);
         textColor_[TextDisplay2::STYLE_NORMAL]->color(val);
 
-        prefs().get(PrefHighInterestColor, val, FL_FOREGROUND_COLOR);
+        prefs().get(PrefHighInterestColor, val, FL_RED);
         textColor_[TextDisplay2::STYLE_HIGH]->color(val);
 
-        prefs().get(PrefMyTextColor, val, FL_FOREGROUND_COLOR);
+        prefs().get(PrefMyTextColor, val, FL_BLUE);
         textColor_[TextDisplay2::STYLE_MYTEXT]->color(val);
     }
 

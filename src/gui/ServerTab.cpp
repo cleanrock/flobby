@@ -93,7 +93,7 @@ void ServerTab::loginResult(bool success, std::string const & info)
     }
     else
     {
-        append("Login failed: " + info, true);
+        append("Login failed: " + info, 1);
     }
 }
 
@@ -102,13 +102,13 @@ void ServerTab::connected(bool connected)
     if (!connected)
     {
         userList_->clear();
-        append("Disconnected from server\n", true); // extra newline for clarity
+        append("Disconnected from server\n", 1); // extra newline for clarity
     }
 }
 
 void ServerTab::message(std::string const & msg)
 {
-    append(msg, true);
+    append(msg, 1);
 }
 
 void ServerTab::userJoined(User const & user)
@@ -123,7 +123,7 @@ void ServerTab::userLeft(User const & user)
 
 void ServerTab::ring(std::string const & userName)
 {
-    append("ring from " + userName, true);
+    append("ring from " + userName, 1);
     Sound::beep();
 }
 
@@ -139,13 +139,13 @@ int ServerTab::handle(int event)
     return Fl_Tile::handle(event);
 }
 
-void ServerTab::append(std::string const & msg, bool interesting)
+void ServerTab::append(std::string const & msg, int interest /* = 0 */)
 {
     logFile_.log(msg);
 
-    text_->append(msg, 0);
+    text_->append(msg, interest);
     // make ChatTabs redraw header
-    if (interesting && !visible() && labelcolor() != FL_RED)
+    if (interest == 1 && !visible() && labelcolor() != FL_RED)
     {
         labelcolor(FL_RED);
         iTabs_.redrawTabs();
@@ -157,11 +157,11 @@ void ServerTab::downloadDone(Model::DownloadType downloadType, std::string const
 {
     if (success)
     {
-        append("download done: " + name, false);
+        append("download done: " + name);
     }
     else
     {
-        append("download failed: " + name, true);
+        append("download failed: " + name, 1);
     }
 }
 
@@ -170,10 +170,12 @@ void ServerTab::onInput(std::string const & text)
     std::string textTrimmed = text;
     boost::trim(textTrimmed);
 
+    append(textTrimmed, -2);
+
     std::string result = model_.serverCommand(textTrimmed);
     if (!result.empty())
     {
-        append("'" + textTrimmed + "' returned:\n" + result);
+        append("'" + textTrimmed + "' returned:\n" + result, 1);
     }
 }
 

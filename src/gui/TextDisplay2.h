@@ -13,7 +13,7 @@ public:
     TextDisplay2(int x, int y, int w, int h, char const * label = 0);
     virtual ~TextDisplay2();
 
-    void append(std::string const & text, int interest = 0); // prepends with time stamp and adds newline at end
+    void append(std::string const & text, int interest = 0);
 
     enum {
         STYLE_TIME = 0,

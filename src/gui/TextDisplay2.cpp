@@ -47,6 +47,9 @@ TextDisplay2::~TextDisplay2()
 
 void TextDisplay2::append(std::string const & text, int interest)
 {
+    // prepends with time stamp and adds newline at end
+    // interest: -2=my, -1=low, 0=normal, 1=high
+
     // scroll to bottom if last line is visible
     bool const scrollToBottom = !(mLastChar < text_->length());
 

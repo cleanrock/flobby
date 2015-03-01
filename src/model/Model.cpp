@@ -102,6 +102,11 @@ Model::Model(IController & controller, bool zerok):
     ADD_MSG_HANDLER(PONG)
     ADD_MSG_HANDLER(HOSTPORT)
     ADD_MSG_HANDLER(FORCEJOINBATTLE)
+    ADD_MSG_HANDLER(STARTLISTSUBSCRIPTION)
+    ADD_MSG_HANDLER(LISTSUBSCRIPTION)
+    ADD_MSG_HANDLER(ENDLISTSUBSCRIPTION)
+    ADD_MSG_HANDLER(OK)
+    ADD_MSG_HANDLER(FAILED)
 
     // setup zerok message handlers
     ADD_ZK_MSG_HANDLER(Welcome)
@@ -2251,6 +2256,51 @@ void Model::handle_FORCEJOINBATTLE(std::istream & is) // destinationBattleID [de
     }
 
     joinBattle(battleId, password);
+}
+
+void Model::handle_STARTLISTSUBSCRIPTION(std::istream & is) // empty
+{
+    using namespace LobbyProtocol;
+
+    serverMsgSignal_("STARTLISTSUBSCRIPTION");
+}
+
+void Model::handle_ENDLISTSUBSCRIPTION(std::istream & is) // empty
+{
+    using namespace LobbyProtocol;
+
+    serverMsgSignal_("ENDLISTSUBSCRIPTION");
+}
+
+void Model::handle_LISTSUBSCRIPTION(std::istream & is) // chanName=<NAME>
+{
+    using namespace LobbyProtocol;
+
+    std::string ex;
+    extractWord(is, ex);
+    serverMsgSignal_(ex);
+}
+
+void Model::handle_OK(std::istream & is) // <command>
+{
+    using namespace LobbyProtocol;
+
+    std::string msg = "OK: ";
+    std::string text;
+    std::getline(is, text);
+    msg += text;
+    serverMsgSignal_(msg);
+}
+
+void Model::handle_FAILED(std::istream & is) // <command> <text>
+{
+    using namespace LobbyProtocol;
+
+    std::string msg = "FAILED: ";
+    std::string text;
+    std::getline(is, text);
+    msg += text;
+    serverMsgSignal_(msg);
 }
 
 std::vector<AI> Model::getModAIs(std::string const & modName)

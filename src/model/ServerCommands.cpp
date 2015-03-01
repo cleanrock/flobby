@@ -20,12 +20,14 @@ private: \
 SERVER_COMMAND(help)
 SERVER_COMMAND(ingame)
 SERVER_COMMAND(regdate);
-SERVER_COMMAND(uptime);
 SERVER_COMMAND(pwhash);
 SERVER_COMMAND(rename);
 SERVER_COMMAND(changepw);
 SERVER_COMMAND(changeuserpw);
 SERVER_COMMAND(join);
+SERVER_COMMAND(sub);
+SERVER_COMMAND(unsub);
+SERVER_COMMAND(listsubs);
 
 
 Model* ServerCommand::model_ = 0;
@@ -40,12 +42,14 @@ void ServerCommand::init(Model& model)
     sc = new SC_help(); commmands_[sc->name_] = sc;
     sc = new SC_ingame(); commmands_[sc->name_] = sc;
     sc = new SC_regdate(); commmands_[sc->name_] = sc;
-    sc = new SC_uptime(); commmands_[sc->name_] = sc;
     sc = new SC_pwhash(); commmands_[sc->name_] = sc;
     sc = new SC_rename(); commmands_[sc->name_] = sc;
     sc = new SC_changepw(); commmands_[sc->name_] = sc;
     sc = new SC_changeuserpw(); commmands_[sc->name_] = sc;
     sc = new SC_join(); commmands_[sc->name_] = sc;
+    sc = new SC_sub(); commmands_[sc->name_] = sc;
+    sc = new SC_unsub(); commmands_[sc->name_] = sc;
+    sc = new SC_listsubs(); commmands_[sc->name_] = sc;
 }
 
 std::string ServerCommand::process(std::string const& str)
@@ -151,22 +155,6 @@ std::string SC_regdate::process(std::vector<std::string> const& args)
         msg += " " + args[0];
     }
     model_->sendMessage(msg);
-
-    return result;
-}
-
-
-std::string SC_uptime::description()
-{
-    return  "/" + name_ + " - "
-            "show server's uptime";
-}
-
-std::string SC_uptime::process(std::vector<std::string> const& args)
-{
-    std::string result;
-
-    model_->sendMessage("UPTIME");
 
     return result;
 }
@@ -311,6 +299,68 @@ std::string SC_join::process(std::vector<std::string> const& args)
     {
         result = name_ + " requires one argument";
     }
+
+    return result;
+}
+
+std::string SC_sub::description()
+{
+    return  "/" + name_ + " channel - "
+            "subscribe to channel";
+}
+
+std::string SC_sub::process(std::vector<std::string> const& args)
+{
+    std::string result;
+
+    if (!args.empty())
+    {
+        std::string msg = "SUBSCRIBE chanName=" + args[0];
+        model_->sendMessage(msg);
+    }
+    else
+    {
+        result = name_ + " requires one argument";
+    }
+
+    return result;
+}
+
+std::string SC_unsub::description()
+{
+    return  "/" + name_ + " channel - "
+            "unsubscribe from channel";
+}
+
+std::string SC_unsub::process(std::vector<std::string> const& args)
+{
+    std::string result;
+
+    if (!args.empty())
+    {
+        std::string msg = "UNSUBSCRIBE chanName=" + args[0];
+        model_->sendMessage(msg);
+    }
+    else
+    {
+        result = name_ + " requires one argument";
+    }
+
+    return result;
+}
+
+std::string SC_listsubs::description()
+{
+    return  "/" + name_ + " - "
+            "list channel subscribtions";
+}
+
+std::string SC_listsubs::process(std::vector<std::string> const& args)
+{
+    std::string result;
+
+    std::string msg = "LISTSUBSCRIPTIONS";
+    model_->sendMessage(msg);
 
     return result;
 }
