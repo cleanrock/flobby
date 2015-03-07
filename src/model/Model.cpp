@@ -1524,7 +1524,7 @@ void Model::handle_SetModOptions(std::istream & is)
     Json::Value const& jvOptions = jv["Options"];
     for (Json::ValueConstIterator it = jvOptions.begin(); it != jvOptions.end(); ++it)
     {
-        setScriptTagSignal_(it.key().asString(), it->asString());
+        setScriptTagSignal_(it.key().asString(), (*it).asString());
     }
 
 }
@@ -1751,7 +1751,7 @@ void Model::handle_JoinChannelResponse(std::istream & is)
         Json::Value const& jvUsers = jv["Channel"]["Users"];
         for (Json::ValueConstIterator it = jvUsers.begin(); it != jvUsers.end(); ++it)
         {
-            userJoinedChannelSignal_(channelName, it->asString());
+            userJoinedChannelSignal_(channelName, (*it).asString());
         }
     }
     else
