@@ -42,6 +42,7 @@ private:
     Fl_Hold_Browser * list_;
     Fl_Input * name_;
     Fl_File_Input * springPath_;
+    Fl_Input * springOptions_;
     Fl_File_Input * unitSyncPath_;
     Fl_Button * save_;
     Fl_Button * delete_;

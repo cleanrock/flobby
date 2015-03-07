@@ -16,45 +16,49 @@
 // prefs
 char const * const PrefSpringProfile = "SpringProfile";
 char const * const PrefSpringPath = "SpringPath";
+char const * const PrefSpringOptions = "SpringOptions";
 char const * const PrefUnitSyncPath = "UnitSyncPath";
 
 SpringDialog::SpringDialog(Model & model) :
-        model_(model), prefs_(prefs(), "SpringProfiles"), Fl_Window(600, 400,
+        model_(model), prefs_(prefs(), "SpringProfiles"), Fl_Window(800, 600,
                 "Spring engines")
 {
     set_modal();
 
     Fl_Button * btn; // used for anonymous buttons below
 
-    list_ = new Fl_Hold_Browser(10, 30, 200, 360, "Spring engines");
+    list_ = new Fl_Hold_Browser(10, 30, 200, 560, "Spring engines");
     list_->align(FL_ALIGN_TOP_LEFT);
     list_->callback(SpringDialog::callbackList, this);
 
-    name_ = new Fl_Input(220, 30, 370, 30, "Name");
+    name_ = new Fl_Input(220, 30, 570, 30, "Name");
     name_->align(FL_ALIGN_TOP_LEFT);
 
-    springPath_ = new Fl_File_Input(220, 90, 350, 40, "Spring (e.g. /usr/bin/spring [options])");
+    springPath_ = new Fl_File_Input(220, 90, 550, 40, "Spring (e.g. /usr/bin/spring)");
     springPath_->align(FL_ALIGN_TOP_LEFT);
 
-    btn = new Fl_Button(570, 90, 20, 40, "...");
+    btn = new Fl_Button(770, 90, 20, 40, "...");
     btn->callback(SpringDialog::callbackBrowseSpring, this);
 
-    unitSyncPath_ = new Fl_File_Input(220, 160, 350, 40, "UnitSync (e.g. /usr/lib/libunitsync.so)");
+    springOptions_ = new Fl_Input(220, 160, 550, 30, "Spring options (e.g. -C ~/springsettings_91.cfg)");
+    springOptions_->align(FL_ALIGN_TOP_LEFT);
+
+    unitSyncPath_ = new Fl_File_Input(220, 230, 550, 40, "UnitSync (e.g. /usr/lib/libunitsync.so)");
     unitSyncPath_->align(FL_ALIGN_TOP_LEFT);
 
-    btn = new Fl_Button(570, 160, 20, 40, "...");
+    btn = new Fl_Button(770, 230, 20, 40, "...");
     btn->callback(SpringDialog::callbackBrowseUnitSync, this);
 
-    save_ = new Fl_Button(500, 290, 90, 30, "Save");
+    save_ = new Fl_Button(700, 460, 90, 30, "Save");
     save_->callback(SpringDialog::callbackSave, this);
 
-    delete_ = new Fl_Button(400, 290, 90, 30, "Delete");
+    delete_ = new Fl_Button(600, 460, 90, 30, "Delete");
     delete_->callback(SpringDialog::callbackDelete, this);
 
-    add_ = new Fl_Button(300, 290, 90, 30, "Add new");
+    add_ = new Fl_Button(500, 460, 90, 30, "Add new");
     add_->callback(SpringDialog::callbackAdd, this);
 
-    select_ = new Fl_Return_Button(500, 350, 90, 30, "Select");
+    select_ = new Fl_Return_Button(700, 520, 90, 30, "Select");
     select_->callback(SpringDialog::callbackSelect, this);
     select_->deactivate();
 
@@ -287,6 +291,7 @@ void SpringDialog::clearInputFields()
 {
     name_->value(0);
     springPath_->value(0);
+    springOptions_->value(0);
     unitSyncPath_->value(0);
 }
 
@@ -301,6 +306,10 @@ void SpringDialog::populate(char const * name)
 
         p.get(PrefSpringPath, str, "");
         springPath_->value(str);
+        ::free(str);
+
+        p.get(PrefSpringOptions, str, "");
+        springOptions_->value(str);
         ::free(str);
 
         p.get(PrefUnitSyncPath, str, "");
@@ -386,6 +395,7 @@ void SpringDialog::onSave()
 
         Fl_Preferences p(prefs_, name);
         p.set(PrefSpringPath, springPath_->value());
+        p.set(PrefSpringOptions, springOptions_->value());
         p.set(PrefUnitSyncPath, unitSyncPath_->value());
         initList();
     }
@@ -471,8 +481,13 @@ bool SpringDialog::setPaths()
         p.get(PrefSpringPath, str, "UNKNOWN");
         std::string springPath(str);
         ::free(str);
-
         model_.setSpringPath(springPath);
+
+        // Spring options
+        p.get(PrefSpringOptions, str, "");
+        std::string springOptions(str);
+        ::free(str);
+        model_.setSpringOptions(springOptions);
 
         // UnitSync
         p.get(PrefUnitSyncPath, str, "UNKNOWN");

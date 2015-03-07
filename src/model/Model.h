@@ -36,6 +36,7 @@ public:
     virtual ~Model();
 
     void setSpringPath(std::string const & path) { springPath_ = path; }
+    void setSpringOptions(std::string const & options) { springOptions_ = options; }
     void setUnitSyncPath(std::string const & path);
     void useExternalPrDownloader(bool useExternal);
     void setPrDownloaderCmd(std::string const & cmd);
@@ -292,6 +293,7 @@ private:
     unsigned int downloaderId_;
 
     std::string springPath_;
+    std::string springOptions_;
     std::string unitSyncPath_;
     bool useExternalPrDownloader_;
     std::string prDownloaderCmd_;

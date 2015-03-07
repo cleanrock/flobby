@@ -18,6 +18,7 @@ class Test : public CppUnit::TestFixture
     CPPUNIT_TEST( testMyImage );
     CPPUNIT_TEST( testLog );
     CPPUNIT_TEST( testTextFunctions );
+    CPPUNIT_TEST( testFlobbyDirs );
     CPPUNIT_TEST_SUITE_END();
 
  public:
@@ -33,6 +34,7 @@ class Test : public CppUnit::TestFixture
     void testMyImage();
     void testLog();
     void testTextFunctions();
+    void testFlobbyDirs();
 
 private:
     static void logThread(int id);

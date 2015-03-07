@@ -12,7 +12,6 @@
 static std::string configDir_;
 static std::string cacheDir_;
 
-static
 std::string wordExpand(std::string const& text)
 {
     std::string result;
@@ -25,8 +24,16 @@ std::string wordExpand(std::string const& text)
         {
             result = we.we_wordv[0];
         }
+        else if (we.we_wordc == 0)
+        {
+            LOG(WARNING)<< "wordexp returned zero words, text='" << text << "'";
+        }
         else
         {
+            for (size_t i = 0; i < we.we_wordc; ++i)
+            {
+                LOG(WARNING)<< "word "<< i << " '" << we.we_wordv[i] << "'";
+            }
             LOG(FATAL)<< "wordexp did not return one word ("<< (int)we.we_wordc << "), text='" << text << "'";
         }
         wordfree(&we);

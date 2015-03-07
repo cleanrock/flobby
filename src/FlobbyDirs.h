@@ -4,6 +4,7 @@
 
 #include <string>
 
+std::string wordExpand(std::string const& text);
 void initDirs(std::string const& dirOverride);
 
 // return values below ends with '/'

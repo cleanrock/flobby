@@ -1,6 +1,7 @@
 add_executable (unittest EXCLUDE_FROM_ALL
     test_main.cpp
     Test.cpp
+    ../FlobbyDirs.cpp
 )
 
 target_link_libraries (unittest

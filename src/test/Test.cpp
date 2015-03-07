@@ -5,6 +5,7 @@
 #include "gui/MyImage.h"
 #include "gui/TextFunctions.h"
 #include "log/Log.h"
+#include "FlobbyDirs.h"
 
 #include <boost/lexical_cast.hpp>
 #include <functional>
@@ -564,4 +565,24 @@ void Test::testTextFunctions()
     CPPUNIT_ASSERT_EQUAL(MR_CONTAINS_I, result.first);
     CPPUNIT_ASSERT("Hagf" == result.second);
 
+}
+
+void Test::testFlobbyDirs()
+{
+    {
+        std::string res = wordExpand("~");
+        std::cout << res << std::endl;
+        CPPUNIT_ASSERT(res.size() > 1);
+    }
+
+    {
+        std::string res = wordExpand("");
+        CPPUNIT_ASSERT(res.empty());
+    }
+
+    {
+        std::string const str = "asdasd";
+        std::string res = wordExpand(str);
+        CPPUNIT_ASSERT(res == str);
+    }
 }

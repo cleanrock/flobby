@@ -13,6 +13,11 @@ implement game hosting
 
 Zero-K
 ======
+default to lobby.zero-k.info
+
+D-17:46:25-Model.cpp:239] message: Say {"Place":5,"User":"cleanrock","IsEmote":true,"Text":"Server self-updating to new version","Ring":false}
+W-17:46:25-Model.cpp:2030] unhandled Say Place 5
+
 add auto-join channel when already joined that channel gives warning:
 D-18:38:44-ServerConn.cpp:109] ServerConn::send JoinChannel {"ChannelName":"zk"}
 D-18:38:44-Model.cpp:228] message: JoinChannelResponse {"ChannelName":"zk","Success":true,"Channel":{"Users":["cleanrock","Hectorion","Saktoth","RayJiff","weeler","Chesti","tommygun1","modschi","Orfelius","BigBlackWolf","gumbot","Kroon","giuseppe","sdkfyt32","Look89201","mur1","martinus7614","mm19","Nightwatch","MoriturusMortus","Cedda","TheBoltOfShadows","NorthChileanG","ax12","Licho","Infinitesimal","dorsh","[tre]PAK","Hutti","Svatopluk","DeinFreund","Fealthas","jacksjesus","GreatAnnhilator","ivand","vexeli","Deadlock","DanseMacabre","Tekster","Klon","Bobingabout","[ffc]killer","mestari02","terechsan","sampu1","BoBaH","RyMarq","DeadShadow42","ZZT","KaktuS","xponen","SpaceAids","SmokeDragon","pizza123","Immun1ty","aeonios","Holtex","Saandro86","noobcluster","Chrissi007","MyHome276","conanos","Baanshe","Karajan123","Alcur","entropy3","ThePiirakkaPvP","steffen519","Firepluk"],"ChannelName":"zk"}}
@@ -23,5 +28,8 @@ D-17:03:15-ServerConn.cpp:109] ServerConn::send LeaveChannel {"ChannelName":"sy"
 D-17:03:16-Model.cpp:231] message: ChannelUserRemoved {"ChannelName":"sy","UserName":"cleanrock"}
 W-17:03:16-Model.cpp:560] failed to process server msg:'ChannelUserRemoved {"ChannelName":"sy","UserName":"cleanrock"}' (row not found:cleanrock)
 
-implement SiteToLobbyCommand @start_replay
+implement SiteToLobbyCommand
 D-11:56:28-Model.cpp:239] message: Say {"Place":2,"Target":"cleanrock","User":"Nightwatch","IsEmote":false,"Text":"!JSON SiteToLobbyCommand {\"SpringLink\":\"@start_replay:http://zero-k.info/replays/20150228_144612_FrostBiteV2_91.sdf,Zero-K v1.3.2.7,FrostBiteV2,91.0\"}","Ring":false}
+D-12:15:23-Model.cpp:239] message: Say {"Place":2,"Target":"cleanrock","User":"Nightwatch","IsEmote":false,"Text":"!JSON SiteToLobbyCommand {\"SpringLink\":\"chat/user/cleanrock\"}","Ring":false}
+14:23 Nightwatch: !JSON SiteToLobbyCommand {"SpringLink":"@start_mission:Tutorial 2 - A Day Out r241"}
+14:24 Nightwatch: !JSON SiteToLobbyCommand {"SpringLink":"@host_mission:Tutorial 2 - A Day Out r241"}

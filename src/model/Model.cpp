@@ -752,7 +752,7 @@ void Model::startSpring()
         std::string const scriptPath = cacheDir() + "flobby_script.txt";
         script_.write(scriptPath);
         std::ostringstream oss;
-        oss << springPath_ << " " << scriptPath;
+        oss << springPath_ << " " << springOptions_ << " " << scriptPath;
 
         springId_ = controller_.startThread( boost::bind(&Model::runProcess, this, oss.str(), false) );
     }
