@@ -2026,6 +2026,10 @@ void Model::handle_Say(std::istream & is)
         battleChatMsgSignal_(jv["User"].asString(), jv["Text"].asString());
         break;
 
+    case 5: // MessageBox
+        serverMsgSignal_(jv["Text"].asString());
+        break;
+
     default:
         LOG(WARNING)<< "unhandled Say Place "<< place ;
         break;

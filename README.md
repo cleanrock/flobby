@@ -37,7 +37,7 @@ Command line arguments
     $ flobby -h
     usage: flobby [options]
         -d | --dir <dir> : use <dir> for flobby config and cache instead of XDG
-        -z | --zerok     : use zero-k lobby protocol
+        -z | --zerok     : use zero-k lobby protocol, use server address lobby.zero-k.info:8200
         -v | --version   : print flobby version
         -h | --help      : print help message
     plus standard fltk options:
