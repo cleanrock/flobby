@@ -1,9 +1,16 @@
 add_definitions(${CMAKE_CXX_FLAGS} "-std=c++0x")
 
+set(FLTK_SKIP_OPENGL true)
+set(FLTK_SKIP_FORMS true)
+# set(FLTK_SKIP_IMAGES true)
+set(FLTK_SKIP_FLUID true)
+find_package(FLTK REQUIRED)
+
 find_package(Boost COMPONENTS system filesystem regex chrono signals thread REQUIRED)
 
 include_directories (
     ${CMAKE_SOURCE_DIR}/src
+    ${FLTK_INCLUDE_DIR}
     ${Boost_INCLUDE_DIRS}
 )
 

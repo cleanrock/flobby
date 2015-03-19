@@ -1,9 +1,3 @@
-set(FLTK_SKIP_OPENGL true)
-set(FLTK_SKIP_FORMS true)
-# set(FLTK_SKIP_IMAGES true)
-set(FLTK_SKIP_FLUID true)
-find_package(FLTK REQUIRED)
-
 add_definitions( -DMAGICKCORE_QUANTUM_DEPTH=8 )
 add_definitions( -DMAGICKCORE_HDRI_ENABLE=0 )
 find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
@@ -11,7 +5,6 @@ find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
 find_package(X11 COMPONENTS X11_Xpm_LIB X11_Xscreensaver_LIB REQUIRED)
 
 include_directories (
-    ${FLTK_INCLUDE_DIR}
     ${ImageMagick_Magick++_INCLUDE_DIR}
 )
 
