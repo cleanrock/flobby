@@ -16,6 +16,7 @@ public:
     static bool enabled();
     static void enable(bool enable);
 
+    std::string path();
     void log(std::string const & text);
 
 private:

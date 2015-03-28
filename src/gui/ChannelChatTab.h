@@ -24,6 +24,7 @@ public:
     virtual ~ChannelChatTab();
     void leave();
     void append(std::string const & msg, int interest = -1);
+    std::string logPath();
 
 private:
     ITabs & iTabs_;

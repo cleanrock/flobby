@@ -23,6 +23,7 @@ public:
     virtual ~PrivateChatTab();
 
     std::string const& userName() const { return userName_; }
+    std::string logPath();
 
 private:
     friend class Tabs;

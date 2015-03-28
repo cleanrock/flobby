@@ -36,6 +36,11 @@ std::string const & LogFile::dir()
     return dir_;
 }
 
+std::string LogFile::path()
+{
+    return dir() + name_ + ".log";
+}
+
 void LogFile::log(std::string const & text)
 {
     if (!enabled_) return;
@@ -47,7 +52,7 @@ void LogFile::log(std::string const & text)
 
     if (!ofs_.is_open())
     {
-        std::string const fileName = dir() + name_ + ".log";
+        std::string const fileName = path();
         ofs_.open(fileName, std::fstream::app);
         if (!ofs_.good())
         {

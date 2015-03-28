@@ -18,10 +18,12 @@
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Input.H>
 #include <FL/fl_ask.H>
+#include <FL/filename.H>
 #include <FL/Fl.H>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 #include <sstream>
 #include <cassert>
 
@@ -215,6 +217,10 @@ int Tabs::handlePrivateChatClick(PrivateChatTab* pc)
     {
         PopupMenu menu;
         menu.add("Close", 1);
+        if (LogFile::enabled() && boost::filesystem::exists(pc->logPath()))
+        {
+            menu.add("Open log", 2);
+        }
 
         // add join battle
         int battleId;
@@ -226,7 +232,7 @@ int Tabs::handlePrivateChatClick(PrivateChatTab* pc)
             {
                 Battle const& battle = model_.getBattle(battleId);
                 std::string joinText = "Join " + battle.title();
-                menu.add(joinText, 2);
+                menu.add(joinText, 3);
             }
         }
         catch (std::invalid_argument const & e) {
@@ -242,6 +248,11 @@ int Tabs::handlePrivateChatClick(PrivateChatTab* pc)
             break;
 
         case 2:
+            openLogFile(pc->logPath());
+            handled = 1;
+            break;
+
+        case 3:
             try {
                 Battle const & battle = model_.getBattle(battleId); // throws if battle do not exist
                 if (battle.passworded()) {
@@ -278,12 +289,22 @@ int Tabs::handleChannelChatClick(ChannelChatTab* cc)
     {
         PopupMenu menu;
         menu.add("Leave", 1);
+        if (LogFile::enabled() && boost::filesystem::exists(cc->logPath()))
+        {
+            menu.add("Open log", 2);
+        }
+
         int const id = menu.show();
         switch (id)
         {
         case 1:
             cc->leave();
             closeTab(cc);
+            handled = 1;
+            break;
+
+        case 2:
+            openLogFile(cc->logPath());
             handled = 1;
             break;
         }
@@ -374,5 +395,22 @@ void Tabs::connected(bool connected)
             cc->append("Connected to server", -1);
         }
         redraw();
+    }
+}
+
+void Tabs::openLogFile(std::string const& path)
+{
+    std::string uri = "file://";
+    uri += path;
+
+    char msg[512];
+    int const res = fl_open_uri(uri.c_str(), msg, sizeof(msg));
+    if (res == 1)
+    {
+        LOG(DEBUG)<< "fl_open_uri success: " << msg;
+    }
+    else // 0
+    {
+        LOG(WARNING)<< "fl_open_uri failed: " << msg;
     }
 }

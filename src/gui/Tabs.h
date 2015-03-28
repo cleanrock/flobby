@@ -55,4 +55,5 @@ private:
     int handleChannelChatClick(ChannelChatTab* cc);
     void closeTab(Fl_Widget* w);
     void draw();
+    void openLogFile(std::string const& path);
 };

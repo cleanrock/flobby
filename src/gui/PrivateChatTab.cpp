@@ -166,3 +166,8 @@ void PrivateChatTab::append(std::string const & msg, int interest)
         Sound::beep();
     }
 }
+
+std::string PrivateChatTab::logPath()
+{
+    return logFile_.path();
+}

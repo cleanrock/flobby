@@ -255,3 +255,8 @@ void ChannelChatTab::onComplete(std::string const& text, std::size_t pos, std::p
         result.second = pairWordPos.second + userName.length();
     }
 }
+
+std::string ChannelChatTab::logPath()
+{
+    return logFile_.path();
+}
