@@ -5,7 +5,7 @@ find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
 find_package(X11 COMPONENTS X11_Xpm_LIB X11_Xscreensaver_LIB REQUIRED)
 
 include_directories (
-    ${ImageMagick_Magick++_INCLUDE_DIR}
+    ${ImageMagick_INCLUDE_DIRS}
 )
 
 add_library (gui STATIC
