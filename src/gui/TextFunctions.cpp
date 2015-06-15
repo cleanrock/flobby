@@ -4,6 +4,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <cctype>
+#include <ctime>
 
 std::pair<std::string, size_t> getLastWord(std::string const& text, std::size_t pos)
 {
@@ -105,4 +106,14 @@ std::pair<MatchResult, std::string> findMatch(std::vector<std::string> const& st
     }
 
     return result;
+}
+
+std::string getHourMinuteNow()
+{
+    char buf[8];
+    std::time_t t = std::time(0);
+    std::tm tm = *std::localtime(&t);
+    std::strftime(buf, 8, "%H:%M", &tm);
+
+    return std::string(buf);
 }

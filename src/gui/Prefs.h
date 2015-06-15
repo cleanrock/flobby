@@ -3,6 +3,8 @@
 #pragma once
 
 #include <FL/Fl_Preferences.H>
+#include <boost/signals2/signal.hpp>
+
 
 void initPrefs();
 Fl_Preferences& prefs();
@@ -18,3 +20,13 @@ char const * const PrefLoginPassword = "Password";
 
 char const * const PrefLogDebug = "LogDebug";
 char const * const PrefLogChats = "LogChats";
+
+struct BattleChatSettings
+{
+    bool showVoteLineMessages;
+    void save();
+};
+BattleChatSettings& battleChatSettings();
+typedef boost::signals2::signal<void (void)> BattleChatSettingsChangedSignal;
+boost::signals2::connection connectBattleChatSettingsChanged(BattleChatSettingsChangedSignal::slot_type subscriber);
+

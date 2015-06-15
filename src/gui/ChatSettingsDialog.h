@@ -51,6 +51,8 @@ private:
     Fl_Check_Button * privateChatBeep_;
     Fl_Multiline_Input * privateChatBeepExceptions_;
 
+    Fl_Check_Button * battleChatShowVoteLineMessages_;
+
     ChannelChatSettings channelChatSettings_;
     PrivateChatSettings privateChatSettings_;
 

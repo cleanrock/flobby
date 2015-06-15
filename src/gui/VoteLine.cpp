@@ -1,6 +1,7 @@
 // This file is part of flobby (GPL v2 or later), see the LICENSE file
 
 #include "VoteLine.h"
+#include "TextFunctions.h"
 
 #include "log/Log.h"
 #include "model/Model.h"
@@ -58,63 +59,92 @@ void VoteLine::onNo(Fl_Widget * w, void * data)
     o->model_.sayBattle("!n");
 }
 
-void VoteLine::processHostMessage(std::string const & msg)
+std::string VoteLine::checkSpringieVote(std::string const & msg)
 {
-    // check for Springie poll
+    std::string voteText;
+
+    if (msg.find("Poll: ") == 0)
     {
-        size_t const pos = msg.find("Poll: ");
-        if (pos == 0)
+        voteText = msg.substr(6);
+        if (msg.find("[END:") == std::string::npos)
         {
-            // Poll line
-            text_->copy_label(msg.substr(6).c_str());
-            if (msg.find("[END:") == std::string::npos)
-            {
-                activate();
-            }
-            else
-            {
-                deactivate();
-            }
-            return;
+            activate();
+        }
+        else
+        {
+            deactivate();
         }
     }
 
-    // check for SPADS poll
+    return voteText;
+}
+
+std::string VoteLine::checkSpadsVote(std::string const & msg)
+{
+    std::string voteText;
+
+    std::vector<std::string> const enablers =
     {
-        const std::vector<std::string> enablers =
-        {
-            "called a vote for command",
-            "Vote in progress:",
-        };
+        "called a vote for command",
+        "Vote in progress:",
+    };
 
-        for (const std::string& text : enablers)
+    for (std::string const & text : enablers)
+    {
+        if (std::string::npos != msg.find(text))
         {
-            if (std::string::npos != msg.find(text))
-            {
-                text_->copy_label(msg.c_str());
-                activate();
-                return;
-            }
+            activate();
+            voteText = msg;
+            return voteText;
         }
-
-        const std::vector<std::string> disablers =
-        {
-            "Vote for command",
-            "Vote cancelled",
-        };
-
-        for (const std::string& text : disablers)
-        {
-            if (std::string::npos != msg.find(text))
-            {
-                text_->copy_label(msg.c_str());
-                deactivate();
-                return;
-            }
-        }
-
     }
 
+    const std::vector<std::string> disablers =
+    {
+        "Vote for command",
+        "Vote cancelled",
+    };
+
+    for (const std::string& text : disablers)
+    {
+        if (std::string::npos != msg.find(text))
+        {
+            deactivate();
+            voteText = msg;
+            return voteText;
+        }
+    }
+
+    return voteText;
+}
+
+void VoteLine::addVoteLine(std::string const & voteText)
+{
+    std::string const timeNow = getHourMinuteNow();
+    std::ostringstream oss;
+    oss << timeNow << " " << voteText << '\n';
+    text_->copy_label(oss.str().c_str());
+}
+
+bool VoteLine::processHostMessage(std::string const & msg)
+{
+    std::string voteText;
+
+    voteText = checkSpringieVote(msg);
+    if (!voteText.empty())
+    {
+        addVoteLine(voteText);
+        return true;
+    }
+
+    voteText = checkSpadsVote(msg);
+    if (!voteText.empty())
+    {
+        addVoteLine(voteText);
+        return true;
+    }
+
+    return false;
 }
 
 /*

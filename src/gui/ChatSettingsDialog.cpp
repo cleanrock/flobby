@@ -44,6 +44,8 @@ ChatSettingsDialog::ChatSettingsDialog():
     privateChatBeepExceptions_ = new Fl_Multiline_Input(10, 220, 380, 50, "Private chat beep exceptions (user names)");
     privateChatBeepExceptions_->align(FL_ALIGN_TOP_LEFT);
 
+    battleChatShowVoteLineMessages_= new Fl_Check_Button(10, 290, 380, 30, "Show vote line messages in battle chat");
+
     {
         int index;
         int y = 30;
@@ -134,6 +136,11 @@ void ChatSettingsDialog::loadPrefs()
         ::free(text);
     }
 
+    // battle chat
+    {
+        battleChatShowVoteLineMessages_->value(battleChatSettings().showVoteLineMessages);
+    }
+
     // chat text color
     {
         prefs().get(PrefTimeColor, val, FL_INACTIVE_COLOR);
@@ -180,6 +187,12 @@ void ChatSettingsDialog::savePrefs()
         prefs().set(PrefPrivateChatBeepExceptions, beepExceptions.c_str());
     }
 
+    // battle chat
+    {
+        battleChatSettings().showVoteLineMessages = battleChatShowVoteLineMessages_->value();
+        battleChatSettings().save();
+    }
+
     // chat text color
     {
         prefs().set(PrefTimeColor, static_cast<int>(textColor_[TextDisplay2::STYLE_TIME]->color()) );
@@ -221,6 +234,11 @@ void ChatSettingsDialog::setCurrentSettings()
         ba::split( words, text, ba::is_any_of("\n "), ba::token_compress_on );
         words.erase( std::remove_if(words.begin(), words.end(), std::mem_fun_ref(&std::string::empty)), words.end() );
         privateChatSettings_.beepExceptions = words;
+    }
+
+    // battle chat
+    {
+        battleChatSettings().showVoteLineMessages = (battleChatShowVoteLineMessages_->value() == 1);
     }
 
     // chat text color

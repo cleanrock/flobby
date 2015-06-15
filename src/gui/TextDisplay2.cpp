@@ -3,13 +3,14 @@
 #include "TextDisplay2.h"
 #include "PopupMenu.h"
 #include "log/Log.h"
+#include "TextFunctions.h"
 
 #include <FL/filename.H>
 #include <FL/Fl.H>
 #include <boost/algorithm/string.hpp>
 #include <sstream>
 #include <cstring>
-#include <ctime>
+
 
 Fl_Text_Display::Style_Table_Entry TextDisplay2::textStyles_[STYLE_COUNT];
 
@@ -67,19 +68,16 @@ void TextDisplay2::append(std::string const & text, int interest)
         boost::replace_all(text2, "\\n", "\n");
 
         // time stamp
-        char buf[16];
-        std::time_t t = std::time(0);
-        std::tm tm = *std::localtime(&t);
-        std::strftime(buf, 16, "%H:%M ", &tm);
+        std::string const timeNow = getHourMinuteNow();
 
         std::ostringstream oss;
-        oss << buf << text2 << '\n';
+        oss << timeNow << " " << text2 << '\n';
         std::string const line = oss.str();
 
         text_->append(line.c_str());
 
-        // style for time
-        std::string const styleTime(::strlen(buf), 'A');
+        // style for time (including trailing space)
+        std::string const styleTime(timeNow.size()+1, 'A');
         style_->append(styleTime.c_str());
 
         // style for rest (text + newline)

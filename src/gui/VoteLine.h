@@ -15,7 +15,7 @@ public:
     VoteLine(int x, int y, int w, int h, Model & model);
     virtual ~VoteLine();
 
-    void processHostMessage(std::string const & text);
+    bool processHostMessage(std::string const & text);
 
 private:
     Model & model_;
@@ -26,14 +26,7 @@ private:
     static void onYes(Fl_Widget * w, void * data);
     static void onNo(Fl_Widget * w, void * data);
 
-    // TODO keeping old for multiple host types
-/*
-    std::string question_;
-    int votesYes_;
-    int votesNo_;
-    int votesTotal_;
-    std::string votes_;
-
-    void makeVotesString();
-*/
+    std::string checkSpringieVote(std::string const & msg);
+    std::string checkSpadsVote(std::string const & msg);
+    void addVoteLine(std::string const & voteText);
 };

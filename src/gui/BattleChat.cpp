@@ -6,6 +6,7 @@
 #include "ChatInput.h"
 #include "VoteLine.h"
 #include "Sound.h"
+#include "Prefs.h"
 
 #include "model/Model.h"
 
@@ -63,7 +64,10 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
     // handle messages from host
     if (userName == battleHost_)
     {
-        voteLine_->processHostMessage(msg);
+        if (voteLine_->processHostMessage(msg) && !battleChatSettings().showVoteLineMessages)
+        {
+            return;
+        }
 
         // detect relayed in-game messages, e.g. "[userName] bla"
         std::string inGameUserName;
