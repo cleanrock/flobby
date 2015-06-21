@@ -47,6 +47,7 @@ public:
 
     int run(int argc, char** argv);
 
+    static void postQuitEvent();
     void addCallbackEvent(void (*cb)(void*) /* Fl_Awake_Handler */, void *data);
 
 private:
@@ -136,6 +137,7 @@ private:
     static void checkAway(void* d);
     static void doGenJob(void* d);
     static void closeProgressDialog(void* d);
+    static void quitHandler(void* d);
 
     void enableMenuItem(void(*cb)(Fl_Widget*, void*), bool enable);
 

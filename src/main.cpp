@@ -7,6 +7,7 @@
 #include "model/Model.h"
 #include "gui/UserInterface.h"
 #include <FL/Fl.H>
+#include <csignal>
 // TODO #include <pr-downloader.h>
 
 static std::string dir_;
@@ -58,8 +59,25 @@ int parseArgs(int argc, char** argv, int& i)
     return 0;
 }
 
+void my_handler(int s)
+{
+    // printf("Caught signal %d\n",s);
+    UserInterface::postQuitEvent();
+}
+
 int main(int argc, char * argv[])
 {
+    // setup handling of SIGINT (Ctrl-C)
+    {
+        struct sigaction sigIntHandler;
+
+        sigIntHandler.sa_handler = my_handler;
+        sigemptyset(&sigIntHandler.sa_mask);
+        sigIntHandler.sa_flags = 0;
+
+        sigaction(SIGINT, &sigIntHandler, NULL);
+    }
+
     std::string commandLine;
     for (int i=0; i<argc; ++i)
     {

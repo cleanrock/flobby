@@ -60,6 +60,7 @@ static char const * PrefAutoJoinChannels = "AutoJoinChannels";
 
 
 static XScreenSaverInfo* xScreenSaverInfo = 0;
+static UserInterface* gUserInterface = nullptr;
 
 UserInterface::UserInterface(Model & model) :
     model_(model),
@@ -160,6 +161,8 @@ UserInterface::UserInterface(Model & model) :
     model.connectDownloadDone( boost::bind(&UserInterface::downloadDone, this, _1, _2, _3) );
 
     Magick::InitializeMagick(0);
+
+    gUserInterface = this;
 }
 
 UserInterface::~UserInterface()
@@ -770,4 +773,16 @@ void UserInterface::doGenJob(void* d)
 
         Fl::add_timeout(0.01, doGenJob, d);
     }
+}
+
+void UserInterface::quitHandler(void* d)
+{
+    UserInterface * ui = static_cast<UserInterface*>(d);
+    ui->quit();
+}
+
+void UserInterface::postQuitEvent()
+{
+    if (!gUserInterface) return;
+    gUserInterface->addCallbackEvent(quitHandler, gUserInterface);
 }
