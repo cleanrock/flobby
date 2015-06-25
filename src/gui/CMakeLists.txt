@@ -49,6 +49,8 @@ add_library (gui STATIC
     DownloadSettingsDialog.cpp
 )
 
+add_dependencies(gui FlobbyConfig)
+
 target_link_libraries (gui
     ${FLTK_LIBRARIES}
     ${ImageMagick_Magick++_LIBRARY}

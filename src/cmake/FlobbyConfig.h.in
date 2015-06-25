@@ -3,4 +3,4 @@
 #pragma once
 
 // the git tag / commit we build from
-#define FLOBBY_VERSION "@FLOBBY_REV@"
+#define FLOBBY_VERSION "@FLOBBY_VERSION@"

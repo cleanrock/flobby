@@ -20,6 +20,8 @@ add_library (model STATIC
     ServerCommands.cpp
 )
 
+add_dependencies(model FlobbyConfig)
+
 target_link_libraries (model
     md5
     dl
