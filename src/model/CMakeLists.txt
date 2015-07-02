@@ -18,6 +18,7 @@ add_library (model STATIC
     AI.cpp
     UserId.cpp
     ServerCommands.cpp
+    Nightwatch.cpp
 )
 
 add_dependencies(model FlobbyConfig)

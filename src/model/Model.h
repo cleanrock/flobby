@@ -454,6 +454,7 @@ private:
     void handle_ChannelUserAdded(std::istream & is);
     void handle_ChannelUserRemoved(std::istream & is);
     void handle_Say(std::istream & is);
+    bool handle_Nightwatch(Json::Value & jv);
     void handle_UpdateUserBattleStatus(std::istream & is);
     void handle_SetRectangle(std::istream & is);
     void handle_UpdateBotStatus(std::istream & is);

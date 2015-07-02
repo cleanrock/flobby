@@ -10,6 +10,7 @@
 #include "UnitSync.h"
 #include "UserId.h"
 #include "ServerCommands.h"
+#include "Nightwatch.h"
 
 #include "md5/md5.h"
 #include "md5/base64.h"
@@ -660,16 +661,25 @@ void Model::sayPrivate(std::string const & userName, std::string const & msg)
     std::ostringstream oss;
     if (zerok_)
     {
+        bool const offline = (users_.find(userName) == users_.end());
+
         Json::Value jv;
         jv["Place"] = 2;
-        jv["Target"] = userName;
+        jv["Target"] = offline ? "Nightwatch" : userName;
         jv["User"] = userName_;
         jv["IsEmote"] = false;
-        jv["Text"] = msg;
+        jv["Text"] = offline ? "!pm " + userName + " " + msg : msg;
         jv["Ring"] = true;
 
         Json::FastWriter writer;
         oss << "Say " << writer.write(jv);
+
+        if (offline)
+        {
+            std::string const offlineMsg = "offline message sent: " + msg;
+
+            sayPrivateSignal_(userName, offlineMsg);
+        }
     }
     else
     {
@@ -1981,6 +1991,38 @@ void Model::handle_SAID_SAIDEX(std::istream & is) // channelName userName {messa
     saidChannelSignal_(channelName, userName, msg);
 }
 
+bool Model::handle_Nightwatch(Json::Value & jv)
+{
+    std::string const text = jv["Text"].asString();
+
+    if (text.find("!pm|") == 0)
+    {
+        NightwatchPm const pm = checkNightwatchPm(text);
+        if (pm.valid_ && !pm.user_.empty())
+        {
+            std::ostringstream ossTimeText;
+            ossTimeText << "[" << pm.time_ << "] " << pm.text_;
+
+            if (!pm.channel_.empty())
+            {
+                saidChannelSignal_(
+                    pm.channel_,
+                    pm.user_,
+                    ossTimeText.str() );
+            }
+            else
+            {
+                saidPrivateSignal_(
+                    pm.user_,
+                    ossTimeText.str() );
+            }
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void Model::handle_Say(std::istream & is)
 {
     Json::Value jv;
@@ -2000,7 +2042,11 @@ void Model::handle_Say(std::istream & is)
     {
         std::string const target = jv["Target"].asString();
         std::string const user = jv["User"].asString();
-        if (target == userName_)
+        if (user == "Nightwatch" && handle_Nightwatch(jv))
+        {
+            // all is done in handle_Nightwatch
+        }
+        else if (target == userName_)
         {
             saidPrivateSignal_(
                 user,

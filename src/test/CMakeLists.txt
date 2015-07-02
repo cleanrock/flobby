@@ -11,6 +11,7 @@ target_link_libraries (unittest
     log
     dl
     ${Boost_LIBRARIES}
+    pthread
 ) 
 
 add_custom_target(runtest

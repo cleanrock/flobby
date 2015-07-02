@@ -6,6 +6,7 @@
 #include "gui/TextFunctions.h"
 #include "log/Log.h"
 #include "FlobbyDirs.h"
+#include "model/Nightwatch.h"
 
 #include <boost/lexical_cast.hpp>
 #include <functional>
@@ -585,4 +586,40 @@ void Test::testFlobbyDirs()
         std::string res = wordExpand(str);
         CPPUNIT_ASSERT(res == str);
     }
+}
+
+void Test::testNightwatch()
+{
+    // ok simple pm channel message
+    {
+        NightwatchPm const res = checkNightwatchPm("!pm|chan1|user1|07/01/2015 03:32:14|text1");
+        CPPUNIT_ASSERT(res.valid_ == true);
+        CPPUNIT_ASSERT(res.channel_ == "chan1");
+        CPPUNIT_ASSERT(res.user_ == "user1");
+        CPPUNIT_ASSERT(res.time_ == "07/01/2015 03:32:14");
+        CPPUNIT_ASSERT(res.text_ == "text1");
+    }
+
+    // ok private chat message with || in text
+    {
+        NightwatchPm const res = checkNightwatchPm("!pm||user2|07/01/2015 03:32:15|text2||");
+        CPPUNIT_ASSERT(res.valid_ == true);
+        CPPUNIT_ASSERT(res.channel_ == "");
+        CPPUNIT_ASSERT(res.user_ == "user2");
+        CPPUNIT_ASSERT(res.time_ == "07/01/2015 03:32:15");
+        CPPUNIT_ASSERT(res.text_ == "text2||");
+    }
+
+    // bad pm
+    {
+        NightwatchPm const res = checkNightwatchPm("!pm|crap");
+        CPPUNIT_ASSERT(res.valid_ == false);
+    }
+
+    // bad pm missing initial !
+    {
+        NightwatchPm const res = checkNightwatchPm("pm||User2|07/01/2015 03:32:14|crap||");
+        CPPUNIT_ASSERT(res.valid_ == false);
+    }
+
 }
