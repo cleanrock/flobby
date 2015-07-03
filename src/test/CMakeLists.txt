@@ -1,4 +1,4 @@
-find_package(Boost REQUIRED COMPONENTS system filesystem regex chrono signals thread OPTIONAL_COMPONENTS unit_test_framework)
+find_package(Boost COMPONENTS system filesystem regex chrono signals thread unit_test_framework)
 
 add_executable (unittest EXCLUDE_FROM_ALL
     Test.cpp
