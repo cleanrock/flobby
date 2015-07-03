@@ -5,7 +5,7 @@ set(FLTK_SKIP_FORMS true)
 # set(FLTK_SKIP_IMAGES true)
 set(FLTK_SKIP_FLUID true)
 find_package(FLTK REQUIRED)
-find_package(Boost COMPONENTS system filesystem regex chrono signals thread REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system filesystem regex chrono signals thread)
 
 ADD_CUSTOM_TARGET(FlobbyConfig
     ${CMAKE_COMMAND} -D FLOBBY_ROOT=${CMAKE_SOURCE_DIR}

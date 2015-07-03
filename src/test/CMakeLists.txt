@@ -1,11 +1,11 @@
+find_package(Boost REQUIRED COMPONENTS system filesystem regex chrono signals thread OPTIONAL_COMPONENTS unit_test_framework)
+
 add_executable (unittest EXCLUDE_FROM_ALL
-    test_main.cpp
     Test.cpp
     ../FlobbyDirs.cpp
 )
 
 target_link_libraries (unittest
-    cppunit
     model
     gui
     log

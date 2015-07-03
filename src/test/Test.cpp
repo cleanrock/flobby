@@ -1,6 +1,5 @@
 // This file is part of flobby (GPL v2 or later), see the LICENSE file
 
-#include "Test.h"
 #include "model/Model.h"
 #include "gui/MyImage.h"
 #include "gui/TextFunctions.h"
@@ -9,83 +8,98 @@
 #include "model/Nightwatch.h"
 
 #include <boost/lexical_cast.hpp>
+#define BOOST_TEST_DYN_LINK // this will define BOOST_TEST_ALTERNATIVE_INIT_API in boost/test/detail/config.hpp
+#define BOOST_TEST_ALTERNATIVE_INIT_API // here for clarity
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 #include <functional>
 #include <thread>
 #include <stdexcept>
 #include <sstream>
 #include <string>
 #include <memory>
+#include <iostream>
 
-// Registers the fixture into the 'registry'
-CPPUNIT_TEST_SUITE_REGISTRATION( Test );
-
-void Test::setUp()
+static
+bool init_unit_test()
 {
+    std::string logFileName = "unittest.log";
+    // reset log file
+    {
+        std::ofstream ofs(logFileName);
+    }
+    Log::logFile(logFileName);
+    Log::minSeverity(DEBUG);
+
+    return true;
 }
 
-void Test::tearDown()
+int BOOST_TEST_CALL_DECL
+main( int argc, char* argv[] )
 {
+    return ::boost::unit_test::unit_test_main( &init_unit_test, argc, argv );
 }
 
-void Test::testUserStatus()
+
+BOOST_AUTO_TEST_CASE(testUserStatus)
 {
     // test default ctor
     {
         UserStatus us;
-        CPPUNIT_ASSERT(!us.inGame());
-        CPPUNIT_ASSERT(!us.away());
-        CPPUNIT_ASSERT(us.rank() == 0);
-        CPPUNIT_ASSERT(!us.moderator());
-        CPPUNIT_ASSERT(!us.bot());
+        BOOST_CHECK(!us.inGame());
+        BOOST_CHECK(!us.away());
+        BOOST_CHECK(us.rank() == 0);
+        BOOST_CHECK(!us.moderator());
+        BOOST_CHECK(!us.bot());
     }
 
     // test when all bits set
     {
         UserStatus us("127");
-        CPPUNIT_ASSERT(us.inGame());
-        CPPUNIT_ASSERT(us.away());
-        CPPUNIT_ASSERT(us.rank() == 7);
-        CPPUNIT_ASSERT(us.moderator());
-        CPPUNIT_ASSERT(us.bot());
+        BOOST_CHECK(us.inGame());
+        BOOST_CHECK(us.away());
+        BOOST_CHECK(us.rank() == 7);
+        BOOST_CHECK(us.moderator());
+        BOOST_CHECK(us.bot());
 
     }
 
     // test rank is 6
     {
         UserStatus us("24");
-        CPPUNIT_ASSERT(!us.inGame());
-        CPPUNIT_ASSERT(!us.away());
-        CPPUNIT_ASSERT(us.rank() == 6);
-        CPPUNIT_ASSERT(!us.moderator());
-        CPPUNIT_ASSERT(!us.bot());
+        BOOST_CHECK(!us.inGame());
+        BOOST_CHECK(!us.away());
+        BOOST_CHECK(us.rank() == 6);
+        BOOST_CHECK(!us.moderator());
+        BOOST_CHECK(!us.bot());
     }
 
     // test set inGame
     {
         UserStatus us;
         us.inGame(true);
-        CPPUNIT_ASSERT(us.inGame());
-        CPPUNIT_ASSERT(!us.away());
-        CPPUNIT_ASSERT(us.rank() == 0);
-        CPPUNIT_ASSERT(!us.moderator());
-        CPPUNIT_ASSERT(!us.bot());
+        BOOST_CHECK(us.inGame());
+        BOOST_CHECK(!us.away());
+        BOOST_CHECK(us.rank() == 0);
+        BOOST_CHECK(!us.moderator());
+        BOOST_CHECK(!us.bot());
     }
 
     // test set away
     {
         UserStatus us;
         us.away(true);
-        CPPUNIT_ASSERT(!us.inGame());
-        CPPUNIT_ASSERT(us.away());
-        CPPUNIT_ASSERT(us.rank() == 0);
-        CPPUNIT_ASSERT(!us.moderator());
-        CPPUNIT_ASSERT(!us.bot());
+        BOOST_CHECK(!us.inGame());
+        BOOST_CHECK(us.away());
+        BOOST_CHECK(us.rank() == 0);
+        BOOST_CHECK(!us.moderator());
+        BOOST_CHECK(!us.bot());
     }
 
     // test exception is thrown on bad input to ctor
     {
-        CPPUNIT_ASSERT_THROW(UserStatus us(""), boost::bad_lexical_cast);
-        CPPUNIT_ASSERT_THROW(UserStatus us("ABC"), boost::bad_lexical_cast);
+        BOOST_CHECK_THROW(UserStatus us(""), boost::bad_lexical_cast)
+        BOOST_CHECK_THROW(UserStatus us("ABC"), boost::bad_lexical_cast);
     }
 
 
@@ -96,39 +110,39 @@ void Test::testUserStatus()
         UserStatus us3("24");
         UserStatus us4("127");
 
-        CPPUNIT_ASSERT( us2 == us3 );
+        BOOST_CHECK( us2 == us3 );
 
-        CPPUNIT_ASSERT( us1 != us2 );
-        CPPUNIT_ASSERT( us1 != us3 );
-        CPPUNIT_ASSERT( us3 != us4 );
+        BOOST_CHECK( us1 != us2 );
+        BOOST_CHECK( us1 != us3 );
+        BOOST_CHECK( us3 != us4 );
     }
 
 }
 
-void Test::testUserBattleStatus()
+BOOST_AUTO_TEST_CASE(testUserBattleStatus)
 {
     // test default ctor
     {
         UserBattleStatus ubs;
-        CPPUNIT_ASSERT(!ubs.ready());
-        CPPUNIT_ASSERT(ubs.team() == 0);
-        CPPUNIT_ASSERT(ubs.allyTeam() == 0);
-        CPPUNIT_ASSERT(ubs.spectator());
-        CPPUNIT_ASSERT(ubs.handicap() == 0);
-        CPPUNIT_ASSERT(ubs.sync() == 0);
-        CPPUNIT_ASSERT(ubs.side() == 0);
+        BOOST_CHECK(!ubs.ready());
+        BOOST_CHECK(ubs.team() == 0);
+        BOOST_CHECK(ubs.allyTeam() == 0);
+        BOOST_CHECK(ubs.spectator());
+        BOOST_CHECK(ubs.handicap() == 0);
+        BOOST_CHECK(ubs.sync() == 0);
+        BOOST_CHECK(ubs.side() == 0);
     }
 
     // test when all bits set
     {
         UserBattleStatus ubs("2147483647");
-        CPPUNIT_ASSERT(ubs.ready());
-        CPPUNIT_ASSERT(ubs.team() == 15);
-        CPPUNIT_ASSERT(ubs.allyTeam() == 15);
-        CPPUNIT_ASSERT(!ubs.spectator());
-        CPPUNIT_ASSERT(ubs.handicap() == 127);
-        CPPUNIT_ASSERT(ubs.sync() == 3);
-        CPPUNIT_ASSERT(ubs.side() == 15);
+        BOOST_CHECK(ubs.ready());
+        BOOST_CHECK(ubs.team() == 15);
+        BOOST_CHECK(ubs.allyTeam() == 15);
+        BOOST_CHECK(!ubs.spectator());
+        BOOST_CHECK(ubs.handicap() == 127);
+        BOOST_CHECK(ubs.sync() == 3);
+        BOOST_CHECK(ubs.side() == 15);
     }
 
     // test set methods
@@ -139,19 +153,19 @@ void Test::testUserBattleStatus()
         ubs.allyTeam(7);
         ubs.team(3);
         ubs.sync(1);
-        CPPUNIT_ASSERT(ubs.ready());
-        CPPUNIT_ASSERT(ubs.team() == 3);
-        CPPUNIT_ASSERT(ubs.allyTeam() == 7);
-        CPPUNIT_ASSERT(!ubs.spectator());
-        CPPUNIT_ASSERT(ubs.handicap() == 0);
-        CPPUNIT_ASSERT(ubs.sync() == 1);
-        CPPUNIT_ASSERT(ubs.side() == 0);
+        BOOST_CHECK(ubs.ready());
+        BOOST_CHECK(ubs.team() == 3);
+        BOOST_CHECK(ubs.allyTeam() == 7);
+        BOOST_CHECK(!ubs.spectator());
+        BOOST_CHECK(ubs.handicap() == 0);
+        BOOST_CHECK(ubs.sync() == 1);
+        BOOST_CHECK(ubs.side() == 0);
     }
 
     // test exception is thrown on bad input to ctor
     {
-        CPPUNIT_ASSERT_THROW(UserBattleStatus ubs(""), boost::bad_lexical_cast);
-        CPPUNIT_ASSERT_THROW(UserBattleStatus ubs("ABC"), boost::bad_lexical_cast);
+        BOOST_CHECK_THROW(UserBattleStatus ubs(""), boost::bad_lexical_cast);
+        BOOST_CHECK_THROW(UserBattleStatus ubs("ABC"), boost::bad_lexical_cast);
     }
 
 
@@ -162,16 +176,16 @@ void Test::testUserBattleStatus()
         UserStatus ubs3("24");
         UserStatus ubs4("127");
 
-        CPPUNIT_ASSERT( ubs2 == ubs3 );
+        BOOST_CHECK( ubs2 == ubs3 );
 
-        CPPUNIT_ASSERT( ubs1 != ubs2 );
-        CPPUNIT_ASSERT( ubs1 != ubs3 );
-        CPPUNIT_ASSERT( ubs3 != ubs4 );
+        BOOST_CHECK( ubs1 != ubs2 );
+        BOOST_CHECK( ubs1 != ubs3 );
+        BOOST_CHECK( ubs3 != ubs4 );
     }
 
 }
 
-void Test::testUser()
+BOOST_AUTO_TEST_CASE(testUser)
 {
     // simple positive
     {
@@ -184,9 +198,9 @@ void Test::testUser()
            << cpu;
         User u(ss);
 
-        CPPUNIT_ASSERT_EQUAL(u.name(), name);
-        CPPUNIT_ASSERT_EQUAL(u.country(), country);
-        CPPUNIT_ASSERT_EQUAL(u.cpu(), cpu);
+        BOOST_CHECK_EQUAL(u.name(), name);
+        BOOST_CHECK_EQUAL(u.country(), country);
+        BOOST_CHECK_EQUAL(u.cpu(), cpu);
 
         // print for ocular inspection
         std::cout << u << std::endl;
@@ -196,14 +210,14 @@ void Test::testUser()
     {
         std::stringstream ss("username CC ");
 
-        CPPUNIT_ASSERT_THROW(User u(ss), std::invalid_argument);
+        BOOST_CHECK_THROW(User u(ss), std::invalid_argument);
     }
 
     // test exception is thrown on empty
     {
         std::stringstream ss("");
 
-        CPPUNIT_ASSERT_THROW(User u(ss), std::invalid_argument);
+        BOOST_CHECK_THROW(User u(ss), std::invalid_argument);
     }
 
     // test operators
@@ -217,13 +231,13 @@ void Test::testUser()
         std::stringstream ss3("name2 SE 0");
         User u3(ss3);
 
-        CPPUNIT_ASSERT(u1 == u2);
-        CPPUNIT_ASSERT(u1 != u3);
+        BOOST_CHECK(u1 == u2);
+        BOOST_CHECK(u1 != u3);
     }
 
 }
 
-void Test::testBattle()
+BOOST_AUTO_TEST_CASE(testBattle)
 {
     // simple positive
     {
@@ -241,27 +255,27 @@ void Test::testBattle()
 
         Battle b(ssOpened);
 
-        CPPUNIT_ASSERT(b.id() == 8235);
-        CPPUNIT_ASSERT(b.replay() == false);
-        CPPUNIT_ASSERT(b.natType() == 0);
-        CPPUNIT_ASSERT(b.founder() == "Founder");
-        CPPUNIT_ASSERT(b.ip() == "94.23.170.70");
-        CPPUNIT_ASSERT(b.port() == "8463");
-        CPPUNIT_ASSERT(b.maxPlayers() == 32);
-        CPPUNIT_ASSERT(b.passworded() == false);
-        CPPUNIT_ASSERT(b.rank() == 0);
-        CPPUNIT_ASSERT(b.mapHash() == -112462944);
-        CPPUNIT_ASSERT(b.mapHash() == static_cast<unsigned int>(-112462944));
-        CPPUNIT_ASSERT(b.engineName() == "engineName");
-        CPPUNIT_ASSERT(b.engineVersion() == "engineVersion");
-        CPPUNIT_ASSERT(b.engineBranch() == "");
-        CPPUNIT_ASSERT(b.engineVersionLong() == "engineVersion");
-        CPPUNIT_ASSERT(b.mapName() == "Map name");
-        CPPUNIT_ASSERT(b.title() == "Battle title");
-        CPPUNIT_ASSERT(b.modName() == "Mod name");
-        CPPUNIT_ASSERT(b.spectators() == 0);
-        CPPUNIT_ASSERT(b.locked() == false);
-        CPPUNIT_ASSERT(b.modHash() == 0);
+        BOOST_CHECK(b.id() == 8235);
+        BOOST_CHECK(b.replay() == false);
+        BOOST_CHECK(b.natType() == 0);
+        BOOST_CHECK(b.founder() == "Founder");
+        BOOST_CHECK(b.ip() == "94.23.170.70");
+        BOOST_CHECK(b.port() == "8463");
+        BOOST_CHECK(b.maxPlayers() == 32);
+        BOOST_CHECK(b.passworded() == false);
+        BOOST_CHECK(b.rank() == 0);
+        BOOST_CHECK(b.mapHash() == -112462944);
+        BOOST_CHECK(b.mapHash() == static_cast<unsigned int>(-112462944));
+        BOOST_CHECK(b.engineName() == "engineName");
+        BOOST_CHECK(b.engineVersion() == "engineVersion");
+        BOOST_CHECK(b.engineBranch() == "");
+        BOOST_CHECK(b.engineVersionLong() == "engineVersion");
+        BOOST_CHECK(b.mapName() == "Map name");
+        BOOST_CHECK(b.title() == "Battle title");
+        BOOST_CHECK(b.modName() == "Mod name");
+        BOOST_CHECK(b.spectators() == 0);
+        BOOST_CHECK(b.locked() == false);
+        BOOST_CHECK(b.modHash() == 0);
 
 
         std::string const updated =
@@ -274,11 +288,11 @@ void Test::testBattle()
         b.updateBattleInfo(ssUpdated);
         b.modHash(9786);
 
-        CPPUNIT_ASSERT(b.spectators() == 3);
-        CPPUNIT_ASSERT(b.locked() == true);
-        CPPUNIT_ASSERT(b.mapHash() == -1517218254);
-        CPPUNIT_ASSERT(b.mapName() == "New map name");
-        CPPUNIT_ASSERT(b.modHash() == 9786);
+        BOOST_CHECK(b.spectators() == 3);
+        BOOST_CHECK(b.locked() == true);
+        BOOST_CHECK(b.mapHash() == -1517218254);
+        BOOST_CHECK(b.mapName() == "New map name");
+        BOOST_CHECK(b.modHash() == 9786);
 
         // print for ocular inspection
         std::cout << b << std::endl;
@@ -300,27 +314,27 @@ void Test::testBattle()
 
         Battle b(ssOpened);
 
-        CPPUNIT_ASSERT(b.id() == 8235);
-        CPPUNIT_ASSERT(b.replay() == false);
-        CPPUNIT_ASSERT(b.natType() == 0);
-        CPPUNIT_ASSERT(b.founder() == "Founder");
-        CPPUNIT_ASSERT(b.ip() == "94.23.170.70");
-        CPPUNIT_ASSERT(b.port() == "8463");
-        CPPUNIT_ASSERT(b.maxPlayers() == 32);
-        CPPUNIT_ASSERT(b.passworded() == false);
-        CPPUNIT_ASSERT(b.rank() == 0);
-        CPPUNIT_ASSERT(b.mapHash() == -112462944);
-        CPPUNIT_ASSERT(b.mapHash() == static_cast<unsigned int>(-112462944));
-        CPPUNIT_ASSERT(b.engineName() == "engineName");
-        CPPUNIT_ASSERT(b.engineVersion() == "engineVersion");
-        CPPUNIT_ASSERT(b.engineBranch() == "develop");
-        CPPUNIT_ASSERT(b.engineVersionLong() == "engineVersion (develop)");
-        CPPUNIT_ASSERT(b.mapName() == "Map name");
-        CPPUNIT_ASSERT(b.title() == "Battle title");
-        CPPUNIT_ASSERT(b.modName() == "Mod name");
-        CPPUNIT_ASSERT(b.spectators() == 0);
-        CPPUNIT_ASSERT(b.locked() == false);
-        CPPUNIT_ASSERT(b.modHash() == 0);
+        BOOST_CHECK(b.id() == 8235);
+        BOOST_CHECK(b.replay() == false);
+        BOOST_CHECK(b.natType() == 0);
+        BOOST_CHECK(b.founder() == "Founder");
+        BOOST_CHECK(b.ip() == "94.23.170.70");
+        BOOST_CHECK(b.port() == "8463");
+        BOOST_CHECK(b.maxPlayers() == 32);
+        BOOST_CHECK(b.passworded() == false);
+        BOOST_CHECK(b.rank() == 0);
+        BOOST_CHECK(b.mapHash() == -112462944);
+        BOOST_CHECK(b.mapHash() == static_cast<unsigned int>(-112462944));
+        BOOST_CHECK(b.engineName() == "engineName");
+        BOOST_CHECK(b.engineVersion() == "engineVersion");
+        BOOST_CHECK(b.engineBranch() == "develop");
+        BOOST_CHECK(b.engineVersionLong() == "engineVersion (develop)");
+        BOOST_CHECK(b.mapName() == "Map name");
+        BOOST_CHECK(b.title() == "Battle title");
+        BOOST_CHECK(b.modName() == "Mod name");
+        BOOST_CHECK(b.spectators() == 0);
+        BOOST_CHECK(b.locked() == false);
+        BOOST_CHECK(b.modHash() == 0);
 
 
         std::string const updated =
@@ -333,11 +347,11 @@ void Test::testBattle()
         b.updateBattleInfo(ssUpdated);
         b.modHash(9786);
 
-        CPPUNIT_ASSERT(b.spectators() == 3);
-        CPPUNIT_ASSERT(b.locked() == true);
-        CPPUNIT_ASSERT(b.mapHash() == -1517218254);
-        CPPUNIT_ASSERT(b.mapName() == "New map name");
-        CPPUNIT_ASSERT(b.modHash() == 9786);
+        BOOST_CHECK(b.spectators() == 3);
+        BOOST_CHECK(b.locked() == true);
+        BOOST_CHECK(b.mapHash() == -1517218254);
+        BOOST_CHECK(b.mapName() == "New map name");
+        BOOST_CHECK(b.modHash() == 9786);
 
         // print for ocular inspection
         std::cout << b << std::endl;
@@ -347,52 +361,52 @@ void Test::testBattle()
     {
         std::stringstream ss("id not int");
 
-        CPPUNIT_ASSERT_THROW(Battle b(ss), boost::bad_lexical_cast);
+        BOOST_CHECK_THROW(Battle b(ss), boost::bad_lexical_cast);
     }
 
     // test exception is thrown on empty
     {
         std::stringstream ss("");
 
-        CPPUNIT_ASSERT_THROW(Battle b(ss), std::invalid_argument);
+        BOOST_CHECK_THROW(Battle b(ss), std::invalid_argument);
     }
 }
 
-void Test::testScript()
+BOOST_AUTO_TEST_CASE(testScript)
 {
     Script script;
 
     {
         auto keyValuePair = script.getKeyValuePair("GAME/Players/[CLAN]PlayerName/skill=(35)");
-        CPPUNIT_ASSERT_EQUAL( keyValuePair.first, std::string("Players/[CLAN]PlayerName/skill") );
-        CPPUNIT_ASSERT_EQUAL( keyValuePair.second, std::string("(35)") );
+        BOOST_CHECK_EQUAL( keyValuePair.first, std::string("Players/[CLAN]PlayerName/skill") );
+        BOOST_CHECK_EQUAL( keyValuePair.second, std::string("(35)") );
     }
 
     {
         auto keyValuePair = script.getKeyValuePair("Players/[CLAN]PlayerName/skill=(35)");
-        CPPUNIT_ASSERT_EQUAL( keyValuePair.first, std::string("") );
-        CPPUNIT_ASSERT_EQUAL( keyValuePair.second, std::string("") );
+        BOOST_CHECK_EQUAL( keyValuePair.first, std::string("") );
+        BOOST_CHECK_EQUAL( keyValuePair.second, std::string("") );
     }
 
     {
         auto keyValuePair = script.getKeyValuePair("GAME/Players/[CLAN]PlayerName/crap");
-        CPPUNIT_ASSERT_EQUAL( keyValuePair.first, std::string("") );
-        CPPUNIT_ASSERT_EQUAL( keyValuePair.second, std::string("") );
+        BOOST_CHECK_EQUAL( keyValuePair.first, std::string("") );
+        BOOST_CHECK_EQUAL( keyValuePair.second, std::string("") );
     }
 
     {
         auto key = script.getKey("GAME/removed");
-        CPPUNIT_ASSERT_EQUAL( std::string("removed"), key );
+        BOOST_CHECK_EQUAL( std::string("removed"), key );
     }
 
     {
         auto key = script.getKey("GAME/removed=bla");
-        CPPUNIT_ASSERT_EQUAL( std::string("removed"), key );
+        BOOST_CHECK_EQUAL( std::string("removed"), key );
     }
 
     {
         auto key = script.getKey("GAME_missing");
-        CPPUNIT_ASSERT_EQUAL( key, std::string("") );
+        BOOST_CHECK_EQUAL( key, std::string("") );
     }
 
     script.add("GAME/Sub1/Sub2/key1=val1");
@@ -401,16 +415,16 @@ void Test::testScript()
     script.add("GAME/Sub1/Sub2/key2=val2");
 
     auto keyValuePair = script.add("GAME/Sub2/removed=removedValue");
-    CPPUNIT_ASSERT_EQUAL( keyValuePair.first, std::string("removed") );
-    CPPUNIT_ASSERT_EQUAL( keyValuePair.second, std::string("removedValue") );
+    BOOST_CHECK_EQUAL( keyValuePair.first, std::string("removed") );
+    BOOST_CHECK_EQUAL( keyValuePair.second, std::string("removedValue") );
 
     auto key =  script.remove("GAME/Sub2/removed");
-    CPPUNIT_ASSERT_EQUAL( key, std::string("removed") );
+    BOOST_CHECK_EQUAL( key, std::string("removed") );
 
     script.write("./script.txt");
 }
 
-void Test::testBot()
+BOOST_AUTO_TEST_CASE(testBot)
 {
     // simple positive
     {
@@ -427,11 +441,11 @@ void Test::testBot()
            << aiDll;
         Bot b(ss);
 
-        CPPUNIT_ASSERT_EQUAL(b.name(), name);
-        CPPUNIT_ASSERT_EQUAL(b.owner(), owner);
-        CPPUNIT_ASSERT_EQUAL(b.battleStatus(), battleStatus);
-        CPPUNIT_ASSERT_EQUAL(b.color(), color);
-        CPPUNIT_ASSERT_EQUAL(b.aiDll(), aiDll);
+        BOOST_CHECK_EQUAL(b.name(), name);
+        BOOST_CHECK_EQUAL(b.owner(), owner);
+        BOOST_CHECK_EQUAL(b.battleStatus(), battleStatus);
+        BOOST_CHECK_EQUAL(b.color(), color);
+        BOOST_CHECK_EQUAL(b.aiDll(), aiDll);
 
         // print for ocular inspection
         std::cout << b << std::endl;
@@ -441,18 +455,18 @@ void Test::testBot()
     {
         std::stringstream ss("123 CC ");
 
-        CPPUNIT_ASSERT_THROW(Bot b(ss), std::invalid_argument);
+        BOOST_CHECK_THROW(Bot b(ss), std::invalid_argument);
     }
 
     // test exception is thrown on empty
     {
         std::stringstream ss("");
 
-        CPPUNIT_ASSERT_THROW(Bot b(ss), std::invalid_argument);
+        BOOST_CHECK_THROW(Bot b(ss), std::invalid_argument);
     }
 }
 
-void Test::testMyImage()
+BOOST_AUTO_TEST_CASE(testMyImage)
 {
     // 3x2x1
     {
@@ -468,10 +482,10 @@ void Test::testMyImage()
 
         MyImage image(fileName);
 
-        CPPUNIT_ASSERT_EQUAL(3, image.w());
-        CPPUNIT_ASSERT_EQUAL(2, image.h());
-        CPPUNIT_ASSERT_EQUAL(1, image.d());
-        CPPUNIT_ASSERT_EQUAL(static_cast<uchar>('1'), image.array[0]);
+        BOOST_CHECK_EQUAL(3, image.w());
+        BOOST_CHECK_EQUAL(2, image.h());
+        BOOST_CHECK_EQUAL(1, image.d());
+        BOOST_CHECK_EQUAL(static_cast<uchar>('1'), image.array[0]);
     }
 
     // 2x3x3
@@ -489,20 +503,29 @@ void Test::testMyImage()
 
         MyImage image(fileName);
 
-        CPPUNIT_ASSERT_EQUAL(2, image.w());
-        CPPUNIT_ASSERT_EQUAL(3, image.h());
-        CPPUNIT_ASSERT_EQUAL(3, image.d());
-        CPPUNIT_ASSERT_EQUAL(static_cast<uchar>('1'), image.array[0]);
+        BOOST_CHECK_EQUAL(2, image.w());
+        BOOST_CHECK_EQUAL(3, image.h());
+        BOOST_CHECK_EQUAL(3, image.d());
+        BOOST_CHECK_EQUAL(static_cast<uchar>('1'), image.array[0]);
     }
 
     // test exception is thrown if file not found
     {
-        CPPUNIT_ASSERT_THROW(MyImage image("non_existing_file"), std::invalid_argument);
+        BOOST_CHECK_THROW(MyImage image("non_existing_file"), std::invalid_argument);
+    }
+}
+
+static
+void logThread(int id)
+{
+    for (int i=0; i<100; ++i)
+    {
+        LOG(DEBUG) << "test_thread_" << id; // change to INFO to see how it looks on std::cout
     }
 }
 
 
-void Test::testLog()
+BOOST_AUTO_TEST_CASE(testLog)
 {
     // 10 threads write 100 lines each, output is analyzed manually
 
@@ -520,15 +543,7 @@ void Test::testLog()
     }
 }
 
-void Test::logThread(int id)
-{
-    for (int i=0; i<100; ++i)
-    {
-        LOG(INFO) << "test_thread_" << id; // change to WARNING to see how it looks on std::cout
-    }
-}
-
-void Test::testTextFunctions()
+BOOST_AUTO_TEST_CASE(testTextFunctions)
 {
     typedef std::vector<std::string> StringVector;
 
@@ -537,89 +552,89 @@ void Test::testTextFunctions()
     std::pair<MatchResult, std::string> result;
 
     result = findMatch(strings, "");
-    CPPUNIT_ASSERT_EQUAL(MR_NO_MATCH, result.first);
+    BOOST_CHECK_EQUAL(MR_NO_MATCH, result.first);
 
     result = findMatch(strings, "GHabc");
-    CPPUNIT_ASSERT_EQUAL(MR_NO_MATCH, result.first);
+    BOOST_CHECK_EQUAL(MR_NO_MATCH, result.first);
 
     result = findMatch(strings, "ab");
-    CPPUNIT_ASSERT_EQUAL(MR_BEGINS_I, result.first);
-    CPPUNIT_ASSERT("abc" == result.second);
+    BOOST_CHECK_EQUAL(MR_BEGINS_I, result.first);
+    BOOST_CHECK("abc" == result.second);
 
 //    result = findMatch(strings, "ab");
-//    CPPUNIT_ASSERT_EQUAL(MR_BEGINS_C, result.first);
-//    CPPUNIT_ASSERT("abc" == result.second);
+//    BOOST_CHECK_EQUAL(MR_BEGINS_C, result.first);
+//    BOOST_CHECK("abc" == result.second);
 
 //    result = findMatch(strings, "A");
-//    CPPUNIT_ASSERT_EQUAL(MR_BEGINS_C, result.first);
-//    CPPUNIT_ASSERT("ABC" == result.second);
+//    BOOST_CHECK_EQUAL(MR_BEGINS_C, result.first);
+//    BOOST_CHECK("ABC" == result.second);
 
     result = findMatch(strings, "ag");
-    CPPUNIT_ASSERT_EQUAL(MR_BEGINS_I, result.first);
-    CPPUNIT_ASSERT("aGF" == result.second);
+    BOOST_CHECK_EQUAL(MR_BEGINS_I, result.first);
+    BOOST_CHECK("aGF" == result.second);
 
     result = findMatch(strings, "BC");
-    CPPUNIT_ASSERT_EQUAL(MR_CONTAINS_I, result.first);
-    CPPUNIT_ASSERT("Habc" == result.second);
+    BOOST_CHECK_EQUAL(MR_CONTAINS_I, result.first);
+    BOOST_CHECK("Habc" == result.second);
 
     result = findMatch(strings, "gf");
-    CPPUNIT_ASSERT_EQUAL(MR_CONTAINS_I, result.first);
-    CPPUNIT_ASSERT("Hagf" == result.second);
+    BOOST_CHECK_EQUAL(MR_CONTAINS_I, result.first);
+    BOOST_CHECK("Hagf" == result.second);
 
 }
 
-void Test::testFlobbyDirs()
+BOOST_AUTO_TEST_CASE(testFlobbyDirs)
 {
     {
         std::string res = wordExpand("~");
         std::cout << res << std::endl;
-        CPPUNIT_ASSERT(res.size() > 1);
+        BOOST_CHECK(res.size() > 1);
     }
 
     {
         std::string res = wordExpand("");
-        CPPUNIT_ASSERT(res.empty());
+        BOOST_CHECK(res.empty());
     }
 
     {
         std::string const str = "asdasd";
         std::string res = wordExpand(str);
-        CPPUNIT_ASSERT(res == str);
+        BOOST_CHECK(res == str);
     }
 }
 
-void Test::testNightwatch()
+BOOST_AUTO_TEST_CASE(testNightwatch)
 {
     // ok simple pm channel message
     {
         NightwatchPm const res = checkNightwatchPm("!pm|chan1|user1|07/01/2015 03:32:14|text1");
-        CPPUNIT_ASSERT(res.valid_ == true);
-        CPPUNIT_ASSERT(res.channel_ == "chan1");
-        CPPUNIT_ASSERT(res.user_ == "user1");
-        CPPUNIT_ASSERT(res.time_ == "07/01/2015 03:32:14");
-        CPPUNIT_ASSERT(res.text_ == "text1");
+        BOOST_CHECK(res.valid_ == true);
+        BOOST_CHECK(res.channel_ == "chan1");
+        BOOST_CHECK(res.user_ == "user1");
+        BOOST_CHECK(res.time_ == "07/01/2015 03:32:14");
+        BOOST_CHECK(res.text_ == "text1");
     }
 
     // ok private chat message with || in text
     {
         NightwatchPm const res = checkNightwatchPm("!pm||user2|07/01/2015 03:32:15|text2||");
-        CPPUNIT_ASSERT(res.valid_ == true);
-        CPPUNIT_ASSERT(res.channel_ == "");
-        CPPUNIT_ASSERT(res.user_ == "user2");
-        CPPUNIT_ASSERT(res.time_ == "07/01/2015 03:32:15");
-        CPPUNIT_ASSERT(res.text_ == "text2||");
+        BOOST_CHECK(res.valid_ == true);
+        BOOST_CHECK(res.channel_ == "");
+        BOOST_CHECK(res.user_ == "user2");
+        BOOST_CHECK(res.time_ == "07/01/2015 03:32:15");
+        BOOST_CHECK(res.text_ == "text2||");
     }
 
     // bad pm
     {
         NightwatchPm const res = checkNightwatchPm("!pm|crap");
-        CPPUNIT_ASSERT(res.valid_ == false);
+        BOOST_CHECK(res.valid_ == false);
     }
 
     // bad pm missing initial !
     {
         NightwatchPm const res = checkNightwatchPm("pm||User2|07/01/2015 03:32:14|crap||");
-        CPPUNIT_ASSERT(res.valid_ == false);
+        BOOST_CHECK(res.valid_ == false);
     }
 
 }

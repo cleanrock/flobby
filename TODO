@@ -28,3 +28,19 @@ D-11:56:28-Model.cpp:239] message: Say {"Place":2,"Target":"cleanrock","User":"N
 D-12:15:23-Model.cpp:239] message: Say {"Place":2,"Target":"cleanrock","User":"Nightwatch","IsEmote":false,"Text":"!JSON SiteToLobbyCommand {\"SpringLink\":\"chat/user/cleanrock\"}","Ring":false}
 14:23 Nightwatch: !JSON SiteToLobbyCommand {"SpringLink":"@start_mission:Tutorial 2 - A Day Out r241"}
 14:24 Nightwatch: !JSON SiteToLobbyCommand {"SpringLink":"@host_mission:Tutorial 2 - A Day Out r241"}
+
+2015-07-02 15:12:20: cleanrock: Licho, but protocol will be the same right ? (i.e. no big changes at some point)
+2015-07-02 15:12:53: Licho: there will be changes to facility proposals by google
+2015-07-02 15:12:58: Licho: matchmaking, simpler rooms etc
+2015-07-02 15:13:10: Licho: so removal of some features, addition of others
+2015-07-02 15:13:20: Licho: it will also change listener to websocket instead of raw tcp
+2015-07-02 15:13:26: Licho: so taht javascript can use protocol directly
+2015-07-02 15:13:32: Licho: but the format of messages stays same
+2015-07-02 15:14:07: Licho: nightwatch will be gone and its features moved to protocol too
+2015-07-02 15:14:24: cleanrock: ok, i would appreciate if you can post breaking changes upfront somewhere
+2015-07-02 15:14:36: Licho: they are always in master
+2015-07-02 15:14:39: Licho: for some time before deployed to stable
+2015-07-02 15:14:45: Licho: that means test.zero-k.info and port 8202 run them
+2015-07-02 15:15:15: Licho: so far no changes but today im working on websocketization
+2015-07-02 15:15:20: Licho: might support legacy tcp as well
+2015-07-02 15:15:31: Licho: for some time
