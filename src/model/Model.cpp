@@ -1806,7 +1806,7 @@ void Model::getChannels()
     }
 }
 
-void Model::joinChannel(std::string const & channelName)
+void Model::joinChannel(std::string const & channelName, std::string const & password)
 {
     if (!channelName.empty() && connected_)
     {
@@ -1815,7 +1815,7 @@ void Model::joinChannel(std::string const & channelName)
         {
             Json::Value jv;
             jv["ChannelName"] = channelName;
-            // TODO Password
+            jv["Password"] = password;
 
             Json::FastWriter writer;
             oss << "JoinChannel " << writer.write(jv);
@@ -1823,6 +1823,10 @@ void Model::joinChannel(std::string const & channelName)
         else
         {
             oss << "JOIN " << channelName;
+            if (!password.empty())
+            {
+                oss << " " << password;
+            }
         }
         controller_.send(oss.str());
     }
@@ -2724,7 +2728,7 @@ void Model::sendMessage(std::string const& msg)
 {
     if (zerok_)
     {
-        // TODO
+        LOG(WARNING)<< "message not sent: " << msg;
         return;
     }
 
@@ -2752,3 +2756,44 @@ std::string Model::serverCommand(std::string const& str)
     }
     return result;
 }
+
+void Model::subscribeChannel(std::string const & channelName)
+{
+    if (zerok_)
+    {
+        std::string const msg = "!subscribe " + channelName;
+        sayPrivate("Nightwatch", msg);
+    }
+    else
+    {
+        std::string const msg = "SUBSCRIBE chanName=" + channelName;
+        sendMessage(msg);
+    }
+}
+
+void Model::unsubscribeChannel(std::string const & channelName)
+{
+    if (zerok_)
+    {
+        std::string const msg = "!unsubscribe " + channelName;
+        sayPrivate("Nightwatch", msg);
+    }
+    else
+    {
+        std::string msg = "UNSUBSCRIBE chanName=" + channelName;
+        sendMessage(msg);
+    }
+}
+
+void Model::listChannelSubscriptions()
+{
+    if (zerok_)
+    {
+        sayPrivate("Nightwatch", "!listsubscriptions");
+    }
+    else
+    {
+        sendMessage("LISTSUBSCRIPTIONS");
+    }
+}
+

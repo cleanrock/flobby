@@ -35,6 +35,7 @@ public:
     Model(IController & controller, bool zerok);
     virtual ~Model();
 
+    bool isZeroK() { return zerok_; }
     void setSpringPath(std::string const & path) { springPath_ = path; }
     void setSpringOptions(std::string const & options) { springOptions_ = options; }
     void setUnitSyncPath(std::string const & path);
@@ -79,7 +80,7 @@ public:
     void disconnect();
 
     void getChannels();
-    void joinChannel(std::string const & channelName);
+    void joinChannel(std::string const & channelName, std::string const & password = "");
     void sayChannel(std::string const & channelName, std::string const & message);
     void leaveChannel(std::string const & channelName);
 
@@ -115,6 +116,11 @@ public:
 
     std::vector<AI> getModAIs(std::string const & modName);
     std::vector<std::string> getModSideNames(std::string const & modName);
+
+    // ServerCommands specific methods
+    void subscribeChannel(std::string const & channelName);
+    void unsubscribeChannel(std::string const & channelName);
+    void listChannelSubscriptions();
 
     // signals
     //

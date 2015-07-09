@@ -28,6 +28,7 @@ SERVER_COMMAND(join);
 SERVER_COMMAND(sub);
 SERVER_COMMAND(unsub);
 SERVER_COMMAND(listsubs);
+SERVER_COMMAND(pm);
 
 
 Model* ServerCommand::model_ = 0;
@@ -40,16 +41,25 @@ void ServerCommand::init(Model& model)
     ServerCommand* sc;
 
     sc = new SC_help(); commmands_[sc->name_] = sc;
-    sc = new SC_ingame(); commmands_[sc->name_] = sc;
-    sc = new SC_regdate(); commmands_[sc->name_] = sc;
     sc = new SC_pwhash(); commmands_[sc->name_] = sc;
-    sc = new SC_rename(); commmands_[sc->name_] = sc;
-    sc = new SC_changepw(); commmands_[sc->name_] = sc;
-    sc = new SC_changeuserpw(); commmands_[sc->name_] = sc;
     sc = new SC_join(); commmands_[sc->name_] = sc;
     sc = new SC_sub(); commmands_[sc->name_] = sc;
     sc = new SC_unsub(); commmands_[sc->name_] = sc;
     sc = new SC_listsubs(); commmands_[sc->name_] = sc;
+    sc = new SC_pm(); commmands_[sc->name_] = sc;
+
+    if (model_->isZeroK())
+    {
+
+    }
+    else // uberserver
+    {
+        sc = new SC_ingame(); commmands_[sc->name_] = sc;
+        sc = new SC_regdate(); commmands_[sc->name_] = sc;
+        sc = new SC_rename(); commmands_[sc->name_] = sc;
+        sc = new SC_changepw(); commmands_[sc->name_] = sc;
+        sc = new SC_changeuserpw(); commmands_[sc->name_] = sc;
+    }
 }
 
 std::string ServerCommand::process(std::string const& str)
@@ -288,12 +298,12 @@ std::string SC_join::process(std::vector<std::string> const& args)
 
     if (!args.empty())
     {
-        std::string msg = "JOIN " + args[0];
+        std::string password;
         if (args.size() > 1)
         {
-            msg += " " + args[1];
+            password = args[1];
         }
-        model_->sendMessage(msg);
+        model_->joinChannel(args[0], password);
     }
     else
     {
@@ -306,7 +316,7 @@ std::string SC_join::process(std::vector<std::string> const& args)
 std::string SC_sub::description()
 {
     return  "/" + name_ + " channel - "
-            "subscribe to channel";
+            "subscribe to channel (zk needs a # before channel name)";
 }
 
 std::string SC_sub::process(std::vector<std::string> const& args)
@@ -315,8 +325,7 @@ std::string SC_sub::process(std::vector<std::string> const& args)
 
     if (!args.empty())
     {
-        std::string msg = "SUBSCRIBE chanName=" + args[0];
-        model_->sendMessage(msg);
+        model_->subscribeChannel(args[0]);
     }
     else
     {
@@ -329,7 +338,7 @@ std::string SC_sub::process(std::vector<std::string> const& args)
 std::string SC_unsub::description()
 {
     return  "/" + name_ + " channel - "
-            "unsubscribe from channel";
+            "unsubscribe from channel (zk needs a # before channel name)";
 }
 
 std::string SC_unsub::process(std::vector<std::string> const& args)
@@ -338,8 +347,7 @@ std::string SC_unsub::process(std::vector<std::string> const& args)
 
     if (!args.empty())
     {
-        std::string msg = "UNSUBSCRIBE chanName=" + args[0];
-        model_->sendMessage(msg);
+        model_->unsubscribeChannel(args[0]);
     }
     else
     {
@@ -352,15 +360,46 @@ std::string SC_unsub::process(std::vector<std::string> const& args)
 std::string SC_listsubs::description()
 {
     return  "/" + name_ + " - "
-            "list channel subscribtions";
+            "list channel subscriptions";
 }
 
 std::string SC_listsubs::process(std::vector<std::string> const& args)
 {
     std::string result;
 
-    std::string msg = "LISTSUBSCRIPTIONS";
-    model_->sendMessage(msg);
+    model_->listChannelSubscriptions();
+
+    return result;
+}
+
+std::string SC_pm::description()
+{
+    return  "/" + name_ + " username message - "
+            "send private chat message";
+}
+
+std::string SC_pm::process(std::vector<std::string> const& args)
+{
+    std::string result;
+
+    if (args.size() > 1)
+    {
+        // build message
+        std::ostringstream oss;
+        for (size_t i = 1; i < args.size(); ++i)
+        {
+            oss << args[i];
+            if (i < (args.size()-1))
+            {
+                oss << " ";
+            }
+        }
+        model_->sayPrivate(args[0], oss.str());
+    }
+    else
+    {
+        result = name_ + " requires <username> <message> arguments";
+    }
 
     return result;
 }
