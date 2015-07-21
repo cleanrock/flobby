@@ -1815,8 +1815,10 @@ void Model::joinChannel(std::string const & channelName, std::string const & pas
         {
             Json::Value jv;
             jv["ChannelName"] = channelName;
-            jv["Password"] = password;
-
+            if (!password.empty())
+            {
+                jv["Password"] = password;
+            }
             Json::FastWriter writer;
             oss << "JoinChannel " << writer.write(jv);
         }
