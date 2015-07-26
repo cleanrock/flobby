@@ -6,8 +6,10 @@
 #include "log/Log.h"
 #include "model/Model.h"
 
+#include <FL/Fl.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
+#include <FL/filename.H>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -214,3 +216,38 @@ void VoteLine::makeVotesString()
     votes_ = oss.str();
 }
 */
+
+int VoteLine::handle(int event)
+{
+    switch (event)
+    {
+    case FL_PUSH: // handle double click on text with web link
+        if (Fl::event_clicks() && Fl::event_button() == FL_LEFT_MOUSE)
+        {
+            std::string const text = text_->label();
+            auto const posStart = text.find("http://");
+            if (posStart != std::string::npos)
+            {
+                auto const posEnd = text.find(' ', posStart);
+
+                std::string const link(text, posStart, posEnd == std::string::npos ? posEnd : posEnd - posStart);
+                LOG(DEBUG) << "link: '" << link << "'";
+
+                char msg[512];
+                int const res = fl_open_uri(link.c_str(), msg, sizeof(msg));
+                if (res == 1)
+                {
+                    LOG(DEBUG)<< "fl_open_uri success: " << msg;
+                }
+                else // 0
+                {
+                    LOG(WARNING)<< "fl_open_uri failed: " << msg;
+                }
+                return 1;
+            }
+        }
+        break;
+    }
+
+    return Fl_Group::handle(event);
+}

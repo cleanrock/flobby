@@ -29,4 +29,6 @@ private:
     std::string checkSpringieVote(std::string const & msg);
     std::string checkSpadsVote(std::string const & msg);
     void addVoteLine(std::string const & voteText);
+
+    int handle(int event);
 };
