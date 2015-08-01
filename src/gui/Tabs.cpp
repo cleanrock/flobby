@@ -164,8 +164,16 @@ int Tabs::handle(int event)
     {
         Fl_Widget* chat =  which(Fl::event_x(), Fl::event_y());
 
-        if (chat != 0 && chat != logUsersTab_)
+        if (chat != 0)
         {
+            if (chat == logUsersTab_)
+            {
+                if (handleServerTabClick())
+                {
+                    return 1;
+                }
+            }
+
             // private chat
             for (auto & pair : privateChatTabs_)
             {
@@ -248,7 +256,7 @@ int Tabs::handlePrivateChatClick(PrivateChatTab* pc)
             break;
 
         case 2:
-            openLogFile(pc->logPath());
+            LogFile::openLogFile(pc->logPath());
             handled = 1;
             break;
 
@@ -304,9 +312,36 @@ int Tabs::handleChannelChatClick(ChannelChatTab* cc)
             break;
 
         case 2:
-            openLogFile(cc->logPath());
+            LogFile::openLogFile(cc->logPath());
             handled = 1;
             break;
+        }
+    }
+
+    return handled;
+}
+
+int Tabs::handleServerTabClick()
+{
+    int handled = 0;
+    if (Fl::event_button() == FL_RIGHT_MOUSE && Fl::event_clicks() == 0)
+    {
+        PopupMenu menu;
+        if (LogFile::enabled() && boost::filesystem::exists(logUsersTab_->logPath()))
+        {
+            menu.add("Open log", 1);
+        }
+
+        if (menu.size() > 0)
+        {
+            int const id = menu.show();
+            switch (id)
+            {
+            case 1:
+                LogFile::openLogFile(logUsersTab_->logPath());
+                handled = 1;
+                break;
+            }
         }
     }
 
@@ -395,22 +430,5 @@ void Tabs::connected(bool connected)
             cc->append("Connected to server", -1);
         }
         redraw();
-    }
-}
-
-void Tabs::openLogFile(std::string const& path)
-{
-    std::string uri = "file://";
-    uri += path;
-
-    char msg[512];
-    int const res = fl_open_uri(uri.c_str(), msg, sizeof(msg));
-    if (res == 1)
-    {
-        LOG(DEBUG)<< "fl_open_uri success: " << msg;
-    }
-    else // 0
-    {
-        LOG(WARNING)<< "fl_open_uri failed: " << msg;
     }
 }

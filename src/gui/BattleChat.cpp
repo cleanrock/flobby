@@ -29,7 +29,7 @@ BattleChat::BattleChat(int x, int y, int w, int h, Model & model):
     voteLine_->deactivate();
 
     int const m = 0; // margin
-    textDisplay_ = new TextDisplay2(x+m, y+ih+m, w-2*m, h-2*ih-2*m);
+    textDisplay_ = new TextDisplay2(x+m, y+ih+m, w-2*m, h-2*ih-2*m, &logFile_);
 
     input_ = new ChatInput(x, y+h-ih, w, ih);
     input_->connectText( boost::bind(&BattleChat::onText, this, _1) );

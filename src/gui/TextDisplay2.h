@@ -5,12 +5,13 @@
 #include <FL/Fl_Text_Display.H>
 #include <string>
 
+class LogFile;
 class Fl_Text_Buffer;
 
 class TextDisplay2: public Fl_Text_Display
 {
 public:
-    TextDisplay2(int x, int y, int w, int h, char const * label = 0);
+    TextDisplay2(int x, int y, int w, int h, LogFile* logFile = nullptr, char const * label = 0);
     virtual ~TextDisplay2();
 
     void append(std::string const & text, int interest = 0);
@@ -29,6 +30,8 @@ public:
 private:
     Fl_Text_Buffer * text_;
     Fl_Text_Buffer * style_;
+
+    LogFile* logFile_;
 
     int handle(int event);
 

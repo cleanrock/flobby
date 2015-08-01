@@ -31,7 +31,7 @@ ServerTab::ServerTab(int x, int y, int w, int h,
     int const leftW = 0.75*w;
     Fl_Group * left = new Fl_Group(x, y, leftW, h);
     int const ih = FL_NORMAL_SIZE*2; // input height
-    text_ = new TextDisplay2(x, y, leftW, h-ih);
+    text_ = new TextDisplay2(x, y, leftW, h-ih, &logFile_);
     input_ = new ChatInput(x, y+h-ih, leftW, ih);
     input_->connectText( boost::bind(&ServerTab::onInput, this, _1) );
     input_->connectComplete( boost::bind(&ServerTab::onComplete, this, _1, _2, _3) );
@@ -190,4 +190,9 @@ void ServerTab::onComplete(std::string const & text, std::size_t pos, std::pair<
         result.first = text.substr(0, pairWordPos.second) + userName + text.substr(pos);
         result.second = pairWordPos.second + userName.length();
     }
+}
+
+std::string ServerTab::logPath()
+{
+    return logFile_.path();
 }

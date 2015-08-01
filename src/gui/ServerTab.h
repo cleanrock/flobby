@@ -25,6 +25,7 @@ public:
     virtual ~ServerTab();
 
     void initTiles();
+    std::string logPath();
 
 private:
     ITabs & iTabs_;

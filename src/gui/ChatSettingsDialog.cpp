@@ -81,7 +81,7 @@ ChatSettingsDialog::ChatSettingsDialog():
         y += 40;
 
         y += 20;
-        chatSample_ = new TextDisplay2(410, y, 380, 85, "Chat sample (FLTK will force black or white if contrast is low)");
+        chatSample_ = new TextDisplay2(410, y, 380, 85, nullptr, "Chat sample (FLTK will force black or white if contrast is low)");
         chatSample_->append("Low Interest", -1);
         chatSample_->append("Normal Interest", 0);
         chatSample_->append("High Interest", 1);

@@ -29,7 +29,7 @@ PrivateChatTab::PrivateChatTab(int x, int y, int w, int h, std::string const & u
 
     int const m = 0; // margin
     int const ih = FL_NORMAL_SIZE*2; // input height
-    text_ = new TextDisplay2(x+m, y+m, w-2*m, h-ih-2*m);
+    text_ = new TextDisplay2(x+m, y+m, w-2*m, h-ih-2*m, &logFile_);
 
     input_ = new ChatInput(x, y+h-ih, w, ih);
     input_->connectText( boost::bind(&PrivateChatTab::onInput, this, _1) );

@@ -2,12 +2,14 @@
 
 #include "TextDisplay2.h"
 #include "PopupMenu.h"
+#include "LogFile.h"
 #include "log/Log.h"
 #include "TextFunctions.h"
 
 #include <FL/filename.H>
 #include <FL/Fl.H>
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 #include <sstream>
 #include <cstring>
 
@@ -25,8 +27,9 @@ void TextDisplay2::initTextStyles()
 }
 
 
-TextDisplay2::TextDisplay2(int x, int y, int w, int h, char const * label):
-    Fl_Text_Display(x, y, w, h, label)
+TextDisplay2::TextDisplay2(int x, int y, int w, int h, LogFile* logFile, char const * label)
+    : Fl_Text_Display(x, y, w, h, label)
+    , logFile_(logFile)
 {
     textsize(12);
 
@@ -168,12 +171,20 @@ int TextDisplay2::handle(int event)
             PopupMenu menu;
             menu.add("Clear", 1);
 
+            if (logFile_ && LogFile::enabled() && boost::filesystem::exists(logFile_->path()))
+            {
+                menu.add("Open log", 2);
+            }
+
             int const id = menu.show();
             switch (id)
             {
             case 1:
                 text_->remove(0, text_->length());
                 style_->remove(0, style_->length());
+                return 1;
+            case 2:
+                LogFile::openLogFile(logFile_->path());
                 return 1;
             }
         }

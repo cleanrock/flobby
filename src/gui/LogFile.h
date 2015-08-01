@@ -19,6 +19,8 @@ public:
     std::string path();
     void log(std::string const & text);
 
+    static void openLogFile(std::string const& path);
+
 private:
     std::string name_;
     std::ofstream ofs_;
