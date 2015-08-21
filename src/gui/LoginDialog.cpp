@@ -64,7 +64,12 @@ void LoginDialog::loadLoginPrefs()
 {
     char str[128];
 
-    prefs_.get(PrefLoginHost, str, "lobby.springrts.com", sizeof(str));
+    std::string defaultLoginHost = "lobby.springrts.com";
+    if (model_.isZeroK())
+    {
+        defaultLoginHost = "lobby.zero-k.info";
+    }
+    prefs_.get(PrefLoginHost, str, defaultLoginHost.c_str(), sizeof(str));
     host_->value(str);
 
     prefs_.get(PrefLoginPort, str, "8200", sizeof(str));
@@ -85,6 +90,13 @@ void LoginDialog::loadLoginPrefs()
 void LoginDialog::show()
 {
     loadLoginPrefs();
+
+    // set input focus to first empty field
+    if      (host_->size() == 0) host_->take_focus();
+    else if (port_->size() == 0) port_->take_focus();
+    else if (userName_->size() == 0) userName_->take_focus();
+    else if (password_->size() == 0) password_->take_focus();
+
     Fl_Window::show();
 }
 
@@ -109,6 +121,12 @@ void LoginDialog::onLogin()
         password_->value(passwordHash_.c_str());
     }
 
+    // save most prefs on login attempt
+    prefs_.set(PrefLoginHost, host_->value());
+    prefs_.set(PrefLoginPort, port_->value());
+    prefs_.set(PrefLoginUser, userName_->value());
+    prefs_.set(PrefAutoLogin, static_cast<int>(autoLogin_->value()) );
+
     attemptLogin();
 }
 
@@ -125,12 +143,8 @@ void LoginDialog::loginResult(bool success, std::string const & info)
     }
     else
     {
-        // save login prefs on successful login
-        prefs_.set(PrefLoginHost, host_->value());
-        prefs_.set(PrefLoginPort, port_->value());
-        prefs_.set(PrefLoginUser, userName_->value());
+        // save password pref on successful login
         prefs_.set(PrefLoginPassword, passwordHash_.c_str());
-        prefs_.set(PrefAutoLogin, static_cast<int>(autoLogin_->value()) );
 
         info_->label(0);
         hide();
