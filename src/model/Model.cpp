@@ -669,7 +669,7 @@ void Model::sayPrivate(std::string const & userName, std::string const & msg)
         jv["User"] = userName_;
         jv["IsEmote"] = false;
         jv["Text"] = offline ? "!pm " + userName + " " + msg : msg;
-        jv["Ring"] = true;
+        jv["Ring"] = false;
 
         Json::FastWriter writer;
         oss << "Say " << writer.write(jv);

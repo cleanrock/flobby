@@ -1,3 +1,4 @@
+highlight chat words setting, this should also include matching messages from users
 auto reconnect to lobby server
 friend list
 map window showing big map image, 512x512
@@ -5,6 +6,7 @@ commands in all chat windows
 single player game
 implement game hosting
 
+? make Save in Spring settings have effect without having to click Select
 ? show all game (mod) settings
 ? graphicsmagick or freeimage instead of imagemagick
 ? load chat history
