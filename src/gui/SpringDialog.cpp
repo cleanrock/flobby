@@ -466,6 +466,44 @@ void SpringDialog::setProfile(std::string const& engineVersion)
     }
 }
 
+std::string SpringDialog::getSpringPathCurrent()
+{
+    std::string result;
+
+    char * str;
+    prefs_.get(PrefSpringProfile, str, "UNKNOWN");
+    std::string const profile(str);
+    ::free(str);
+
+    if (prefs_.groupExists(profile.c_str()))
+    {
+        Fl_Preferences p(prefs_, profile.c_str());
+
+        p.get(PrefSpringPath, str, "");
+        result = str;
+        ::free(str);
+    }
+
+    return result;
+}
+
+std::string SpringDialog::getSpringPath(std::string const& engineVersion)
+{
+    std::string result;
+
+    if (prefs_.groupExists(engineVersion.c_str()))
+    {
+        Fl_Preferences p(prefs_, engineVersion.c_str());
+
+        char * str;
+        p.get(PrefSpringPath, str, "");
+        result = str;
+        ::free(str);
+    }
+
+    return result;
+}
+
 bool SpringDialog::setPaths()
 {
     char * str;

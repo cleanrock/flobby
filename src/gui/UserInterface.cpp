@@ -609,19 +609,52 @@ void UserInterface::reloadMapsMods()
 
 void UserInterface::downloadDone(Model::DownloadType downloadType, std::string const& name, bool success)
 {
-    if (success && downloadType == Model::DT_ENGINE)
+    switch (downloadType)
     {
-        if (springDialog_->addProfile(name))
+    case Model::DT_MAP:
+    case Model::DT_GAME:
+        if (success)
         {
-            int const battleId = battleRoom_->battleId();
-
-            if (battleId != -1 && model_.getBattle(battleId).engineVersion() == name)
+            reloadMapsMods();
+        }
+        break;
+    case Model::DT_ENGINE:
+        if (success)
+        {
+            if (springDialog_->addProfile(name))
             {
-                springDialog_->setProfile(name);
+                int const battleId = battleRoom_->battleId();
+
+                if (battleId != -1 && model_.getBattle(battleId).engineVersion() == name)
+                {
+                    springDialog_->setProfile(name);
+                }
+            }
+            reloadMapsMods();
+        }
+        break;
+    case Model::DT_DEMO:
+        if (success)
+        {
+            std::vector<std::string> args;
+            boost::split(args, name, boost::is_any_of(","));
+            if (args.size() == 2)
+            {
+                std::string const engineName = args[1];
+                std::string springPath = springDialog_->getSpringPath(engineName);
+                if (springPath.empty())
+                {
+                    springPath = springDialog_->getSpringPathCurrent();
+                    LOG(WARNING)<< "spring '" + engineName + "' not found, using current engine: '" << springPath << "'";
+                }
+                if (!springPath.empty() && !args[0].empty())
+                {
+                    model_.startDemo(springPath, args[0]);
+                }
             }
         }
+        break;
     }
-    reloadMapsMods();
 }
 
 void UserInterface::autoJoinChannels(std::string const & text)

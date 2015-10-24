@@ -52,7 +52,7 @@ ServerTab::ServerTab(int x, int y, int w, int h,
     model_.connectConnected( boost::bind(&ServerTab::connected, this, _1) );
     model_.connectServerInfo( boost::bind(&ServerTab::serverInfo, this, _1) );
     model_.connectLoginResult( boost::bind(&ServerTab::loginResult, this, _1, _2) );
-    model_.connectServerMsg( boost::bind(&ServerTab::message, this, _1) );
+    model_.connectServerMsg( boost::bind(&ServerTab::message, this, _1, _2) );
     model_.connectUserJoined( boost::bind(&ServerTab::userJoined, this, _1) );
     model_.connectUserLeft( boost::bind(&ServerTab::userLeft, this, _1) );
     model_.connectRing( boost::bind(&ServerTab::ring, this, _1) );
@@ -106,9 +106,9 @@ void ServerTab::connected(bool connected)
     }
 }
 
-void ServerTab::message(std::string const & msg)
+void ServerTab::message(std::string const & msg, int interest)
 {
-    append(msg, 1);
+    append(msg, interest);
 }
 
 void ServerTab::userJoined(User const & user)

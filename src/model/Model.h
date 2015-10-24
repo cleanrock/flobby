@@ -19,6 +19,7 @@
 #include <unordered_map>
 #include <functional>
 #include <map>
+#include <set>
 #include <string>
 #include <memory>
 
@@ -77,6 +78,7 @@ public:
     std::string serverCommand(std::string const& str);
 
     void startSpring(); // throws on failure
+    void startDemo(std::string const& springPath, std::string const& demoPath);
     void disconnect();
 
     void getChannels();
@@ -104,8 +106,8 @@ public:
     std::unique_ptr<uint8_t[]> getMetalMap(std::string const & mapName, int & w, int & h); // returns single component data
     std::unique_ptr<uint8_t[]> getHeightMap(std::string const & mapName, int & w, int & h); // returns single component data
 
-    enum DownloadType { DT_MAP, DT_GAME, DT_ENGINE };
-    bool download(std::string const & name, DownloadType type); // returns true if download attempt is done
+    enum DownloadType { DT_MAP, DT_GAME, DT_ENGINE, DT_DEMO };
+    unsigned int download(std::string const & name, DownloadType type); // returns >0 (job id) if download attempt is done
 
     void testThread(); // TODO remove some day
 
@@ -208,7 +210,7 @@ public:
     boost::signals2::connection connectDownloadDone(DownloadDoneSignal::slot_type subscriber)
     { return downloadDoneSignal_.connect(subscriber); }
 
-    typedef boost::signals2::signal<void (std::string const & msg)> ServerMsgSignal;
+    typedef boost::signals2::signal<void (std::string const & msg, int interest)> ServerMsgSignal;
     boost::signals2::connection connectServerMsg(ServerMsgSignal::slot_type subscriber)
     { return serverMsgSignal_.connect(subscriber); }
 
@@ -296,7 +298,7 @@ private:
 
     // thread ids (0 if not running)
     unsigned int springId_;
-    unsigned int downloaderId_;
+    unsigned int prDownloaderId_;
 
     std::string springPath_;
     std::string springOptions_;
@@ -307,7 +309,7 @@ private:
 
     int runProcess(std::string const& cmd, bool logToFile);
 
-    bool downloadExternal(std::string const& name, DownloadType type); // returns true if download attempt is done
+    unsigned int downloadExternal(std::string const& name, DownloadType type); // returns >0 if download attempt is done
 
     // TODO disabled for now
     int downloadInternal(std::string const& name, DownloadType type); // returns true if download attempt is done
@@ -466,5 +468,11 @@ private:
     void handle_UpdateBotStatus(std::istream & is);
     void handle_RemoveBot(std::istream & is);
     void handle_SetModOptions(std::istream & is);
+    void handle_SiteToLobbyCommand(std::istream & is);
 
+    // ZeroK specific methods and attributes
+    void handleZerokAction(std::string const& action, std::string const& arg);
+    std::vector<std::string> start_replay_Args_;
+    std::string const flobbyDemo_;
+    std::set<unsigned int> demoDownloadJobs_;
 };

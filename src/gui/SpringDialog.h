@@ -28,6 +28,8 @@ public:
     void show();
     bool setPaths(); // returns true on success
     void setProfile(std::string const& engineVersion);
+    std::string getSpringPathCurrent();
+    std::string getSpringPath(std::string const& engineVersion);
 
     // signals
     typedef boost::signals2::signal<void (std::string const & text)> ProfileSetSignal;

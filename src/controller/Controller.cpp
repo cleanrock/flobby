@@ -105,19 +105,21 @@ void Controller::threadDoneCallback(void* data)
 {
     unsigned int id = reinterpret_cast<uintptr_t>(data);
 
-    boost::lock_guard<boost::mutex> lock(controller_->mutexThreads_); // protect threads_
+    int result;
+    {
+        boost::lock_guard<boost::mutex> lock(controller_->mutexThreads_); // protect threads_
 
-    Threads::iterator it = controller_->threads_.find(id);
-    LOG_IF(FATAL, it == controller_->threads_.end())<< "thread " << id << "not found";
+        Threads::iterator it = controller_->threads_.find(id);
+        LOG_IF(FATAL, it == controller_->threads_.end())<< "thread " << id << "not found";
 
-    ThreadInfo& ti = it->second;
+        ThreadInfo& ti = it->second;
+        result = ti.result_;
 
-    ti.thread_->join();
-    delete ti.thread_;
-
-    controller_->client_->processDone(std::make_pair(id, ti.result_));
-
-    controller_->threads_.erase(it);
+        ti.thread_->join();
+        delete ti.thread_;
+        controller_->threads_.erase(it);
+    }
+    controller_->client_->processDone(std::make_pair(id, result));
 }
 
 void Controller::connected(bool connected)

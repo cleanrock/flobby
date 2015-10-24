@@ -48,7 +48,8 @@ Model::Model(IController & controller, bool zerok):
     joinedBattleId_(-1),
     me_(0),
     springId_(0),
-    downloaderId_(0)
+    prDownloaderId_(0),
+    flobbyDemo_("flobby_demo.sdf")
 {
     controller_.setIControllerEvent(*this);
     ServerCommand::init(*this);
@@ -130,6 +131,7 @@ Model::Model(IController & controller, bool zerok):
     ADD_ZK_MSG_HANDLER(UpdateBotStatus)
     ADD_ZK_MSG_HANDLER(RemoveBot)
     ADD_ZK_MSG_HANDLER(SetModOptions)
+    ADD_ZK_MSG_HANDLER(SiteToLobbyCommand)
 }
 
 Model::~Model()
@@ -280,7 +282,7 @@ void Model::processDone(std::pair<unsigned int, int> idRetPair)
         springId_ = 0;
         meInGame(false);
     }
-    else if (idRetPair.first == downloaderId_)
+    else if (idRetPair.first == prDownloaderId_)
     {
         // remove possible * at end of engine downloads
         if (downloadName_.back() == '*')
@@ -289,9 +291,27 @@ void Model::processDone(std::pair<unsigned int, int> idRetPair)
         }
 
         downloadDoneSignal_(downloadType_, downloadName_, idRetPair.second == 0 ? true : false);
-        downloaderId_ = 0;
+        prDownloaderId_ = 0;
     }
 
+    // check start of downloaded demo
+    if (demoDownloadJobs_.find(idRetPair.first) != demoDownloadJobs_.end())
+    {
+        // if job failed insert zero to indicate failure
+        if (idRetPair.second != 0)
+        {
+            demoDownloadJobs_.insert(0);
+        }
+
+        demoDownloadJobs_.erase(idRetPair.first);
+        if (demoDownloadJobs_.empty() ||
+             (demoDownloadJobs_.size() == 1 && demoDownloadJobs_.count(0) == 1) )
+        {
+            std::string const demoInfo = flobbyDemo_ + "," + start_replay_Args_[3];
+            downloadDoneSignal_(DT_DEMO, demoInfo, demoDownloadJobs_.empty() ? true : false);
+            demoDownloadJobs_.clear();
+        }
+    }
 }
 
 void Model::connect(const std::string & host, const std::string & port)
@@ -551,7 +571,7 @@ void Model::processServerMsg(const std::string & msg)
             else
             {
                 LOG(WARNING) << "Disconnecting, first message is not "<< FirstMsg << ":" << msg;
-                serverMsgSignal_("Bad first msg from server: " + msg.substr(0, 32));
+                serverMsgSignal_("Bad first msg from server: " + msg.substr(0, 32), 1);
                 disconnect();
                 return;
             }
@@ -1703,7 +1723,7 @@ void Model::handle_MOTD(std::istream & is) // {message}
     using namespace LobbyProtocol;
     std::string ex;
     extractSentence(is, ex);
-    serverMsgSignal_("MOTD: " + ex);
+    serverMsgSignal_("MOTD: " + ex, 0);
 }
 
 void Model::handle_SERVERMSG(std::istream & is) // {message}
@@ -1711,7 +1731,7 @@ void Model::handle_SERVERMSG(std::istream & is) // {message}
     using namespace LobbyProtocol;
     std::string ex;
     extractSentence(is, ex);
-    serverMsgSignal_(ex);
+    serverMsgSignal_(ex, 1);
 }
 
 void Model::handle_SERVERMSGBOX(std::istream & is) // {message} [{url}]
@@ -1725,7 +1745,7 @@ void Model::handle_SERVERMSGBOX(std::istream & is) // {message} [{url}]
         extractSentence(is, url);
         msg += " " + url;
     }
-    serverMsgSignal_(msg);
+    serverMsgSignal_(msg, 1);
 }
 
 void Model::handle_CHANNEL(std::istream & is) // channelName userCount [{topic}]
@@ -2079,7 +2099,7 @@ void Model::handle_Say(std::istream & is)
         break;
 
     case 5: // MessageBox
-        serverMsgSignal_(jv["Text"].asString());
+        serverMsgSignal_(jv["Text"].asString(), 1);
         break;
 
     default:
@@ -2318,14 +2338,14 @@ void Model::handle_STARTLISTSUBSCRIPTION(std::istream & is) // empty
 {
     using namespace LobbyProtocol;
 
-    serverMsgSignal_("STARTLISTSUBSCRIPTION");
+    serverMsgSignal_("STARTLISTSUBSCRIPTION", 0);
 }
 
 void Model::handle_ENDLISTSUBSCRIPTION(std::istream & is) // empty
 {
     using namespace LobbyProtocol;
 
-    serverMsgSignal_("ENDLISTSUBSCRIPTION");
+    serverMsgSignal_("ENDLISTSUBSCRIPTION", 0);
 }
 
 void Model::handle_LISTSUBSCRIPTION(std::istream & is) // chanName=<NAME>
@@ -2334,7 +2354,7 @@ void Model::handle_LISTSUBSCRIPTION(std::istream & is) // chanName=<NAME>
 
     std::string ex;
     extractWord(is, ex);
-    serverMsgSignal_(ex);
+    serverMsgSignal_(ex, 0);
 }
 
 void Model::handle_OK(std::istream & is) // <command>
@@ -2345,7 +2365,7 @@ void Model::handle_OK(std::istream & is) // <command>
     std::string text;
     std::getline(is, text);
     msg += text;
-    serverMsgSignal_(msg);
+    serverMsgSignal_(msg, 0);
 }
 
 void Model::handle_FAILED(std::istream & is) // <command> <text>
@@ -2356,7 +2376,7 @@ void Model::handle_FAILED(std::istream & is) // <command> <text>
     std::string text;
     std::getline(is, text);
     msg += text;
-    serverMsgSignal_(msg);
+    serverMsgSignal_(msg, 1);
 }
 
 std::vector<AI> Model::getModAIs(std::string const & modName)
@@ -2568,18 +2588,18 @@ void Model::testThread()
 }
 
 
-bool Model::download(std::string const& name, DownloadType type)
+unsigned int Model::download(std::string const& name, DownloadType type)
 {
-    if (downloaderId_ != 0)
+    if (prDownloaderId_ != 0)
     {
         LOG(WARNING)<< "downloader already running (" << downloadName_ << ")";
-        return false;
+        return 0;
     }
 
     if (name.empty())
     {
         LOG(ERROR)<< "download name empty";
-        return false;
+        return 0;
     }
 
     downloadType_ = type;
@@ -2594,7 +2614,7 @@ bool Model::download(std::string const& name, DownloadType type)
         // TODO pr-d static disabled for now
         assert(false);
         //downloaderId_ = controller_.startThread( boost::bind(&Model::downloadInternal, this, name, type) );
-        return true;
+        return 0;
     }
 }
 
@@ -2650,12 +2670,12 @@ int Model::downloadInternal(std::string const& name, DownloadType type)
 }
 */
 
-bool Model::downloadExternal(std::string const& name, DownloadType type)
+unsigned int Model::downloadExternal(std::string const& name, DownloadType type)
 {
     if (prDownloaderCmd_.empty())
     {
         LOG(ERROR)<< "pr-downloader path empty";
-        return false;
+        return 0;
     }
 
     std::ostringstream oss;
@@ -2676,13 +2696,13 @@ bool Model::downloadExternal(std::string const& name, DownloadType type)
 
     default:
         LOG(ERROR)<< "unknown DownloadType:"<< type;
-        return false;
+        return 0;
     }
     oss << "\"" << name << "\"";
 
-    downloaderId_ = controller_.startThread( boost::bind(&Model::runProcess, this, oss.str(), true) );
+    prDownloaderId_ = controller_.startThread( boost::bind(&Model::runProcess, this, oss.str(), true) );
 
-    return true;
+    return prDownloaderId_;
 }
 
 void Model::checkPing()
@@ -2695,7 +2715,7 @@ void Model::checkPing()
         {
             std::string const msg = "PONG not received in time, disconnecting";
             LOG(WARNING) << msg;
-            serverMsgSignal_(msg);
+            serverMsgSignal_(msg, 1);
             disconnect();
         }
         else
@@ -2799,3 +2819,75 @@ void Model::listChannelSubscriptions()
     }
 }
 
+void Model::handle_SiteToLobbyCommand(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+
+    if (jv.isMember("Command"))
+    {
+        std::string const command = jv["Command"].asString();
+        if (!command.empty() && command[0] == '@')
+        {
+            auto posColon = command.find(':');
+            if (posColon != std::string::npos)
+            {
+                std::string const action = command.substr(1, posColon-1);
+                std::string const arg = command.substr(posColon+1);
+                handleZerokAction(action, arg);
+            }
+        }
+    }
+}
+
+void Model::handleZerokAction(std::string const& action, std::string const& arg)
+{
+    if (action == "start_replay")
+    {
+        if (!demoDownloadJobs_.empty())
+        {
+            LOG(WARNING)<< "download of zk demo is already in progress";
+            return;
+        }
+
+        serverMsgSignal_("handling " + action + ": " + arg, 0);
+
+        // arg is "demoUrl,game,mapName,springVersion" e.g:
+        // http://zero-k.info/replays/20151010_003505_DeltaSiegeX_100.sdf,Zero-K v1.3.9.0,DeltaSiegeX,100.0
+        start_replay_Args_.clear();
+        boost::split(start_replay_Args_, arg, boost::is_any_of(","));
+
+        if (start_replay_Args_.size() != 4)
+        {
+            LOG(ERROR)<< action << " failed, expected 4 args";
+            return;
+        }
+
+        // download map if needed
+        std::string const mapName = start_replay_Args_[2];
+        if (0 == getMapChecksum(mapName))
+        {
+            auto const jobId = download(mapName, DT_MAP);
+            if (jobId)
+            {
+                demoDownloadJobs_.insert(jobId);
+                serverMsgSignal_("downloading map " + mapName + " ...", 0);
+            }
+        }
+
+        // attempt download with curl, demo will be placed in CWD, normally ~/.config/spring/
+        std::string url = start_replay_Args_[0];
+        boost::replace_all(url, " ", "%20");
+        std::ostringstream oss;
+        oss << "curl -o " << flobbyDemo_ << " '" << url << "'";
+        auto const downloadDemoId = controller_.startThread( boost::bind(&Model::runProcess, this, oss.str(), true) );
+        demoDownloadJobs_.insert(downloadDemoId);
+        serverMsgSignal_("downloading demo " + url + " to " + flobbyDemo_+ " ...", 0);
+    }
+}
+
+void Model::startDemo(std::string const& springPath, std::string const& demoPath)
+{
+    std::string const cmd = springPath + " " + demoPath;
+    controller_.startThread( boost::bind(&Model::runProcess, this, cmd, true) );
+}

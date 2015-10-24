@@ -45,7 +45,7 @@ private:
     void connected(bool connected);
     void serverInfo(ServerInfo const & si);
     void loginResult(bool success, std::string const & info);
-    void message(std::string const & msg);
+    void message(std::string const & msg, int interest);
     void userJoined(User const & user);
     void userLeft(User const & user);
     void ring(std::string const & userName);
