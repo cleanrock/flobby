@@ -466,7 +466,34 @@ void SpringDialog::setProfile(std::string const& engineVersion)
     }
 }
 
-std::string SpringDialog::getSpringPathCurrent()
+std::string SpringDialog::buildSpringCmd(Fl_Preferences& profile)
+{
+    std::string result;
+
+    char* str;
+
+    std::string springPath;
+    profile.get(PrefSpringPath, str, "");
+    springPath = str;
+    ::free(str);
+    if (!springPath.empty())
+    {
+        result = "\"" + springPath + "\"";
+
+        std::string springOptions;
+        profile.get(PrefSpringOptions, str, "");
+        springOptions = str;
+        ::free(str);
+        if (!springOptions.empty())
+        {
+            result += " " + springOptions;
+        }
+    }
+
+    return result;
+}
+
+std::string SpringDialog::getCurrentSpringCmd()
 {
     std::string result;
 
@@ -479,15 +506,13 @@ std::string SpringDialog::getSpringPathCurrent()
     {
         Fl_Preferences p(prefs_, profile.c_str());
 
-        p.get(PrefSpringPath, str, "");
-        result = str;
-        ::free(str);
+        result = buildSpringCmd(p);
     }
 
     return result;
 }
 
-std::string SpringDialog::getSpringPath(std::string const& engineVersion)
+std::string SpringDialog::getSpringCmd(std::string const& engineVersion)
 {
     std::string result;
 
@@ -495,10 +520,7 @@ std::string SpringDialog::getSpringPath(std::string const& engineVersion)
     {
         Fl_Preferences p(prefs_, engineVersion.c_str());
 
-        char * str;
-        p.get(PrefSpringPath, str, "");
-        result = str;
-        ::free(str);
+        result = buildSpringCmd(p);
     }
 
     return result;

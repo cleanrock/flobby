@@ -641,15 +641,15 @@ void UserInterface::downloadDone(Model::DownloadType downloadType, std::string c
             if (args.size() == 2)
             {
                 std::string const engineName = args[1];
-                std::string springPath = springDialog_->getSpringPath(engineName);
-                if (springPath.empty())
+                std::string springCmd = springDialog_->getSpringCmd(engineName);
+                if (springCmd.empty())
                 {
-                    springPath = springDialog_->getSpringPathCurrent();
-                    LOG(WARNING)<< "spring '" + engineName + "' not found, using current engine: '" << springPath << "'";
+                    springCmd = springDialog_->getCurrentSpringCmd();
+                    LOG(WARNING)<< "spring '" + engineName + "' not found, using current engine: '" << springCmd << "'";
                 }
-                if (!springPath.empty() && !args[0].empty())
+                if (!springCmd.empty() && !args[0].empty())
                 {
-                    model_.startDemo(springPath, args[0]);
+                    model_.startDemo(springCmd, args[0]);
                 }
             }
         }

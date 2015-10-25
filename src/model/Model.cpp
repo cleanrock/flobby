@@ -2886,8 +2886,8 @@ void Model::handleZerokAction(std::string const& action, std::string const& arg)
     }
 }
 
-void Model::startDemo(std::string const& springPath, std::string const& demoPath)
+void Model::startDemo(std::string const& springCmd, std::string const& demoPath)
 {
-    std::string const cmd = springPath + " " + demoPath;
-    controller_.startThread( boost::bind(&Model::runProcess, this, cmd, true) );
+    std::string const cmd = springCmd + " " + demoPath;
+    controller_.startThread( boost::bind(&Model::runProcess, this, cmd, false) );
 }

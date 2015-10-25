@@ -28,8 +28,8 @@ public:
     void show();
     bool setPaths(); // returns true on success
     void setProfile(std::string const& engineVersion);
-    std::string getSpringPathCurrent();
-    std::string getSpringPath(std::string const& engineVersion);
+    std::string getCurrentSpringCmd();
+    std::string getSpringCmd(std::string const& engineVersion);
 
     // signals
     typedef boost::signals2::signal<void (std::string const & text)> ProfileSetSignal;
@@ -71,4 +71,5 @@ private:
     void onBrowseUnitSync();
     bool openFileDialog(char const * title, char const * fileName, std::string & result); // returns false on cancel
     boost::filesystem::path findEngineDir(boost::filesystem::path const& engineDir, std::string const& engineVersion);
+    std::string buildSpringCmd(Fl_Preferences& profile);
 };

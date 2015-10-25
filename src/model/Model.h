@@ -78,7 +78,7 @@ public:
     std::string serverCommand(std::string const& str);
 
     void startSpring(); // throws on failure
-    void startDemo(std::string const& springPath, std::string const& demoPath);
+    void startDemo(std::string const& springCmd, std::string const& demoPath);
     void disconnect();
 
     void getChannels();

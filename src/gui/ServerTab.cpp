@@ -145,7 +145,7 @@ void ServerTab::append(std::string const & msg, int interest /* = 0 */)
 
     text_->append(msg, interest);
     // make ChatTabs redraw header
-    if (interest == 1 && !visible() && labelcolor() != FL_RED)
+    if (interest >= 0 && !visible() && labelcolor() != FL_RED)
     {
         labelcolor(FL_RED);
         iTabs_.redrawTabs();
@@ -175,7 +175,7 @@ void ServerTab::onInput(std::string const & text)
     std::string result = model_.serverCommand(textTrimmed);
     if (!result.empty())
     {
-        append("'" + textTrimmed + "' returned:\n" + result, 1);
+        append("'" + textTrimmed + "' returned:\n" + result, 0);
     }
 }
 
