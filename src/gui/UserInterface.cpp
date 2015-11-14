@@ -613,10 +613,7 @@ void UserInterface::downloadDone(Model::DownloadType downloadType, std::string c
     {
     case Model::DT_MAP:
     case Model::DT_GAME:
-        if (success)
-        {
-            reloadMapsMods();
-        }
+        reloadMapsMods();
         break;
     case Model::DT_ENGINE:
         if (success)
@@ -630,8 +627,8 @@ void UserInterface::downloadDone(Model::DownloadType downloadType, std::string c
                     springDialog_->setProfile(name);
                 }
             }
-            reloadMapsMods();
         }
+        reloadMapsMods();
         break;
     case Model::DT_DEMO:
         if (success)
