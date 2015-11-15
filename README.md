@@ -1,7 +1,7 @@
 flobby
 ======
-flobby is a spring (http://springrts.com) lobby client written in C++.
-flobby is developed and tested on archlinux.
+flobby is a [spring](https://springrts.com) lobby client written in C++.  
+flobby is developed and tested on archlinux, use AUR package [flobby-git](https://aur.archlinux.org/packages/flobby-git/) for easy install and update.
 
 Dependencies worth noting
 -------------------------
@@ -17,6 +17,8 @@ Dependencies worth noting
 
 Build and run
 -------------
+    git clone --recursive https://github.com/cleanrock/flobby.git
+    cd flobby
     cmake .
     make
     src/flobby
@@ -37,7 +39,7 @@ Command line arguments
     $ flobby -h
     usage: flobby [options]
         -d | --dir <dir> : use <dir> for flobby config and cache instead of XDG
-        -z | --zerok     : use zero-k lobby protocol, use server address lobby.zero-k.info:8200
+        -z | --zerok     : use zero-k lobby protocol, uses server address lobby.zero-k.info:8200 by default
         -v | --version   : print flobby version
         -h | --help      : print help message
     plus standard fltk options:
@@ -57,3 +59,8 @@ Command line arguments
         -ti[tle] windowtitle
         -to[oltips]
 
+Non-obvious features
+--------------------
+- Alt+[1-9,0] - go to chat tab #, 0 will go to last tab
+- Alt+[Left|Right] - go one chat tab left/right, works when in a chat tab
+- supports watching replays from Zero-K website

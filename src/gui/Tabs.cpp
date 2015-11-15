@@ -197,16 +197,13 @@ int Tabs::handle(int event)
     else if (event == FL_SHORTCUT)
     {
         int const key = Fl::event_key();
-        if ( key >= '1' && key <= '9' && (Fl::event_state() & FL_ALT) )
+        if ( children() > 0 && key >= '0' && key <= '9' && (Fl::event_state() & FL_ALT) )
         {
-            int const index = key - '1';
-            if (index < children())
-            {
-                Fl_Widget* tab = child(index);
-                value(tab);
-                tab->show();
-                return 1;
-            }
+            int const index = (key == '0') ? children()-1 : key - '1';
+            Fl_Widget* tab = child( std::min(index, children()-1) );
+            value(tab);
+            tab->show();
+            return 1;
         }
     }
 
