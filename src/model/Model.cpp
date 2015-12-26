@@ -751,23 +751,7 @@ void Model::startSpring()
     {
         std::ostringstream oss;
         oss << "GAME/MyPasswd=";
-        if (zerok_)
-        {
-            if (battle.passworded())
-            {
-                // TODO seems ZK requires the battle password here
-                oss << userName_;
-                LOG(WARNING)<< "probably wrong MyPasswd";
-            }
-            else
-            {
-                oss << userName_;
-            }
-        }
-        else
-        {
-            oss << myScriptPassword_;
-        }
+        oss << myScriptPassword_;
         script_.add(oss.str());
     }
 
@@ -1419,6 +1403,16 @@ void Model::handle_JoinedBattle(std::istream & is)
         joinedBattleId_ = b.id();
         sendMyInitialBattleStatus(b);
         battleJoinedSignal_(b);
+
+        if (jv.isMember("ScriptPassword"))
+        {
+            myScriptPassword_ = jv["ScriptPassword"].asString();
+        }
+        else
+        {
+            LOG(WARNING)<< "script password not sent in JoinedBattle, falling back to username";
+            myScriptPassword_ = userName_;
+        }
     }
 }
 
