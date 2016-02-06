@@ -227,7 +227,7 @@ void BattleRoom::joined(Battle const & battle)
         showDownloadGameButton(Model::DT_GAME);
         sideNames_.clear();
     }
-    else if (springProfile_.find(battle.engineVersion()) == std::string::npos)
+    else if (springProfile_ != battle.engineVersion())
     {
         showDownloadGameButton(Model::DT_ENGINE);
     }
