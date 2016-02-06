@@ -3,6 +3,8 @@
 #pragma once
 
 #include <string>
+#include <map>
+#include <dlfcn.h>
 
 class UnitSync {
 public:
@@ -178,6 +180,9 @@ public:
 
 private:
     void * lib_;
+
+    // used for reuse of namespaces to reduce effect of namespace limit of 16
+    static std::map<std::string, Lmid_t> dlmNamespaces_;
 
     template <typename T>
     void bind(std::string const & name, T & fp);

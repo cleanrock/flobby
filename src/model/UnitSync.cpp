@@ -1,19 +1,44 @@
 // This file is part of flobby (GPL v2 or later), see the LICENSE file
 
 #include "UnitSync.h"
+#include "log/Log.h"
 
 #include <stdexcept>
 #include <cassert>
-#include <dlfcn.h>
 
 #define BIND( NAME ) bind( #NAME , NAME )
 
+std::map<std::string, Lmid_t> UnitSync::dlmNamespaces_;
+
 UnitSync::UnitSync(std::string const & path)
 {
-    lib_ = ::dlopen(path.c_str(), RTLD_LAZY);
+    Lmid_t dlmNamespace = LM_ID_NEWLM;
+
+    auto ns = dlmNamespaces_.find(path);
+    if (ns != dlmNamespaces_.end())
+    {
+        dlmNamespace = ns->second;
+    }
+
+    lib_ = ::dlmopen(dlmNamespace, path.c_str(), RTLD_LAZY);
     if (lib_ == NULL)
     {
-        throw std::invalid_argument("dlopen failed:" + path);
+        throw std::invalid_argument("dlopen failed: " + path);
+    }
+
+    // store new namespace for reuse
+    if (dlmNamespace == LM_ID_NEWLM)
+    {
+        Lmid_t lmid;
+        int const res = ::dlinfo(lib_, RTLD_DI_LMID, &lmid);
+        if (res != 0)
+        {
+            LOG(WARNING)<< "dlinfo(RTLD_DI_LMID) failed: " << path;
+        }
+        else
+        {
+            dlmNamespaces_[path] = lmid;
+        }
     }
 
     BIND(GetNextError);
