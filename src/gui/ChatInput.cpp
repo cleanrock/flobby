@@ -1,6 +1,7 @@
 // This file is part of flobby (GPL v2 or later), see the LICENSE file
 
 #include "ChatInput.h"
+#include "Sound.h"
 
 #include "FL/Fl.H"
 #include <boost/bind.hpp>
@@ -84,8 +85,11 @@ int ChatInput::handleKeyDown()
             return 1;
 
         case FL_Tab:
-            // do tab completion if unmodified tab
-            if (mods == 0)
+        {
+            // do tab completion if unmodified tab and char before cursor is not space
+            char const* val = value();
+            int const pos = position();
+            if (mods == 0 && pos > 0 && val[pos-1] != ' ')
             {
                 std::pair<std::string, std::size_t> result;
                 completeSignal_(value(), position(), result);
@@ -93,10 +97,16 @@ int ChatInput::handleKeyDown()
                 {
                     value(result.first.c_str());
                     position(result.second);
-                    return 1;
                 }
+                else
+                {
+                    // no match found
+                    Sound::beep();
+                }
+                return 1;
             }
-            break;
+        }
+        break;
 
         default:
             break;
