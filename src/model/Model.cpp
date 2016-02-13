@@ -1591,7 +1591,7 @@ void Model::handle_SAIDBATTLE_SAIDBATTLEEX(std::istream & is) // userName {messa
     std::string userName;
     extractWord(is, userName);
     std::string ex;
-    extractSentence(is, ex);
+    extractToNewline(is, ex);
     battleChatMsgSignal_(userName, ex);
 }
 
@@ -1601,7 +1601,7 @@ void Model::handle_SAYPRIVATE(std::istream & is) // userName {message}
     std::string userName;
     extractWord(is, userName);
     std::string msg;
-    extractSentence(is, msg);
+    extractToNewline(is, msg);
     sayPrivateSignal_(userName, msg);
 }
 
@@ -1611,7 +1611,7 @@ void Model::handle_SAIDPRIVATE(std::istream & is) // userName {message}
     std::string userName;
     extractWord(is, userName);
     std::string msg;
-    extractSentence(is, msg);
+    extractToNewline(is, msg);
     saidPrivateSignal_(userName, msg);
 }
 
@@ -1716,7 +1716,7 @@ void Model::handle_MOTD(std::istream & is) // {message}
 {
     using namespace LobbyProtocol;
     std::string ex;
-    extractSentence(is, ex);
+    extractToNewline(is, ex);
     serverMsgSignal_("MOTD: " + ex, 0);
 }
 
@@ -1724,7 +1724,7 @@ void Model::handle_SERVERMSG(std::istream & is) // {message}
 {
     using namespace LobbyProtocol;
     std::string ex;
-    extractSentence(is, ex);
+    extractToNewline(is, ex);
     serverMsgSignal_(ex, 1);
 }
 
@@ -1991,7 +1991,7 @@ void Model::handle_CHANNELMESSAGE(std::istream & is) // channelName {message}
     extractWord(is, channelName);
 
     std::string message;
-    extractSentence(is, message);
+    extractToNewline(is, message);
 
     channelMessageSignal_(channelName, message);
 }
@@ -2007,7 +2007,7 @@ void Model::handle_SAID_SAIDEX(std::istream & is) // channelName userName {messa
     extractWord(is, userName);
 
     std::string msg;
-    extractSentence(is, msg);
+    extractToNewline(is, msg);
     saidChannelSignal_(channelName, userName, msg);
 }
 

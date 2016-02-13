@@ -37,12 +37,14 @@ TextDisplay2::TextDisplay2(int x, int y, int w, int h, LogFile* logFile, char co
     box(FL_THIN_DOWN_BOX);
     text_ = new Fl_Text_Buffer();
     buffer(text_);
+    text_->tab_distance(4);
 
     style_ = new Fl_Text_Buffer();
     int style_size = sizeof(textStyles_)/sizeof(textStyles_[0]);
     highlight_data(style_, textStyles_, style_size, 'A', 0, 0);
 
     wrap_mode(WRAP_AT_BOUNDS, 0);
+
 }
 
 TextDisplay2::~TextDisplay2()

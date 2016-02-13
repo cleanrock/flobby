@@ -6,6 +6,7 @@
 #include "log/Log.h"
 #include "FlobbyDirs.h"
 #include "model/Nightwatch.h"
+#include "model/LobbyProtocol.h"
 
 #include <boost/lexical_cast.hpp>
 #define BOOST_TEST_DYN_LINK // this will define BOOST_TEST_ALTERNATIVE_INIT_API in boost/test/detail/config.hpp
@@ -98,7 +99,7 @@ BOOST_AUTO_TEST_CASE(testUserStatus)
 
     // test exception is thrown on bad input to ctor
     {
-        BOOST_CHECK_THROW(UserStatus us(""), boost::bad_lexical_cast)
+        BOOST_CHECK_THROW(UserStatus us(""), boost::bad_lexical_cast);
         BOOST_CHECK_THROW(UserStatus us("ABC"), boost::bad_lexical_cast);
     }
 
@@ -637,4 +638,54 @@ BOOST_AUTO_TEST_CASE(testNightwatch)
         BOOST_CHECK(res.valid_ == false);
     }
 
+}
+
+BOOST_AUTO_TEST_CASE(testLobbyProtocol)
+{
+    using namespace LobbyProtocol;
+
+    // extractWord
+    {
+        std::istringstream iss("word1 word2  word3");
+        std::string ex;
+
+        extractWord(iss, ex);
+        BOOST_CHECK(ex == "word1");
+
+        extractWord(iss, ex);
+        BOOST_CHECK(ex == "word2");
+
+        extractWord(iss, ex);
+        BOOST_CHECK(ex == "word3");
+    }
+
+    // extractSentence
+    {
+        std::istringstream iss("sentence 1\tsentence 2");
+        std::string ex;
+
+        extractSentence(iss, ex);
+        BOOST_CHECK(ex == "sentence 1");
+
+        extractSentence(iss, ex);
+        BOOST_CHECK(ex == "sentence 2");
+    }
+
+    // extractToNewline
+    {
+        std::istringstream iss("a b\tc d\nremaining");
+        std::string ex;
+
+        extractToNewline(iss, ex);
+        BOOST_CHECK(ex == "a b\tc d");
+    }
+
+    // skipSpaces
+    {
+        std::istringstream iss(" a b");
+
+        skipSpaces(iss);
+        std::string content(std::istreambuf_iterator<char>(iss), {});
+        BOOST_CHECK(content == "a b");
+    }
 }
