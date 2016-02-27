@@ -37,7 +37,6 @@ private:
             void draw();
         private:
             std::string info_;
-
         };
 
         std::vector<std::string> names_;
@@ -46,12 +45,15 @@ private:
         int pos_;
 
         MapArea::MapInfoWin* mapInfoWin_;
+        Model& model_;
 
-        MapArea(int x, int y, int w, int h);
+        MapArea(int x, int y, int w, int h, Model& model);
         void draw();
         int handle(int event);
 
+        int mousePosToMapIndex(int x, int y); // returns -1 if not on a map
         void updateMapInfoWin(int x, int y);
+        void showMapInfoMenu(int x, int y);
         int mapsPerLine() const;
         int linesVisible() const;
         int lines() const;

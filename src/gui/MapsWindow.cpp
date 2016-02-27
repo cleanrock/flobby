@@ -1,6 +1,7 @@
 // This file is part of flobby (GPL v2 or later), see the LICENSE file
 
 #include "MapsWindow.h"
+#include "PopupMenu.h"
 #include "Prefs.h"
 #include "Cache.h"
 
@@ -31,7 +32,7 @@ MapsWindow::MapsWindow(Model & model, Cache& cache):
     prefs_(prefs(), label())
 {
     int const scrollW = Fl::scrollbar_size();
-    mapArea_ = new MapArea(0, 0, w()-scrollW, h());
+    mapArea_ = new MapArea(0, 0, w()-scrollW, h(), model);
     scrollbar_ = new Fl_Scrollbar(w()-scrollW, 0, scrollW, h());
     resizable(mapArea_);
     end();
@@ -115,7 +116,8 @@ void MapsWindow::resize(int x, int y, int w, int h)
 ///////////////
 // MapInfoWin
 
-MapsWindow::MapArea::MapInfoWin::MapInfoWin(): Fl_Menu_Window(1,1)
+MapsWindow::MapArea::MapInfoWin::MapInfoWin()
+    : Fl_Menu_Window(1,1)
 {
     set_override();
     end();
@@ -148,9 +150,10 @@ void MapsWindow::MapArea::MapInfoWin::draw()
 ////////////
 // MapArea
 
-MapsWindow::MapArea::MapArea(int x, int y, int w, int h)
+MapsWindow::MapArea::MapArea(int x, int y, int w, int h, Model& model)
     : Fl_Widget(x, y, w, h)
     , pos_(0)
+    , model_(model)
 {
     Fl_Group *save = Fl_Group::current();
     mapInfoWin_ = new MapInfoWin();
@@ -191,24 +194,24 @@ int MapsWindow::MapArea::handle(int event)
 {
     switch (event)
     {
-    case FL_ENTER: {
+    case FL_ENTER:
         return 1; // to get FL_MOVE and FL_LEAVE events
-    } break;
-
     case FL_LEAVE:
     case FL_HIDE:
         mapInfoWin_->hide();
         break;
-
     case FL_MOVE:
         updateMapInfoWin(Fl::event_x(), Fl::event_y());
-
+        break;
+    case FL_PUSH:
+        showMapInfoMenu(Fl::event_x(), Fl::event_y());
+        return 1;
     }
 
     Fl_Widget::handle(event);
 }
 
-void MapsWindow::MapArea::updateMapInfoWin(int x, int y)
+int MapsWindow::MapArea::mousePosToMapIndex(int x, int y)
 {
     int offsetX = x/SIZE_; // offsetX is map index on line
     if (offsetX < mapsPerLine())
@@ -216,16 +219,49 @@ void MapsWindow::MapArea::updateMapInfoWin(int x, int y)
         int index = mapsPerLine()*((pos_ + y)/SIZE_) + offsetX;
         if (index < names_.size())
         {
-            std::ostringstream oss;
-            oss << names_[index];
-            mapInfoWin_->position(Fl::event_x_root(), Fl::event_y_root()+20);
-            mapInfoWin_->info(oss.str());
-            mapInfoWin_->show();
-            return;
+            return index;
         }
+    }
+    return -1;
+}
+
+void MapsWindow::MapArea::updateMapInfoWin(int x, int y)
+{
+    int const index = mousePosToMapIndex(x, y);
+    if (index >= 0)
+    {
+        mapInfoWin_->position(Fl::event_x_root(), Fl::event_y_root()+20);
+        mapInfoWin_->info(names_[index]);
+        mapInfoWin_->show();
+        return;
     }
 
     mapInfoWin_->hide();
+}
+
+void MapsWindow::MapArea::showMapInfoMenu(int x, int y)
+{
+    int const index = mousePosToMapIndex(x, y);
+    if (index >= 0)
+    {
+        PopupMenu menu;
+        MapInfo mi = model_.getMapInfo(names_[index]);
+        std::ostringstream oss;
+        oss << mi.name_ << ": "
+            << "Size:" << mi.width_/512 << "x" << mi.height_/512 << ", "
+            << "Wind:" << mi.windMin_ << "-" << mi.windMax_ << ", "
+            << "Tidal:" << mi.tidalStrength_ << ", "
+            << "Gravity:" << mi.gravity_;
+        menu.add(oss.str());
+        menu.add("Copy map name to clipboard", 1);
+        int const id = menu.show();
+        switch (id)
+        {
+        case 1:
+            Fl::copy(names_[index].c_str(), names_[index].size(), 1 /* clipboard */);
+            break;
+        }
+    }
 }
 
 int MapsWindow::MapArea::mapsPerLine() const
