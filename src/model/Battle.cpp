@@ -185,6 +185,21 @@ int Battle::playerCount() const
     return playerCount;
 }
 
+int Battle::spectators() const
+{
+    int spectatorCount = spectators_;
+
+    for (BattleUsers::value_type const& pairNamePtr: users_)
+    {
+        if (pairNamePtr.second->status().bot())
+        {
+            --spectatorCount;
+        }
+    }
+
+    return spectatorCount;
+}
+
 void Battle::print(std::ostream & os) const
 {
     os << "[Battle:" // TODO add more info

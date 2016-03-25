@@ -41,7 +41,7 @@ public:
     std::string const & modName() const;
     int userCount() const;
     int playerCount() const; // number of non-bot users
-    int spectators() const;
+    int spectators() const; // excluding bot users
     bool locked() const;
     bool running() const;
     bool running(bool running); // returns true if running status changed
@@ -185,11 +185,6 @@ inline std::string const & Battle::title() const
 inline std::string const & Battle::modName() const
 {
     return modName_;
-}
-
-inline int Battle::spectators() const
-{
-    return spectators_;
 }
 
 inline bool Battle::locked() const
