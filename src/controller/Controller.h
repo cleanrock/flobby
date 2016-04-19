@@ -50,7 +50,7 @@ private:
     RecvQueue recvQueue_;
 
     boost::mutex mutexConnected_;
-    boost::mutex mutexRecv_;
+    boost::recursive_mutex mutexRecv_;
     boost::mutex mutexThreads_;
 
     // IServerEvent (called by server_ from its own thread)

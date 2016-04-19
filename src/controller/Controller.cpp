@@ -140,7 +140,7 @@ void Controller::disconnect()
 void Controller::message(std::string const & msg)
 {
     {
-        boost::lock_guard<boost::mutex> lock(mutexRecv_);
+        boost::lock_guard<boost::recursive_mutex> lock(mutexRecv_);
         recvQueue_.push_back(msg);
         LOG_IF(DEBUG, recvQueue_.size() > 10) << "recvQueue_.size():" << recvQueue_.size();
     }
@@ -167,11 +167,12 @@ void Controller::messageCallback(void *data)
 {
     Controller* c = static_cast<Controller*>(data);
 
-    boost::lock_guard<boost::mutex> lock(c->mutexRecv_);
+    boost::lock_guard<boost::recursive_mutex> lock(c->mutexRecv_);
 
     while (!c->recvQueue_.empty())
     {
-        c->client_->message(c->recvQueue_.front());
+        auto msg = c->recvQueue_.front();
         c->recvQueue_.pop_front();
+        c->client_->message(msg);
     }
 }
