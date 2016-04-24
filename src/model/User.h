@@ -28,6 +28,7 @@ public:
     std::string const & cpu() const;
 
     std::string const info() const; // name, country, lobby
+    std::string const zkAccountID() const { return zkAccountID_; }
 
     int color() const;
     void color(int color);
@@ -53,6 +54,7 @@ private:
     std::string country_;
     std::string cpu_;
     std::string zkClientType_;
+    std::string zkAccountID_;
     int color_; // 0x00BBGGRR
     UserStatus status_;
     UserBattleStatus battleStatus_;

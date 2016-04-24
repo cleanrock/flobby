@@ -2,9 +2,9 @@
 
 #include "LogFile.h"
 #include "FlobbyDirs.h"
+#include "TextFunctions.h"
 #include "log/Log.h"
 
-#include <FL/filename.H>
 #include <boost/filesystem.hpp>
 #include <stdexcept>
 #include <ctime>
@@ -81,17 +81,6 @@ void LogFile::enable(bool enable)
 
 void LogFile::openLogFile(std::string const& path)
 {
-    std::string uri = "file://";
-    uri += path;
-
-    char msg[512];
-    int const res = fl_open_uri(uri.c_str(), msg, sizeof(msg));
-    if (res == 1)
-    {
-        LOG(DEBUG)<< "fl_open_uri success: " << msg;
-    }
-    else // 0
-    {
-        LOG(WARNING)<< "fl_open_uri failed: " << msg;
-    }
+    std::string const uri = "file://" + path;
+    flOpenUri(uri);
 }

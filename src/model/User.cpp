@@ -54,6 +54,7 @@ User::User(Json::Value & jv):
         zkClientType_ = "Unknown";
         break;
     }
+    if (jv.isMember("AccountID")) zkAccountID_ = jv["AccountID"].asString();
 
     status_.bot(jv["IsBot"].asBool());
     status_.moderator(jv["IsAdmin"].asBool());

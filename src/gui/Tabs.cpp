@@ -7,6 +7,7 @@
 #include "PrivateChatTab.h"
 #include "PopupMenu.h"
 #include "ChatSettingsDialog.h"
+#include "TextFunctions.h"
 
 #include "model/Model.h"
 #include "log/Log.h"
@@ -18,7 +19,6 @@
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Input.H>
 #include <FL/fl_ask.H>
-#include <FL/filename.H>
 #include <FL/Fl.H>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
@@ -227,8 +227,9 @@ int Tabs::handlePrivateChatClick(PrivateChatTab* pc)
             menu.add("Open log", 2);
         }
 
-        // add join battle
+        // add "Join <battlename>" and "Open user web page"
         int battleId;
+        std::string zkAccountID;
         try {
             User const& user = model_.getUser(pc->userName()); // throws if user not online
 
@@ -238,6 +239,11 @@ int Tabs::handlePrivateChatClick(PrivateChatTab* pc)
                 Battle const& battle = model_.getBattle(battleId);
                 std::string joinText = "Join " + battle.title();
                 menu.add(joinText, 3);
+            }
+
+            zkAccountID = user.zkAccountID();
+            if (!zkAccountID.empty()) {
+                menu.add("Open user web page", 4);
             }
         }
         catch (std::invalid_argument const & e) {
@@ -275,6 +281,11 @@ int Tabs::handlePrivateChatClick(PrivateChatTab* pc)
             }
             handled = 1;
             break;
+        case 4: {
+            std::string const link("http://zero-k.info/Users/Detail/" + zkAccountID);
+            flOpenUri(link);
+            break;
+        }
         }
     }
 

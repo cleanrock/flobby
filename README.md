@@ -61,6 +61,7 @@ Command line arguments
 
 Non-obvious features
 --------------------
+- user name tab completion (case-insensitive), matches first "starting with" then "containing", cycles through multiple matches
 - Alt+[1-9,0] - go to chat tab #, 0 will go to last tab
 - Alt+[Left|Right] - go one chat tab left/right, works when in a chat tab
 - supports watching replays from Zero-K website

@@ -684,6 +684,11 @@ void BattleRoom::menuUser(User const& user)
         }
     }
 
+    std::string const zkAccountID = user.zkAccountID();
+    if (!zkAccountID.empty()) {
+        menu.add("Open user web page", 2);
+    }
+
     if (menu.size() > 0)
     {
         int const id = menu.show();
@@ -692,6 +697,12 @@ void BattleRoom::menuUser(User const& user)
         case 1:
             iTabs_.openPrivateChat(user.name());
             break;
+
+        case 2: {
+            std::string const link("http://zero-k.info/Users/Detail/" + zkAccountID);
+            flOpenUri(link);
+            break;
+        }
 
         default:
             if (id >= 0x10 && id < 0x20)

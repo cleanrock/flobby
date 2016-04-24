@@ -4,7 +4,6 @@
 
 #include "log/Log.h"
 
-#include <FL/filename.H>
 #include <sstream>
 #include <ctime>
 
@@ -88,18 +87,7 @@ int TextDisplay::handle(int event)
                 {
                     size_t end = text.find_first_of(" \t\r\n\v\f", pos);
                     std::string const link = text.substr(pos, end-pos);
-                    LOG(DEBUG) << "link: '" << link << "'";
-
-                    char msg[512];
-                    int const res = fl_open_uri(link.c_str(), msg, sizeof(msg));
-                    if (res == 1)
-                    {
-                        LOG(DEBUG)<< "fl_open_uri success: " << msg;
-                    }
-                    else // 0
-                    {
-                        LOG(WARNING)<< "fl_open_uri failed: " << msg;
-                    }
+                    flOpenUri(link);
                 }
             }
             return 1;

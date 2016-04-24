@@ -108,6 +108,11 @@ void UserList::userClicked(int rowIndex, int button)
             }
         }
 
+        std::string const zkAccountID = user->zkAccountID();
+        if (!zkAccountID.empty()) {
+            menu.add("Open user web page", 3);
+        }
+
         if (menu.size() > 0)
         {
             int const id = menu.show();
@@ -147,6 +152,12 @@ void UserList::userClicked(int rowIndex, int button)
                     LOG(WARNING)<< e.what();
                 }
                 break;
+
+            case 3: {
+                std::string const link("http://zero-k.info/Users/Detail/" + zkAccountID);
+                flOpenUri(link);
+                break;
+            }
             }
         }
     }

@@ -6,7 +6,6 @@
 #include "log/Log.h"
 #include "TextFunctions.h"
 
-#include <FL/filename.H>
 #include <FL/Fl.H>
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
@@ -150,19 +149,7 @@ int TextDisplay2::handle(int event)
                         char * sel = text_->selection_text();
                         std::string const link = sel;
                         ::free(sel);
-                        LOG(DEBUG) << "link: '" << link << "'";
-
-                        char msg[512];
-                        int const res = fl_open_uri(link.c_str(), msg, sizeof(msg));
-                        if (res == 1)
-                        {
-                            LOG(DEBUG)<< "fl_open_uri success: " << msg;
-                        }
-                        else // 0
-                        {
-                            LOG(WARNING)<< "fl_open_uri failed: " << msg;
-                        }
-
+                        flOpenUri(link);
                         return 1;
                     }
                 }

@@ -20,3 +20,5 @@ std::string findMatch(std::vector<std::string> const& strings, std::string const
 
 // returns current local 24h time string, e.g. "17:59"
 std::string getHourMinuteNow();
+
+bool flOpenUri(std::string const& uri);

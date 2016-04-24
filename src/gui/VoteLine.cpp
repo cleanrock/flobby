@@ -9,7 +9,6 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
-#include <FL/filename.H>
 #include <boost/bind.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -231,18 +230,7 @@ int VoteLine::handle(int event)
                 auto const posEnd = text.find(' ', posStart);
 
                 std::string const link(text, posStart, posEnd == std::string::npos ? posEnd : posEnd - posStart);
-                LOG(DEBUG) << "link: '" << link << "'";
-
-                char msg[512];
-                int const res = fl_open_uri(link.c_str(), msg, sizeof(msg));
-                if (res == 1)
-                {
-                    LOG(DEBUG)<< "fl_open_uri success: " << msg;
-                }
-                else // 0
-                {
-                    LOG(WARNING)<< "fl_open_uri failed: " << msg;
-                }
+                flOpenUri(link);
                 return 1;
             }
         }

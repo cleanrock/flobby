@@ -1,7 +1,8 @@
 // This file is part of flobby (GPL v2 or later), see the LICENSE file
 
 #include "TextFunctions.h"
-
+#include "log/Log.h"
+#include <FL/filename.H> // fl_open_uri
 #include <boost/algorithm/string.hpp>
 #include <cctype>
 #include <ctime>
@@ -128,4 +129,21 @@ std::string getHourMinuteNow()
     std::strftime(buf, 8, "%H:%M", &tm);
 
     return std::string(buf);
+}
+
+bool flOpenUri(std::string const& uri)
+{
+    LOG(DEBUG) << "uri: '" << uri << "'";
+
+    bool result = false;
+    char msg[512];
+    int const res = fl_open_uri(uri.c_str(), msg, sizeof(msg));
+    if (res == 1) {
+        LOG(DEBUG)<< "fl_open_uri success: " << msg;
+        result = true;
+    }
+    else { // 0
+        LOG(WARNING)<< "fl_open_uri(" << uri << ") failed: " << msg;
+    }
+    return result;
 }
