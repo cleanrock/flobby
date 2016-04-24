@@ -3,7 +3,7 @@
 #pragma once
 
 #include "LogFile.h"
-
+#include "ChatInput.h"
 #include <FL/Fl_Tile.H>
 #include <vector>
 #include <string>
@@ -13,7 +13,6 @@ class ITabs;
 class User;
 class TextDisplay2;
 class UserList;
-class ChatInput;
 class ChatSettingsDialog;
 
 class ChannelChatTab: public Fl_Tile
@@ -39,7 +38,7 @@ private:
     bool beep_;
 
     void onInput(std::string const & text);
-    void onComplete(std::string const& text, std::size_t pos, std::pair<std::string, std::size_t>& result);
+    void onComplete(std::string const& text, std::size_t pos, std::string const& ignore, CompleteResult& result);
     int handle(int event);
 
     void initChatSettings();

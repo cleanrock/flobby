@@ -8,6 +8,12 @@
 #include <string>
 #include <cassert>
 
+struct CompleteResult {
+    std::string match_;
+    std::string newText_;
+    std::size_t newPos_;
+};
+
 class ChatInput: public Fl_Input
 {
 public:
@@ -19,7 +25,7 @@ public:
     { return textSignal_.connect(subscriber); }
 
     // result contain completed word and new insert position, completed word is unchanged if not found
-    typedef boost::signals2::signal<void (std::string const & text, std::size_t pos, std::pair<std::string, std::size_t>& result)> CompleteSignal;
+    typedef boost::signals2::signal<void (std::string const& text, std::size_t pos, std::string const& ignore, CompleteResult& result)> CompleteSignal;
     boost::signals2::connection connectComplete(CompleteSignal::slot_type subscriber)
     { assert(completeSignal_.num_slots() == 0); return completeSignal_.connect(subscriber); }
 
@@ -28,6 +34,13 @@ private:
     std::deque<std::string> history_;
     int pos_;
     std::string msg_; // stores unsent message when browsing history
+
+    // variables for cycling between multiple complete matches
+    std::string lastCompleteMatch_;
+    std::string lastCompleteText_;
+    std::string lastCompleteTextBeforeCompletion_;
+    int lastCompletePos_;
+    int lastPosAfterComplete_;
 
     TextSignal textSignal_;
     CompleteSignal completeSignal_;

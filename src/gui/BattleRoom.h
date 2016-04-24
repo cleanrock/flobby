@@ -4,6 +4,7 @@
 
 #include "StringTable.h"
 #include "model/Model.h"
+#include "ChatInput.h"
 #include "FL/Fl_Tile.H"
 #include <vector>
 #include <string>
@@ -120,7 +121,7 @@ private:
     void playerClicked(int rowIndex, int button);
     void playerDoubleClicked(int rowIndex, int button);
 
-    void onComplete(std::string const& text, std::size_t pos, std::pair<std::string, std::size_t>& result);
+    void onComplete(std::string const& text, std::size_t pos, std::string const& ignore, CompleteResult& result);
 
     void menuUser(User const & user);
     void menuBot(std::string const& botName, std::string const& ownerName);

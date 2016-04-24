@@ -7,10 +7,12 @@
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 
-ChatInput::ChatInput(int x, int y, int w, int h, size_t historySize):
-    Fl_Input(x, y, w, h),
-    historySize_(historySize),
-    pos_(-1)
+ChatInput::ChatInput(int x, int y, int w, int h, size_t historySize)
+    : Fl_Input(x, y, w, h)
+    , historySize_(historySize)
+    , pos_(-1)
+    , lastCompletePos_(0)
+    , lastPosAfterComplete_(0)
 {
     box(FL_THIN_DOWN_BOX);
     callback(ChatInput::callbackText, this);
@@ -44,6 +46,9 @@ void ChatInput::onText()
             }
         }
     }
+
+    // reset lastComplete on enter, probably not needed though
+    lastCompleteMatch_.clear();
 
     value(0);
 }
@@ -87,20 +92,38 @@ int ChatInput::handleKeyDown()
         case FL_Tab:
         {
             // do tab completion if unmodified tab and char before cursor is not space
-            char const* val = value();
-            int const pos = position();
-            if (mods == 0 && pos > 0 && val[pos-1] != ' ')
+            if (mods == 0 && position() > 0 && value()[position()-1] != ' ')
             {
-                std::pair<std::string, std::size_t> result;
-                completeSignal_(value(), position(), result);
-                if (!result.first.empty())
+                // use previous input if text and pos is same as after last match
+                std::string ignore;
+                std::string text = value();
+                int pos = position();
+                if (text == lastCompleteText_ && pos == lastPosAfterComplete_) {
+                    text = lastCompleteTextBeforeCompletion_;
+                    pos = lastCompletePos_;
+                    ignore = lastCompleteMatch_;
+                }
+
+                CompleteResult result;
+                completeSignal_(text, pos, ignore, result);
+                lastCompleteMatch_ = result.match_;
+                lastCompletePos_ = pos;
+                if (!result.match_.empty())
                 {
-                    value(result.first.c_str());
-                    position(result.second);
+                    lastCompleteTextBeforeCompletion_ = text;
+
+                    value(result.newText_.c_str());
+                    position(result.newPos_);
+
+                    lastCompleteText_ = value();
+                    lastPosAfterComplete_ = position();
                 }
                 else
                 {
                     // no match found
+                    lastCompleteTextBeforeCompletion_.clear();
+                    lastCompleteText_.clear();
+                    lastPosAfterComplete_ = 0;
                     Sound::beep();
                 }
                 return 1;

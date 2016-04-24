@@ -2,7 +2,6 @@
 
 #include "ServerTab.h"
 #include "TextDisplay2.h"
-#include "ChatInput.h"
 #include "UserList.h"
 #include "Prefs.h"
 #include "ITabs.h"
@@ -34,7 +33,7 @@ ServerTab::ServerTab(int x, int y, int w, int h,
     text_ = new TextDisplay2(x, y, leftW, h-ih, &logFile_);
     input_ = new ChatInput(x, y+h-ih, leftW, ih);
     input_->connectText( boost::bind(&ServerTab::onInput, this, _1) );
-    input_->connectComplete( boost::bind(&ServerTab::onComplete, this, _1, _2, _3) );
+    input_->connectComplete( boost::bind(&ServerTab::onComplete, this, _1, _2, _3, _4) );
     left->resizable(text_);
     left->end();
 
@@ -179,16 +178,17 @@ void ServerTab::onInput(std::string const & text)
     }
 }
 
-void ServerTab::onComplete(std::string const & text, std::size_t pos, std::pair<std::string, std::size_t>& result)
+void ServerTab::onComplete(std::string const & text, std::size_t pos, std::string const& ignore, CompleteResult& result)
 {
     auto const pairWordPos = getLastWord(text, pos);
 
-    std::string const userName = userList_->completeUserName(pairWordPos.first);
+    std::string const userName = userList_->completeUserName(pairWordPos.first, ignore);
 
     if (!userName.empty())
     {
-        result.first = text.substr(0, pairWordPos.second) + userName + text.substr(pos);
-        result.second = pairWordPos.second + userName.length();
+        result.match_ = userName;
+        result.newText_ = text.substr(0, pairWordPos.second) + userName + text.substr(pos);
+        result.newPos_ = pairWordPos.second + userName.length();
     }
 }
 

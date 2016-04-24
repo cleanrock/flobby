@@ -3,7 +3,6 @@
 #include "BattleRoom.h"
 #include "StringTable.h"
 #include "BattleChat.h"
-#include "ChatInput.h"
 #include "Cache.h"
 #include "ITabs.h"
 #include "Prefs.h"
@@ -157,7 +156,7 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
     playerList_->connectRowClicked( boost::bind(&BattleRoom::playerClicked, this, _1, _2) );
     playerList_->connectRowDoubleClicked( boost::bind(&BattleRoom::playerDoubleClicked, this, _1, _2) );
 
-    battleChat_->getChatInput().connectComplete( boost::bind(&BattleRoom::onComplete, this, _1, _2, _3) );
+    battleChat_->getChatInput().connectComplete( boost::bind(&BattleRoom::onComplete, this, _1, _2, _3, _4) );
 
 }
 
@@ -927,7 +926,7 @@ void BattleRoom::showDownloadGameButton(Model::DownloadType downloadType)
     header_->init_sizes();
 }
 
-void BattleRoom::onComplete(std::string const& text, std::size_t pos, std::pair<std::string, std::size_t>& result)
+void BattleRoom::onComplete(std::string const& text, std::size_t pos, std::string const& ignore, CompleteResult& result)
 {
     auto const pairWordPos = getLastWord(text, pos);
 
@@ -942,18 +941,23 @@ void BattleRoom::onComplete(std::string const& text, std::size_t pos, std::pair<
     for (int i=0; i<playerList_->rows(); ++i)
     {
         StringTableRow const & row = playerList_->getRow(static_cast<std::size_t>(i));
-        userNames.push_back(row.data_[2]);
-
+        try
+        {
+            User const & user = model_.getUser(row.data_[2]);
+            userNames.push_back(row.data_[2]);
+        }
+        catch (std::invalid_argument const & e)
+        {
+            // ignore bots
+        }
     }
 
-    auto const pairResultName = findMatch(userNames, pairWordPos.first);
-    if (pairResultName.first != MR_NO_MATCH)
+    auto const match = findMatch(userNames, pairWordPos.first, ignore);
+    if (!match.empty())
     {
-        // contain full new line
-        result.first = text.substr(0, pairWordPos.second) + pairResultName.second + text.substr(pos);
-
-        // contain new cursor pos
-        result.second = pairWordPos.second + pairResultName.second.length();
+        result.match_ = match;
+        result.newText_ = text.substr(0, pairWordPos.second) + match + text.substr(pos);
+        result.newPos_ = pairWordPos.second + match.length();
     }
 }
 

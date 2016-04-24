@@ -6,9 +6,13 @@
 #include <cctype>
 #include <ctime>
 
+// return pair with word before pos (up to pos) and pos of word start
+// e.g. "asd gh|f ert" would return ["gh", 4]
+// text must be none empty and end with a non-spac
 std::pair<std::string, size_t> getLastWord(std::string const& text, std::size_t pos)
 {
-    size_t posLastSpace = text.find_last_of(' ', pos);
+    // find beginning of last word (last space before pos/cursor)
+    size_t posLastSpace = text.find_last_of(' ', pos-1);
     size_t posStart = (posLastSpace == std::string::npos) ? 0 : posLastSpace+1;
 
     return std::make_pair(text.substr(posStart, pos-posStart), posStart);
@@ -61,47 +65,55 @@ bool containsI(std::string const& text, std::string const& needle)
     return false;
 }
 
-std::pair<MatchResult, std::string> findMatch(std::vector<std::string> const& strings, std::string const& needle)
+std::string findMatch(std::vector<std::string> const& strings, std::string const& needle, std::string const& previousMatch)
 {
-    std::pair<MatchResult, std::string> result;
-    result.first = MR_NO_MATCH;
+    std::string result;
 
-    if (needle.empty())
-    {
+    if (needle.empty()) {
         return result;
     }
 
-    // Disabled beginsC for now.
-    // I suspect it will just be confusing for the user.
+    std::vector<std::string> matches;
+
+    // Disabled for now, I suspect it will be confusing for the user.
     /*
+    // add entries that start with needle, case-sensitive
     for (auto const& text : strings)
     {
         if (beginsC(text, needle))
         {
-            result.first = MR_BEGINS_C;
-            result.second = text;
-            return result;
+            matches.push_back(text);
         }
     }
     */
 
-    for (auto const& text : strings)
-    {
-        if (beginsI(text, needle))
-        {
-            result.first = MR_BEGINS_I;
-            result.second = text;
-            return result;
+    // add entries that start with needle, case-insensitive
+    for (auto const& text : strings) {
+        if (beginsI(text, needle)) {
+            matches.push_back(text);
         }
     }
 
-    for (auto const& text : strings)
-    {
-        if (containsI(text, needle))
-        {
-            result.first = MR_CONTAINS_I;
-            result.second = text;
-            return result;
+    // add entries that contain needle, case-insensitive
+    for (auto const& text : strings) {
+        if (containsI(text, needle)) {
+            matches.push_back(text);
+        }
+    }
+
+    if (!matches.empty()) {
+        if (previousMatch.empty()) {
+            result = matches.front();
+        } else {
+            // take next match, take first if previousMatch is the last
+            auto it = std::find(matches.cbegin(), matches.cend(), previousMatch);
+            if (it != matches.end()) {
+                if ((it+1) == matches.end()) {
+                    result = matches.front();
+                } else {
+                    result = *(++it);
+                }
+            }
         }
     }
 

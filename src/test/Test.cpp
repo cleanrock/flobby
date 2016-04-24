@@ -550,17 +550,16 @@ BOOST_AUTO_TEST_CASE(testTextFunctions)
 
     StringVector strings = { "Habc", "abc", "ABC", "Hagf", "aGF" };
 
-    std::pair<MatchResult, std::string> result;
+    std::string result;
 
     result = findMatch(strings, "");
-    BOOST_CHECK_EQUAL(MR_NO_MATCH, result.first);
+    BOOST_CHECK("" == result);
 
     result = findMatch(strings, "GHabc");
-    BOOST_CHECK_EQUAL(MR_NO_MATCH, result.first);
+    BOOST_CHECK("" == result);
 
     result = findMatch(strings, "ab");
-    BOOST_CHECK_EQUAL(MR_BEGINS_I, result.first);
-    BOOST_CHECK("abc" == result.second);
+    BOOST_CHECK("abc" == result);
 
 //    result = findMatch(strings, "ab");
 //    BOOST_CHECK_EQUAL(MR_BEGINS_C, result.first);
@@ -571,17 +570,43 @@ BOOST_AUTO_TEST_CASE(testTextFunctions)
 //    BOOST_CHECK("ABC" == result.second);
 
     result = findMatch(strings, "ag");
-    BOOST_CHECK_EQUAL(MR_BEGINS_I, result.first);
-    BOOST_CHECK("aGF" == result.second);
+    BOOST_CHECK("aGF" == result);
 
     result = findMatch(strings, "BC");
-    BOOST_CHECK_EQUAL(MR_CONTAINS_I, result.first);
-    BOOST_CHECK("Habc" == result.second);
+    BOOST_CHECK("Habc" == result);
 
     result = findMatch(strings, "gf");
-    BOOST_CHECK_EQUAL(MR_CONTAINS_I, result.first);
-    BOOST_CHECK("Hagf" == result.second);
+    BOOST_CHECK("Hagf" == result);
 
+    result = findMatch(strings, "BC", "Habc");
+    BOOST_CHECK("abc" == result);
+
+    // match cycling
+    {
+        StringVector strings = { "a", "ab", "abc" };
+        std::string result;
+
+        result = findMatch(strings, "a", "abc");
+        BOOST_CHECK("a" == result);
+
+        result = findMatch(strings, "a", "a");
+        BOOST_CHECK("ab" == result);
+
+        result = findMatch(strings, "a", "ab");
+        BOOST_CHECK("abc" == result);
+    }
+
+    // match cycling with one match
+    {
+        StringVector strings = { "ab" };
+        std::string result;
+
+        result = findMatch(strings, "a");
+        BOOST_CHECK("ab" == result);
+
+        result = findMatch(strings, "a", "ab");
+        BOOST_CHECK("ab" == result);
+    }
 }
 
 BOOST_AUTO_TEST_CASE(testFlobbyDirs)
@@ -687,5 +712,64 @@ BOOST_AUTO_TEST_CASE(testLobbyProtocol)
         skipSpaces(iss);
         std::string content(std::istreambuf_iterator<char>(iss), {});
         BOOST_CHECK(content == "a b");
+    }
+}
+
+BOOST_AUTO_TEST_CASE(test_getLastWord)
+{
+    // empty string
+    {
+        auto pairWordPos = getLastWord("", 0);
+        BOOST_CHECK(pairWordPos.first == "");
+        BOOST_CHECK(pairWordPos.second == 0);
+    }
+
+    // mid of two spaces
+    {
+        auto pairWordPos = getLastWord("  ", 1);
+        BOOST_CHECK(pairWordPos.first == "");
+        BOOST_CHECK(pairWordPos.second == 1);
+    }
+
+    // end of first and only word
+    {
+        auto pairWordPos = getLastWord("ab", 2);
+        BOOST_CHECK(pairWordPos.first == "ab");
+        BOOST_CHECK(pairWordPos.second == 0);
+    }
+
+    // end of first and only word, spaces
+    {
+        auto pairWordPos = getLastWord(" ab ", 3);
+        BOOST_CHECK(pairWordPos.first == "ab");
+        BOOST_CHECK(pairWordPos.second == 1);
+    }
+
+    // end of second and last word
+    {
+        auto pairWordPos = getLastWord("ab cd", 5);
+        BOOST_CHECK(pairWordPos.first == "cd");
+        BOOST_CHECK(pairWordPos.second == 3);
+    }
+
+    // end of first of two words
+    {
+        auto pairWordPos = getLastWord("ab cd", 2);
+        BOOST_CHECK(pairWordPos.first == "ab");
+        BOOST_CHECK(pairWordPos.second == 0);
+    }
+
+    // end of second of three words
+    {
+        auto pairWordPos = getLastWord("ab cd ef", 5);
+        BOOST_CHECK(pairWordPos.first == "cd");
+        BOOST_CHECK(pairWordPos.second == 3);
+    }
+
+    // end of second of three words, extra spaces
+    {
+        auto pairWordPos = getLastWord(" ab  cd  ef ", 7);
+        BOOST_CHECK(pairWordPos.first == "cd");
+        BOOST_CHECK(pairWordPos.second == 5);
     }
 }

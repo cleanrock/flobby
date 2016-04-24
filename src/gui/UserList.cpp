@@ -158,7 +158,7 @@ void UserList::userDoubleClicked(int rowIndex, int button)
     iTabs_.openPrivateChat(row.id_);
 }
 
-std::string UserList::completeUserName(std::string const& text)
+std::string UserList::completeUserName(std::string const& text, std::string const& ignore)
 {
     std::string fullUserName;
 
@@ -173,13 +173,21 @@ std::string UserList::completeUserName(std::string const& text)
     for (int i=0; i<rows(); ++i)
     {
         StringTableRow const & row = getRow(static_cast<std::size_t>(i));
-        userNames.push_back(row.data_[0]);
+        try
+        {
+            User const & user = model_.getUser(row.data_[0]);
+            userNames.push_back(row.data_[0]);
+        }
+        catch (std::invalid_argument const & e)
+        {
+            LOG(WARNING)<< "unexpected exception: "<< e.what();
+        }
     }
 
-    auto const findResult = findMatch(userNames, text);
-    if (findResult.first != MR_NO_MATCH)
+    auto const match = findMatch(userNames, text, ignore);
+    if (!match.empty())
     {
-        fullUserName = findResult.second;
+        fullUserName = match;
     }
 
     return fullUserName;

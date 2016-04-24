@@ -19,7 +19,7 @@ public:
     void add(std::string const & userName);
     void remove(std::string const & userName);
 
-    std::string completeUserName(std::string const& text);
+    std::string completeUserName(std::string const& text, std::string const& ignore);
 
 private:
     Model & model_;

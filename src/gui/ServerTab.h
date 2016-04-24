@@ -4,7 +4,7 @@
 
 #include "LogFile.h"
 #include "model/Model.h"
-
+#include "ChatInput.h"
 #include <FL/Fl_Tile.H>
 #include <string>
 
@@ -13,7 +13,6 @@ class ITabs;
 class User;
 class Fl_Tile;
 class TextDisplay2;
-class ChatInput;
 class UserList;
 class ServerInfo;
 
@@ -37,7 +36,7 @@ private:
 
     int handle(int event);
     void onInput(std::string const & text);
-    void onComplete(std::string const & text, std::size_t pos, std::pair<std::string, std::size_t>& result);
+    void onComplete(std::string const & text, std::size_t pos, std::string const& ignore, CompleteResult& result);
 
     void append(std::string const & msg, int interest = 0);
 
