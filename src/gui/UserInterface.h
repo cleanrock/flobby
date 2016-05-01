@@ -108,6 +108,7 @@ private:
     void loginResult(bool success, std::string const & info);
     void joinBattleFailed(std::string const & reason);
     void downloadDone(Model::DownloadType downloadType, std::string const& name, bool success);
+    void startDemo(std::string const& engineVersion, std::string const& demoFile);
 
     // other signal handlers
     void autoJoinChannels(std::string const & text);

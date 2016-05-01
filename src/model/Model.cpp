@@ -49,6 +49,7 @@ Model::Model(IController & controller, bool zerok):
     me_(0),
     springId_(0),
     prDownloaderId_(0),
+    curlId_(0),
     flobbyDemo_("flobby_demo.sdf")
 {
     controller_.setIControllerEvent(*this);
@@ -285,13 +286,18 @@ void Model::processDone(std::pair<unsigned int, int> idRetPair)
     else if (idRetPair.first == prDownloaderId_)
     {
         // remove possible * at end of engine downloads
-        if (downloadName_.back() == '*')
+        if (prDownloadName_.back() == '*')
         {
-            downloadName_.pop_back();
+            prDownloadName_.pop_back();
         }
 
-        downloadDoneSignal_(downloadType_, downloadName_, idRetPair.second == 0 ? true : false);
+        downloadDoneSignal_(prDownloadType_, prDownloadName_, idRetPair.second == 0 ? true : false);
         prDownloaderId_ = 0;
+    }
+    else if (idRetPair.first == curlId_)
+    {
+        downloadDoneSignal_(DT_CURL, curlDownloadUrl_, idRetPair.second == 0 ? true : false);
+        curlId_ = 0;
     }
 
     // check start of downloaded demo
@@ -304,11 +310,13 @@ void Model::processDone(std::pair<unsigned int, int> idRetPair)
         }
 
         demoDownloadJobs_.erase(idRetPair.first);
-        if (demoDownloadJobs_.empty() ||
-             (demoDownloadJobs_.size() == 1 && demoDownloadJobs_.count(0) == 1) )
+        if (demoDownloadJobs_.empty())
         {
-            std::string const demoInfo = flobbyDemo_ + "," + start_replay_Args_[3];
-            downloadDoneSignal_(DT_DEMO, demoInfo, demoDownloadJobs_.empty() ? true : false);
+            startDemoSignal_(start_replay_Args_[3], flobbyDemo_);
+        }
+        else if (demoDownloadJobs_.size() == 1 && demoDownloadJobs_.count(0) == 1)
+        {
+            serverMsgSignal_("failed to start demo", 1);
             demoDownloadJobs_.clear();
         }
     }
@@ -2582,26 +2590,35 @@ void Model::testThread()
 }
 
 
-unsigned int Model::download(std::string const& name, DownloadType type)
+unsigned int Model::downloadPr(std::string const& name, DownloadType type)
 {
     if (prDownloaderId_ != 0)
     {
-        LOG(WARNING)<< "downloader already running (" << downloadName_ << ")";
+        LOG(WARNING)<< "pr-downloader already running " << prDownloadName_;
+        serverMsgSignal_("download of " + name + " failed, pr-downloader currently downloading " + prDownloadName_, 1);
         return 0;
     }
 
     if (name.empty())
     {
-        LOG(ERROR)<< "download name empty";
+        LOG(ERROR)<< "pr download name empty";
         return 0;
     }
 
-    downloadType_ = type;
-    downloadName_ = name;
+    prDownloadType_ = type;
+    prDownloadName_ = name;
 
     if (useExternalPrDownloader_)
     {
-        return downloadExternal(name, type);
+        auto const jobId = prDownloadExternal(name, type);
+        if (jobId == 0) {
+            serverMsgSignal_("download of " + name + " failed", 1);
+        }
+        else {
+            serverMsgSignal_("downloading " + name + " ...", 0);
+        }
+
+        return jobId;
     }
     else
     {
@@ -2612,8 +2629,25 @@ unsigned int Model::download(std::string const& name, DownloadType type)
     }
 }
 
+unsigned int Model::downloadCurl(std::string const& url, std::string const& file)
+{
+    if (curlId_ != 0) {
+        LOG(WARNING)<< "curl already running " << curlDownloadUrl_;
+        serverMsgSignal_("download of " + url + " failed, curl currently downloading " + curlDownloadUrl_, 1);
+        return 0;
+    }
+    serverMsgSignal_("downloading " + url + " to " + file + " ...", 0);
+    curlDownloadUrl_ = url;
+    std::string url2 = url;
+    boost::replace_all(url2, " ", "%20");
+    std::ostringstream oss;
+    oss << "curl -o " << file << " '" << url2 << "'";
+    curlId_ = controller_.startThread( boost::bind(&Model::runProcess, this, oss.str(), true) );
+    return curlId_;
+}
+
 /* TODO disable pr-d static for now
-int Model::downloadInternal(std::string const& name, DownloadType type)
+int Model::prDownloadInternal(std::string const& name, DownloadType type)
 {
     category prdType;
 
@@ -2664,11 +2698,12 @@ int Model::downloadInternal(std::string const& name, DownloadType type)
 }
 */
 
-unsigned int Model::downloadExternal(std::string const& name, DownloadType type)
+unsigned int Model::prDownloadExternal(std::string const& name, DownloadType type)
 {
     if (prDownloaderCmd_.empty())
     {
         LOG(ERROR)<< "pr-downloader path empty";
+        serverMsgSignal_("pr-downloader path empty, check your Downloader settings", 1);
         return 0;
     }
 
@@ -2840,7 +2875,9 @@ void Model::handleZerokAction(std::string const& action, std::string const& arg)
     {
         if (!demoDownloadJobs_.empty())
         {
-            LOG(WARNING)<< "download of zk demo is already in progress";
+            std::string const msg = "download of zk demo is already in progress";
+            LOG(WARNING)<< msg;
+            serverMsgSignal_("unable to download and start zk demo, " + msg, 1);
             return;
         }
 
@@ -2854,6 +2891,7 @@ void Model::handleZerokAction(std::string const& action, std::string const& arg)
         if (start_replay_Args_.size() != 4)
         {
             LOG(ERROR)<< action << " failed, expected 4 args";
+            serverMsgSignal_("unable to download and start zk demo, unexpected data", 1);
             return;
         }
 
@@ -2861,22 +2899,19 @@ void Model::handleZerokAction(std::string const& action, std::string const& arg)
         std::string const mapName = start_replay_Args_[2];
         if (0 == getMapChecksum(mapName))
         {
-            auto const jobId = download(mapName, DT_MAP);
+            auto const jobId = downloadPr(mapName, DT_MAP);
             if (jobId)
             {
                 demoDownloadJobs_.insert(jobId);
-                serverMsgSignal_("downloading map " + mapName + " ...", 0);
             }
         }
 
         // attempt download with curl, demo will be placed in CWD, normally ~/.config/spring/
-        std::string url = start_replay_Args_[0];
-        boost::replace_all(url, " ", "%20");
-        std::ostringstream oss;
-        oss << "curl -o " << flobbyDemo_ << " '" << url << "'";
-        auto const downloadDemoId = controller_.startThread( boost::bind(&Model::runProcess, this, oss.str(), true) );
-        demoDownloadJobs_.insert(downloadDemoId);
-        serverMsgSignal_("downloading demo " + url + " to " + flobbyDemo_+ " ...", 0);
+        auto const url = start_replay_Args_[0];
+        auto const curlJobId = downloadCurl(url, flobbyDemo_);
+        if (curlJobId) {
+            demoDownloadJobs_.insert(curlJobId);
+        }
     }
 }
 

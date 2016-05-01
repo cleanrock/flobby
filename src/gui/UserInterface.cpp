@@ -159,6 +159,7 @@ UserInterface::UserInterface(Model & model) :
     model.connectLoginResult( boost::bind(&UserInterface::loginResult, this, _1, _2) );
     model.connectJoinBattleFailed( boost::bind(&UserInterface::joinBattleFailed, this, _1) );
     model.connectDownloadDone( boost::bind(&UserInterface::downloadDone, this, _1, _2, _3) );
+    model.connectStartDemo(boost::bind(&UserInterface::startDemo, this, _1, _2) );
 
     Magick::InitializeMagick(0);
 
@@ -298,7 +299,7 @@ void UserInterface::onTest(Fl_Widget *w, void* d)
 
     //m.testThread();
     //m.download("asda asdasd dsa", Model::DT_MAP);
-    m.download("Red Comet", Model::DT_MAP);
+    m.downloadPr("Red Comet", Model::DT_MAP);
     //m.download("aksdgh", Model::DT_GAME);
 
 #if 0
@@ -630,27 +631,18 @@ void UserInterface::downloadDone(Model::DownloadType downloadType, std::string c
         }
         reloadMapsMods();
         break;
-    case Model::DT_DEMO:
-        if (success)
-        {
-            std::vector<std::string> args;
-            boost::split(args, name, boost::is_any_of(","));
-            if (args.size() == 2)
-            {
-                std::string const engineName = args[1];
-                std::string springCmd = springDialog_->getSpringCmd(engineName);
-                if (springCmd.empty())
-                {
-                    springCmd = springDialog_->getCurrentSpringCmd();
-                    LOG(WARNING)<< "spring '" + engineName + "' not found, using current engine: '" << springCmd << "'";
-                }
-                if (!springCmd.empty() && !args[0].empty())
-                {
-                    model_.startDemo(springCmd, args[0]);
-                }
-            }
-        }
-        break;
+    }
+}
+
+void UserInterface::startDemo(std::string const& engineVersion, std::string const& demoFile)
+{
+    std::string springCmd = springDialog_->getSpringCmd(engineVersion);
+    if (springCmd.empty()) {
+        springCmd = springDialog_->getCurrentSpringCmd();
+        LOG(WARNING)<< "spring '" + engineVersion + "' not found, using current engine: '" << springCmd << "'";
+    }
+    if (!springCmd.empty() && !demoFile.empty()) {
+        model_.startDemo(springCmd, demoFile);
     }
 }
 

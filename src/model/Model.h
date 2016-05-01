@@ -106,8 +106,9 @@ public:
     std::unique_ptr<uint8_t[]> getMetalMap(std::string const & mapName, int & w, int & h); // returns single component data
     std::unique_ptr<uint8_t[]> getHeightMap(std::string const & mapName, int & w, int & h); // returns single component data
 
-    enum DownloadType { DT_MAP, DT_GAME, DT_ENGINE, DT_DEMO };
-    unsigned int download(std::string const & name, DownloadType type); // returns >0 (job id) if download attempt is done
+    enum DownloadType { DT_MAP, DT_GAME, DT_ENGINE, DT_CURL };
+    unsigned int downloadPr(std::string const & name, DownloadType type); // returns >0 (job id) if download attempt is done
+    unsigned int downloadCurl(std::string const& url, std::string const& file); // returns >0 (job id) if curl is started
 
     void testThread(); // TODO remove some day
 
@@ -274,6 +275,10 @@ public:
     boost::signals2::connection connectRemoveScriptTag(RemoveScriptTagSignal::slot_type subscriber)
     { return removeScriptTagSignal_.connect(subscriber); }
 
+    typedef boost::signals2::signal<void (std::string const& engineVersion, std::string const& demoFile)> StartDemoSignal;
+    boost::signals2::connection connectStartDemo(StartDemoSignal::slot_type subscriber)
+    { return startDemoSignal_.connect(subscriber); }
+
 private:
     IController & controller_;
     bool zerok_;
@@ -293,12 +298,14 @@ private:
     User * me_;
 
     // what is being downloaded
-    DownloadType downloadType_;
-    std::string downloadName_;
+    DownloadType prDownloadType_;
+    std::string prDownloadName_;
+    std::string curlDownloadUrl_;
 
     // thread ids (0 if not running)
     unsigned int springId_;
     unsigned int prDownloaderId_;
+    unsigned int curlId_;
 
     std::string springPath_;
     std::string springOptions_;
@@ -309,10 +316,10 @@ private:
 
     int runProcess(std::string const& cmd, bool logToFile);
 
-    unsigned int downloadExternal(std::string const& name, DownloadType type); // returns >0 if download attempt is done
+    unsigned int prDownloadExternal(std::string const& name, DownloadType type); // returns >0 if download attempt is done
 
     // TODO disabled for now
-    int downloadInternal(std::string const& name, DownloadType type); // returns true if download attempt is done
+    //int prDownloadInternal(std::string const& name, DownloadType type);
 
     // IControllerEvent
     //
@@ -357,6 +364,7 @@ private:
     RemoveStartRectSignal removeStartRectSignal_;
     SetScriptTagSignal setScriptTagSignal_;
     RemoveScriptTagSignal removeScriptTagSignal_;
+    StartDemoSignal startDemoSignal_;
 
     void attemptLogin();
     void processServerMsg(const std::string & msg);

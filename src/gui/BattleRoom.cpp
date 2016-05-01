@@ -809,7 +809,7 @@ void BattleRoom::handleOnMapImage()
             {
                 case FL_LEFT_MOUSE: // start download or display minimap
                 {
-                    if (mapImageBox_->image() == 0 && model_.download(mapName, Model::DT_MAP))
+                    if (mapImageBox_->image() == 0 && model_.downloadPr(mapName, Model::DT_MAP))
                     {
                         mapImageBox_->label("downloading...");
                         mapImageBox_->deactivate();
@@ -909,7 +909,7 @@ void BattleRoom::handleOnDownloadGame()
         return;
     }
 
-    if (model_.download(downloadName, downloadType))
+    if (model_.downloadPr(downloadName, downloadType))
     {
         downloadGameBtn_->label("Downloading...");
         downloadGameBtn_->deactivate();
