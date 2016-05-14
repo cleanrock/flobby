@@ -96,14 +96,11 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
         oss << userName << ": " << msg;
     }
 
-    if (interest == 0)
+    // beep if not from self
+    if (interest >= -1 && msg.find(myName) != std::string::npos)
     {
-        if (msg.find(myName) != std::string::npos)
-        {
-            interest = 1;
-            Sound::beep();
-        }
-
+        interest = 1;
+        Sound::beep();
     }
 
     textDisplay_->append(oss.str(), interest);
