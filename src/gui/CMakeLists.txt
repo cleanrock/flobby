@@ -1,11 +1,14 @@
 add_definitions( -DMAGICKCORE_QUANTUM_DEPTH=8 )
 add_definitions( -DMAGICKCORE_HDRI_ENABLE=0 )
-find_package(ImageMagick COMPONENTS Magick++ REQUIRED)
+
+find_package(PkgConfig REQUIRED)
+
+pkg_check_modules(GraphicsMagick REQUIRED GraphicsMagick++)
 
 find_package(X11 COMPONENTS X11_Xpm_LIB X11_Xscreensaver_LIB REQUIRED)
 
 include_directories (
-    ${ImageMagick_INCLUDE_DIRS}
+    ${GraphicsMagick_INCLUDE_DIRS}
 )
 
 add_library (gui STATIC
@@ -53,7 +56,7 @@ add_dependencies(gui FlobbyConfig)
 
 target_link_libraries (gui
     ${FLTK_LIBRARIES}
-    ${ImageMagick_Magick++_LIBRARY}
+    ${GraphicsMagick_LIBRARIES}
     ${X11_Xpm_LIB}
     ${X11_Xscreensaver_LIB}
 )

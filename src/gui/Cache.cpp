@@ -217,7 +217,7 @@ void Cache::createImageFile(uint8_t const * data, int w, int h, int d, std::stri
 
     // create image, we will resize it below
     Magick::Image image;
-    image.read(w, h, d == 1 ? "I" : "RGB", MagickCore::CharPixel, data);
+    image.read(w, h, d == 1 ? "I" : "RGB", Magick::CharPixel, data);
     image.depth(8);
 
     double const r2 = static_cast<double>(w)/h * r;
@@ -239,8 +239,6 @@ void Cache::createImageFile(uint8_t const * data, int w, int h, int d, std::stri
     // resize and write
     Magick::Geometry geom(w2, h2);
     geom.aspect(true);
-    // TODO remove ? default filter seem good
-    // image.filterType(Magick::BoxFilter);
     image.resize(geom);
     image.write(path);
 }

@@ -9,7 +9,7 @@ Dependencies worth noting
 * jsoncpp
 * libxpm
 * libxss
-* ImageMagick
+* GraphicsMagick
 * curl
 * boost
 * C++11 (gcc 4.6 should be enough)

@@ -1,6 +1,9 @@
-find_package(Jsoncpp REQUIRED)
 
-include_directories(${JSONCPP_INCLUDE_DIR})
+find_package(PkgConfig REQUIRED)
+
+pkg_check_modules(JsonCpp REQUIRED jsoncpp)
+
+include_directories(${JsonCpp_INCLUDE_DIRS})
 
 add_library (model STATIC
     Battle.cpp
@@ -26,5 +29,5 @@ add_dependencies(model FlobbyConfig)
 target_link_libraries (model
     md5
     dl
-    ${JSONCPP_LIBRARY}
+    ${JsonCpp_LIBRARIES}
 )
