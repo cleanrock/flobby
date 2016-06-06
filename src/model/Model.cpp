@@ -50,7 +50,7 @@ Model::Model(IController & controller, bool zerok):
     springId_(0),
     prDownloaderId_(0),
     curlId_(0),
-    flobbyDemo_("flobby_demo.sdf")
+    flobbyDemo_("flobby_demo")
 {
     controller_.setIControllerEvent(*this);
     ServerCommand::init(*this);
@@ -312,7 +312,8 @@ void Model::processDone(std::pair<unsigned int, int> idRetPair)
         demoDownloadJobs_.erase(idRetPair.first);
         if (demoDownloadJobs_.empty())
         {
-            startDemoSignal_(start_replay_Args_[3], flobbyDemo_);
+            boost::filesystem::path const pathUrl(start_replay_Args_[0]);
+            startDemoSignal_(start_replay_Args_[3], flobbyDemo_ + pathUrl.extension().string());
         }
         else if (demoDownloadJobs_.size() == 1 && demoDownloadJobs_.count(0) == 1)
         {
@@ -2908,7 +2909,8 @@ void Model::handleZerokAction(std::string const& action, std::string const& arg)
 
         // attempt download with curl, demo will be placed in CWD, normally ~/.config/spring/
         auto const url = start_replay_Args_[0];
-        auto const curlJobId = downloadCurl(url, flobbyDemo_);
+        boost::filesystem::path const pathUrl(start_replay_Args_[0]);
+        auto const curlJobId = downloadCurl(url, flobbyDemo_ + pathUrl.extension().string());
         if (curlJobId) {
             demoDownloadJobs_.insert(curlJobId);
         }
