@@ -66,16 +66,11 @@ void TextDisplay2::append(std::string const & text, int interest)
     }
     else
     {
-        // copy text and transform newlines
-        std::string text2 = text;
-        boost::replace_all(text2, "\r", ""); //  remove CR first
-        boost::replace_all(text2, "\\n", "\n");
-
         // time stamp
         std::string const timeNow = getHourMinuteNow();
 
         std::ostringstream oss;
-        oss << timeNow << " " << text2 << '\n';
+        oss << timeNow << " " << text << '\n';
         std::string const line = oss.str();
 
         text_->append(line.c_str());
@@ -98,7 +93,7 @@ void TextDisplay2::append(std::string const & text, int interest)
             LOG(WARNING)<< "unknown interest level "<< interest;
             break;
         }
-        std::string const styleText(text2.size(), style);
+        std::string const styleText(text.size(), style);
         style_->append(styleText.c_str());
         style_->append("\n");
     }
