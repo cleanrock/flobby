@@ -197,7 +197,8 @@ void BattleRoom::setMapImage(Battle const & battle)
     else if (!model_.getUnitSyncPath().empty())
     {
         mapImageBox_->image(0);
-        mapImageBox_->label("click to\ndownload map");
+        std::string const msg = "click to\ndownload map\n" + battle.mapName();
+        mapImageBox_->copy_label(msg.c_str());
         mapImageBox_->activate();
 
         mapInfo_->value(0);

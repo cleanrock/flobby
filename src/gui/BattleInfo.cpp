@@ -2,9 +2,11 @@
 
 #include "BattleInfo.h"
 #include "StringTable.h"
+#include "MapImage.h"
 #include "Cache.h"
 
 #include "model/Model.h"
+#include "log/Log.h"
 
 #include <FL/Fl_RGB_Image.H>
 #include <FL/Fl_Button.H>
@@ -27,8 +29,9 @@ BattleInfo::BattleInfo(int x, int y, int w, int h, Model & model, Cache & cache)
 
     // TODO remove ? box(FL_FLAT_BOX);
 
-    mapImageBox_ = new Fl_Box(x,y, h, h);
+    mapImageBox_ = new MapImage(x,y, h, h);
     mapImageBox_->box(FL_FLAT_BOX);
+    mapImageBox_->callback(BattleInfo::onMapImage, this);
 
     x += 128;
     headerText_ = new Fl_Multiline_Output(x, y, w-h, h);
@@ -59,13 +62,110 @@ void BattleInfo::setMapImage(Battle const & battle)
     {
         mapImageBox_->label(0);
         mapImageBox_->image(image);
+        mapImageBox_->activate();
         currentMapImage_ = battle.mapName();
+    }
+    else if (!model_.getUnitSyncPath().empty())
+    {
+        mapImageBox_->image(0);
+        std::string const msg = "click to\ndownload map\n" + battle.mapName();
+        mapImageBox_->copy_label(msg.c_str());
+        mapImageBox_->activate();
+        currentMapImage_.clear();
     }
     else
     {
+        // disable map download since we don't have unitsync yet
         mapImageBox_->image(0);
-        mapImageBox_->label("map\nnot\nfound");
+        mapImageBox_->label("");
+        mapImageBox_->deactivate();
         currentMapImage_.clear();
+    }
+}
+
+void BattleInfo::onMapImage(Fl_Widget* w, void* data)
+{
+    BattleInfo* o = static_cast<BattleInfo*>(data);
+    o->handleOnMapImage();
+}
+
+void BattleInfo::handleOnMapImage()
+{
+    if (battleId_ == -1)
+    {
+        LOG(WARNING)<< "battleId_ == -1";
+        return;
+    }
+
+    std::string const mapName = model_.getBattle(battleId_).mapName();
+    if (mapName.empty())
+    {
+        LOG(WARNING)<< "mapName empty";
+        return;
+    }
+
+    switch (Fl::event())
+    {
+        case FL_PUSH: // mouse button single click
+            switch (Fl::event_button())
+            {
+                case FL_LEFT_MOUSE: // start download or display minimap
+                {
+                    if (mapImageBox_->image() == 0 && model_.downloadPr(mapName, Model::DT_MAP))
+                    {
+                        mapImageBox_->label("downloading...");
+                        mapImageBox_->deactivate();
+                    }
+                    else
+                    {
+                        Fl_Image * image = cache_.getMapImage(mapName);
+                        if (image && image != mapImageBox_->image())
+                        {
+                            mapImageBox_->image(image);
+                            mapImageBox_->redraw();
+                        }
+                    }
+                }
+                break;
+            }
+            break;
+
+        case FL_MOUSEWHEEL:
+            Fl_Image * imageCurrent = mapImageBox_->image();
+            if (imageCurrent != 0)
+            {
+                Fl_Image * imageHeight = cache_.getHeightImage(mapName);
+                Fl_Image * imageMap = cache_.getMapImage(mapName);
+                Fl_Image * imageMetal = cache_.getMetalImage(mapName);
+
+                if (Fl::event_dy() < 0) // wheel up
+                {
+                    if (imageCurrent == imageMap)
+                    {
+                        mapImageBox_->image(imageHeight);
+                        mapImageBox_->redraw();
+                    }
+                    else if (imageCurrent == imageMetal)
+                    {
+                        mapImageBox_->image(imageMap);
+                        mapImageBox_->redraw();
+                    }
+                }
+                else if (Fl::event_dy() > 0) // wheel down
+                {
+                    if (imageCurrent == imageMap)
+                    {
+                        mapImageBox_->image(imageMetal);
+                        mapImageBox_->redraw();
+                    }
+                    else if (imageCurrent == imageHeight)
+                    {
+                        mapImageBox_->image(imageMap);
+                        mapImageBox_->redraw();
+                    }
+                }
+            }
+            break;
     }
 }
 
@@ -82,6 +182,7 @@ void BattleInfo::reset()
     battleId_ = -1;
     mapImageBox_->image(0);
     mapImageBox_->label(0);
+    mapImageBox_->deactivate();
     currentMapImage_.clear();
     headerText_->value("");
 }

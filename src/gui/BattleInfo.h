@@ -3,6 +3,7 @@
 #pragma once
 
 #include "StringTable.h"
+#include "MapImage.h"
 #include <FL/Fl_Group.H>
 #include <string>
 
@@ -33,7 +34,7 @@ private:
     Cache & cache_;
     int battleId_;
     Fl_Group *header_;
-    Fl_Box *mapImageBox_;
+    MapImage* mapImageBox_;
     std::unique_ptr<Fl_RGB_Image> mapImage_;
     std::string currentMapImage_; // optimization, indicates what map image is currently shown to avoid setting the same image
     Fl_Multiline_Output *headerText_;
@@ -42,6 +43,8 @@ private:
     void setMapImage(Battle const & battle);
     void setHeaderText(Battle const & battle);
     static void onJoin(Fl_Widget* w, void* data);
+    static void onMapImage(Fl_Widget* w, void* data);
+    void handleOnMapImage();
 
     // model signal handlers
     void battleChanged(const Battle & battle);
