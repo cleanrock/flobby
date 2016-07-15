@@ -24,6 +24,8 @@ public:
     virtual ~ServerTab();
 
     void initTiles();
+    int getSplitPos();
+    void setSplitPos(int x);
     std::string logPath();
 
 private:
@@ -35,6 +37,9 @@ private:
     LogFile logFile_;
 
     int handle(int event);
+    void resize(int x, int y, int w, int h) override;
+    static void callbackSplit(Fl_Widget*, void* data);
+
     void onInput(std::string const & text);
     void onComplete(std::string const & text, std::size_t pos, std::string const& ignore, CompleteResult& result);
 

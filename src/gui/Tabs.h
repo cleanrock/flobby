@@ -46,9 +46,11 @@ private:
     void channelJoined(std::string const & channelName);
 
     // ITabs
-    void openPrivateChat(std::string const & userName);
-    void openChannelChat(std::string const & channelName);
-    void redrawTabs();
+    void openPrivateChat(std::string const & userName) override;
+    void openChannelChat(std::string const & channelName) override;
+    void redrawTabs() override;
+    int getSplitPos() override;
+    void setSplitPos(int x, void* ignore) override;
 
     int handle(int event);
     int handleServerTabClick();

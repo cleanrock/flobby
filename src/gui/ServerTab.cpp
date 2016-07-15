@@ -11,13 +11,12 @@
 #include "FlobbyConfig.h"
 
 #include "model/Model.h"
+#include "log/Log.h"
 
 #include <FL/fl_ask.H>
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 #include <cassert>
-
-static char const * PrefServerMessagesSplitH = "ServerMessagesSplitH";
 
 ServerTab::ServerTab(int x, int y, int w, int h,
                                ITabs& iTabs, Model & model):
@@ -26,6 +25,11 @@ ServerTab::ServerTab(int x, int y, int w, int h,
     model_(model),
     logFile_("messages")
 {
+    callback(ServerTab::callbackSplit, this);
+
+    // limit split drag
+    resizable( new Fl_Box(this->x()+100, this->y(), this->w()-(100+100), this->h()) );
+
     // left side (text and input)
     int const leftW = 0.75*w;
     Fl_Group * left = new Fl_Group(x, y, leftW, h);
@@ -69,6 +73,34 @@ void ServerTab::initTiles()
     x = std::max(w()-200, 100);
     prefs().get(PrefServerMessagesSplitH, x, x);
     position(userList_->x(), 0, x, 0);
+}
+
+int ServerTab::getSplitPos()
+{
+    return userList_->x();
+}
+
+void ServerTab::setSplitPos(int x)
+{
+    init_sizes();
+    position(userList_->x(), 0, x, 0);
+}
+
+void ServerTab::callbackSplit(Fl_Widget*, void *data)
+{
+    ServerTab* st = static_cast<ServerTab*>(data);
+
+    st->iTabs_.setSplitPos(st->userList_->x(), st);
+}
+
+void ServerTab::resize(int x, int y, int w, int h)
+{
+    int userListW = userList_->w();
+    Fl_Tile::resize(x, y, w, h);
+    if (w > userListW+100)
+    {
+        setSplitPos(this->w()-userListW);
+    }
 }
 
 void ServerTab::serverInfo(ServerInfo const & si)

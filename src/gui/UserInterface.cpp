@@ -83,6 +83,7 @@ UserInterface::UserInterface(Model & model) :
     springDialog_->connectProfileSet(boost::bind(&UserInterface::springProfileSet, this, _1));
 
     mainWindow_ = new Fl_Double_Window(W, H, "flobby");
+    mainWindow_->size_range(600, 400, 0, 0);
     mainWindow_->user_data(this);
     mainWindow_->callback(UserInterface::mainWindowCallback);
 
@@ -124,7 +125,14 @@ UserInterface::UserInterface(Model & model) :
 
     tile_ = new Fl_Tile(0, mH, W, cH);
 
+    // limit split drag
+    tile_->resizable(new Fl_Box(tile_->x()+200, tile_->y(), tile_->w()-(200+400), tile_->h()));
+
     tileLeft_ = new Fl_Tile(0, mH, leftW, cH);
+
+    // limit split drag
+    tileLeft_->resizable( new Fl_Box(tileLeft_->x(), tileLeft_->y()+100, tileLeft_->w(), tileLeft_->h()-(100+200)) );
+
     int const tabsH = cH/2;
     tabs_ = new Tabs(0, mH, leftW, tabsH, model_);
     battleList_ = new BattleList(0, mH+tabsH, leftW, cH-tabsH, model_, *cache_);

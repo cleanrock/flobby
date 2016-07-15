@@ -10,7 +10,8 @@ void initPrefs();
 Fl_Preferences& prefs();
 
 // prefs used by multiple classes
-static char const * PrefFontSize = "FontSize";
+char const * const PrefFontSize = "FontSize";
+char const * const PrefServerMessagesSplitH = "ServerMessagesSplitH";
 
 char const * const PrefLogin = "Login";
 char const * const PrefLoginHost = "Host";

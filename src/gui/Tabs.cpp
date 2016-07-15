@@ -406,6 +406,28 @@ void Tabs::redrawTabs()
     redraw_tabs();
 }
 
+int Tabs::getSplitPos()
+{
+    return logUsersTab_->getSplitPos();
+}
+
+void Tabs::setSplitPos(int x, void* ignore)
+{
+    if (logUsersTab_ != ignore)
+    {
+        logUsersTab_->setSplitPos(x);
+    }
+
+    for (auto& pair : channelChatTabs_)
+    {
+        ChannelChatTab* cc = pair.second;
+        if (cc != ignore)
+        {
+            cc->setSplitPos(x);
+        }
+    }
+}
+
 void Tabs::connected(bool connected)
 {
     if (!connected)

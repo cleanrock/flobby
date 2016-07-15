@@ -16,9 +16,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
 
-// we use the split setting of the ServerMessages tab in all channel tabs
-static char const * PrefServerMessagesSplitH = "ServerMessagesSplitH";
-
 ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & channelName,
                          ITabs& iTabs, Model & model, ChatSettingsDialog & chatSettingsDialog):
     Fl_Tile(x,y,w,h),
@@ -28,6 +25,8 @@ ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & c
     channelName_(channelName),
     logFile_("channel_" + channelName)
 {
+    callback(ChannelChatTab::callbackSplit, this);
+
     // make tab name unique
     std::string const tabName("#"+channelName);
     copy_label(tabName.c_str());
@@ -48,14 +47,7 @@ ChannelChatTab::ChannelChatTab(int x, int y, int w, int h, std::string const & c
     userList_ = new UserList(x+leftW, y, rightW, h, model_, iTabs_);
 
     // setup split
-    {
-        int x;
-        prefs().get(PrefServerMessagesSplitH, x, 0);
-        if (x != 0)
-        {
-            position(userList_->x(), 0, x, 0);
-        }
-    }
+    position(userList_->x(), 0, iTabs.getSplitPos(), 0);
 
     end();
 
@@ -85,6 +77,29 @@ int ChannelChatTab::handle(int event)
         break;
     }
     return Fl_Tile::handle(event);
+}
+
+void ChannelChatTab::setSplitPos(int x)
+{
+    init_sizes();
+    position(userList_->x(), 0, x, 0);
+}
+
+void ChannelChatTab::callbackSplit(Fl_Widget*, void *data)
+{
+    ChannelChatTab* o = static_cast<ChannelChatTab*>(data);
+
+    o->iTabs_.setSplitPos(o->userList_->x(), o);
+}
+
+void ChannelChatTab::resize(int x, int y, int w, int h)
+{
+    int userListW = userList_->w();
+    Fl_Tile::resize(x, y, w, h);
+    if (w > userListW+100)
+    {
+        setSplitPos(this->w()-userListW);
+    }
 }
 
 void ChannelChatTab::onInput(std::string const & text)

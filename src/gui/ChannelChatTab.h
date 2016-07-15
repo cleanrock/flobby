@@ -23,6 +23,7 @@ public:
     virtual ~ChannelChatTab();
     void leave();
     void append(std::string const & msg, int interest = -1);
+    void setSplitPos(int x);
     std::string logPath();
 
 private:
@@ -40,6 +41,8 @@ private:
     void onInput(std::string const & text);
     void onComplete(std::string const& text, std::size_t pos, std::string const& ignore, CompleteResult& result);
     int handle(int event);
+    void resize(int x, int y, int w, int h) override;
+    static void callbackSplit(Fl_Widget*, void* data);
 
     void initChatSettings();
 

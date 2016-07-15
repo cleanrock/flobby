@@ -44,6 +44,9 @@ BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache,
     battleId_(-1),
     lastRunning_(false)
 {
+    // limit split drag
+    resizable( new Fl_Box(this->x(), this->y()+100, this->w(), this->h()-(100+100)) );
+
     int const topH = h/2;
     top_ = new Fl_Group(x, y, w, topH);
 
