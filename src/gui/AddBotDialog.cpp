@@ -73,6 +73,20 @@ void AddBotDialog::onList()
         }
     }
 
+    // try to find a unique bot name
+    Model::Bots const& bots = model_.getBots();
+    std::string botName = aiName + "_";
+    for (int i=1; i<100; ++i)
+    {
+        std::string const botNameCandidate = botName + boost::lexical_cast<std::string>(i);
+        if (bots.count(botNameCandidate) == 0)
+        {
+            botName = botNameCandidate;
+            break;
+        }
+    }
+    botName_->value(botName.c_str());
+
     add_->activate();
 
     // add if double click
@@ -94,7 +108,22 @@ void AddBotDialog::onAdd()
     if (line > 0)
     {
         std::string const aiName = botName_->value();
-        std::string const aiDll = list_->text(line);
+        std::string aiDll = list_->text(line);
+
+        // add version to aiDll if version starts with a number
+        for (auto const& ai: ais_)
+        {
+            if (ai.name_ == aiDll)
+            {
+                auto v = ai.info_.find("version");
+                if (v != ai.info_.end() && !v->second.empty() && ::isdigit(v->second[0]))
+                {
+                    aiDll += "|" + v->second;
+                }
+                break;
+            }
+        }
+
         model_.addBot(Bot(aiName, aiDll));
         hide();
     }
