@@ -18,9 +18,7 @@ public:
         tidalStrength_(0),
         windMin_(0),
         windMax_(0),
-        gravity_(0),
-        resourceCount_(0),
-        startPosCount_(0)
+        gravity_(0)
     {};
 
     std::string name_;
@@ -34,14 +32,6 @@ public:
     int windMin_;
     int windMax_;
     int gravity_;
-
-    int resourceCount_;
-    std::vector<std::string> resourceNames_;
-    std::vector<float> resourceMax_;
-    std::vector<int> resourceExtractorRadius_;
-
-    int startPosCount_;
-    std::vector<std::pair<float,float>> startPos_;
 
     void serialize(std::ostream & os) const;
     void unserialize(std::istream & is); // throws on error

@@ -10,35 +10,48 @@ std::string const MapInfo::version_ = "MapInfo_1";
 MapInfo::MapInfo(UnitSync & unitSync, int index):
     name_( nullToEmpty(unitSync.GetMapName(index)) ),
     fileName_( nullToEmpty(unitSync.GetMapFileName(index)) ),
-    description_( nullToEmpty(unitSync.GetMapDescription(index)) ),
-    author_( nullToEmpty(unitSync.GetMapAuthor(index)) ),
-    checksum_(unitSync.GetMapChecksum(index)),
-    width_(unitSync.GetMapWidth(index)),
-    height_(unitSync.GetMapHeight(index)),
-    tidalStrength_(unitSync.GetMapTidalStrength(index)),
-    windMin_(unitSync.GetMapWindMin(index)),
-    windMax_(unitSync.GetMapWindMax(index)),
-    gravity_(unitSync.GetMapGravity(index)),
-    resourceCount_(unitSync.GetMapResourceCount(index)),
-    resourceNames_(resourceCount_ > 0 ? resourceCount_ : 0),
-    resourceMax_(resourceCount_ > 0 ? resourceCount_ : 0),
-    resourceExtractorRadius_(resourceCount_ > 0 ? resourceCount_ : 0),
-    startPosCount_(unitSync.GetMapPosCount(index)),
-    startPos_(startPosCount_ > 0 ? startPosCount_ : 0)
+    checksum_(unitSync.GetMapChecksum(index))
 {
-    for (int i=0; i<resourceCount_; ++i)
+    int const mapInfos = unitSync.GetMapInfoCount(index);
+    for (int i=0; i<mapInfos; ++i)
     {
-        resourceNames_[i] = nullToEmpty(unitSync.GetMapResourceName(index, i));
-        resourceMax_[i] = unitSync.GetMapResourceMax(index, i);
-        resourceExtractorRadius_[i] = unitSync.GetMapResourceExtractorRadius(index, i);
-    }
+        const std::string key = unitSync.GetInfoKey(i);
 
-    for (int i=0; i<startPosCount_; ++i)
-    {
-        std::pair<float,float> pos;
-        pos.first = unitSync.GetMapPosX(index, i);
-        pos.second = unitSync.GetMapPosZ(index, i);
-        startPos_[i] = pos;
+        // not using GetInfoType, assignments below are probably safe enough
+        // const std::string type = unitSync.GetInfoType(i);
+
+        if (key == "description") {
+            description_ = nullToEmpty(unitSync.GetInfoValueString(i));
+            continue;
+        }
+        if (key == "author") {
+            author_ = nullToEmpty(unitSync.GetInfoValueString(i));
+            continue;
+        }
+        if (key == "width") {
+            width_ = unitSync.GetInfoValueInteger(i);
+            continue;
+        }
+        if (key == "height") {
+            height_ = unitSync.GetInfoValueInteger(i);
+            continue;
+        }
+        if (key == "tidalStrength") {
+            tidalStrength_ = unitSync.GetInfoValueInteger(i);
+            continue;
+        }
+        if (key == "minWind") {
+            windMin_ = unitSync.GetInfoValueInteger(i);
+            continue;
+        }
+        if (key == "maxWind") {
+            windMax_ = unitSync.GetInfoValueInteger(i);
+            continue;
+        }
+        if (key == "gravity") {
+            gravity_ = unitSync.GetInfoValueInteger(i);
+            continue;
+        }
     }
 }
 
@@ -56,13 +69,6 @@ void MapInfo::serialize(std::ostream & os) const
        << windMin_ << std::endl
        << windMax_ << std::endl
        << gravity_ << std::endl;
-    // TODO
-//       << "resourceCount_=" <<  mapName_ << ", "
-//       << "users=";
-//       for (BattleUsers::value_type const & pair: users_)
-//       {
-//           os << *pair.second << ",";
-//       }
 }
 
 void MapInfo::unserialize(std::istream & is)
