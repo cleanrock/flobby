@@ -61,8 +61,9 @@ void BattleChat::battleChatMsg(std::string const & userName, std::string const &
         interest = -2;
     }
 
-    // handle messages from host
-    if (userName == battleHost_)
+    // handle messages from host, TODO: not sure zk handling is correct
+    if ( (!model_.isZeroK() && userName == battleHost_)
+            || (model_.isZeroK() && userName == "Nightwatch") )
     {
         if (voteLine_->processHostMessage(msg) && !battleChatSettings().showVoteLineMessages)
         {
