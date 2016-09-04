@@ -33,13 +33,18 @@ Bot::Bot(Json::Value & jv)
     owner_ = jv["Owner"].asString();
 
     battleStatus_.allyTeam(jv["AllyNumber"].asInt());
-    battleStatus_.team(jv["TeamNumber"].asInt());
+    if (jv.isMember("TeamNumber")) {
+        battleStatus_.team(jv["TeamNumber"].asInt());
+    }
+    else {
+        battleStatus_.team(0);
+    }
     battleStatus_.spectator(false);
     battleStatus_.sync(1);
 
     color_ = 0;
 
-    aiDll_ = jv["AiLib"].asString();;
+    aiDll_ = jv["AiLib"].asString();
 }
 
 Bot::Bot(std::string const & name, std::string const & aiDll):

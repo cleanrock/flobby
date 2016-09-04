@@ -133,6 +133,7 @@ Model::Model(IController & controller, bool zerok):
     ADD_ZK_MSG_HANDLER(RemoveBot)
     ADD_ZK_MSG_HANDLER(SetModOptions)
     ADD_ZK_MSG_HANDLER(SiteToLobbyCommand)
+    ADD_ZK_MSG_HANDLER(ConnectSpring)
 }
 
 Model::~Model()
@@ -1011,6 +1012,8 @@ int Model::calcSync(Battle const & battle)
     if (modChecksum == 0 || mapChecksum == 0)
     {
         // not synced, we dont have either mod or map
+        LOG(WARNING)<< "modChecksum:"<< modChecksum;
+        LOG(WARNING)<< "mapChecksum:"<< mapChecksum;
         return 2;
     }
     else if ((battle.modHash() == 0 || battle.modHash() == modChecksum)
@@ -1040,7 +1043,7 @@ void Model::sendMyBattleStatus()
         jv["IsSpectator"] = me().battleStatus().spectator();
         jv["Name"] = userName_;
         jv["Sync"] = me().battleStatus().sync();
-        jv["TeamNumber"] = me().battleStatus().team();
+        // jv["TeamNumber"] = me().battleStatus().team();
 
         Json::FastWriter writer;
         oss << "UpdateUserBattleStatus " << writer.write(jv);
@@ -1412,16 +1415,6 @@ void Model::handle_JoinedBattle(std::istream & is)
         joinedBattleId_ = b.id();
         sendMyInitialBattleStatus(b);
         battleJoinedSignal_(b);
-
-        if (jv.isMember("ScriptPassword"))
-        {
-            myScriptPassword_ = jv["ScriptPassword"].asString();
-        }
-        else
-        {
-            LOG(WARNING)<< "script password not sent in JoinedBattle, falling back to username";
-            myScriptPassword_ = userName_;
-        }
     }
 }
 
@@ -2163,6 +2156,7 @@ void Model::handle_ADDSTARTRECT(std::istream & is) // allyNo left top right bott
     addStartRectSignal_(StartRect(ally, left, top, right, bottom));
 }
 
+// SetRectangle is removed from ZK protocol
 void Model::handle_SetRectangle(std::istream & is)
 {
     Json::Value jv;
@@ -2467,7 +2461,7 @@ void Model::addBot(Bot const & bot)
         Json::Value jv;
         jv["Name"] = bot.name();
         jv["AllyNumber"] = bot.battleStatus().allyTeam();
-        jv["TeamNumber"] = bot.battleStatus().team();
+        // jv["TeamNumber"] = bot.battleStatus().team();
         jv["AiLib"] = bot.aiDll();
         jv["Owner"] = userName_;
 
@@ -2498,7 +2492,7 @@ void Model::botAllyTeam(std::string const& name, int allyTeam)
             Json::Value jv;
             jv["Name"] = bot.name();
             jv["AllyNumber"] = ubs.allyTeam();
-            jv["TeamNumber"] = bot.battleStatus().team();
+            // jv["TeamNumber"] = bot.battleStatus().team();
             jv["AiLib"] = bot.aiDll();
             jv["Owner"] = userName_;
 
@@ -2921,4 +2915,55 @@ void Model::startDemo(std::string const& springCmd, std::string const& demoPath)
 {
     std::string const cmd = springCmd + " " + demoPath;
     controller_.startThread( boost::bind(&Model::runProcess, this, cmd, false) );
+}
+
+void Model::requestConnectSpring()
+{
+    if (!isZeroK()) {
+        LOG(ERROR)<< __FUNCTION__<< " not zk";
+        return;
+    }
+
+    if (joinedBattleId_ == -1) {
+        LOG(ERROR)<< __FUNCTION__<< " not in a battle";
+        return;
+    }
+
+    Battle const & battle = getBattle(joinedBattleId_);
+
+    Json::Value jv;
+    jv["BattleID"] = battle.id();
+
+    Json::FastWriter writer;
+    std::ostringstream oss;
+    oss<< "RequestConnectSpring "<< writer.write(jv);
+    controller_.send(oss.str());
+}
+
+void Model::handle_ConnectSpring(std::istream & is)
+{
+    if (-1 == joinedBattleId_) {
+        LOG(ERROR)<< __FUNCTION__<< " no battle joined";
+        return;
+    }
+
+    Battle& b = battle(joinedBattleId_);
+
+    Json::Value jv;
+    is >> jv;
+
+    b.setIp(jv["Ip"].asString());
+    b.setPort(jv["Port"].asString());
+
+    if (jv.isMember("ScriptPassword"))
+    {
+        myScriptPassword_ = jv["ScriptPassword"].asString();
+    }
+    else
+    {
+        LOG(WARNING)<< "no ScriptPassword, falling back to username";
+        myScriptPassword_ = userName_;
+    }
+
+    startSpring();
 }

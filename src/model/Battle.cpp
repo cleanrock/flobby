@@ -85,9 +85,6 @@ Battle::Battle(Json::Value & jv):
 
     founder_ = jv["Founder"].asString();
 
-    ip_ = jv["Ip"].asString();
-    port_ = jv["Port"].asString();
-
     maxPlayers_ = jv["MaxPlayers"].asInt();
 
     passworded_ = !jv["Password"].asString().empty();
@@ -98,6 +95,9 @@ Battle::Battle(Json::Value & jv):
 
     engineName_ = "spring";
     engineVersion_ = jv["Engine"].asString();
+
+
+    // TODO use IsRunning, RunningSince ?
 
     // separate engine version and branch
     std::istringstream iss(engineVersion_);
@@ -150,6 +150,7 @@ void Battle::updateBattleUpdate(Json::Value & jv)
     if (jv.isMember("Title")) title_ = jv["Title"].asString();
     if (jv.isMember("Game")) modName_ = jv["Game"].asString();
     if (jv.isMember("SpectatorCount")) spectators_ = jv["SpectatorCount"].asInt();
+    // TODO use IsRunning, RunningSince ?
 }
 
 void Battle::joined(User const & user)

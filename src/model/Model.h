@@ -77,6 +77,7 @@ public:
 
     std::string serverCommand(std::string const& str);
 
+    void requestConnectSpring(); // zk specific
     void startSpring(); // throws on failure
     void startDemo(std::string const& springCmd, std::string const& demoPath);
     void disconnect();
@@ -477,6 +478,7 @@ private:
     void handle_RemoveBot(std::istream & is);
     void handle_SetModOptions(std::istream & is);
     void handle_SiteToLobbyCommand(std::istream & is);
+    void handle_ConnectSpring(std::istream & is);
 
     // ZeroK specific methods and attributes
     void handleZerokAction(std::string const& action, std::string const& arg);

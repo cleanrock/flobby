@@ -539,7 +539,12 @@ void BattleRoom::onAddBot(Fl_Widget* w, void* data)
 void BattleRoom::onStart(Fl_Widget* w, void* data)
 {
     BattleRoom * br = static_cast<BattleRoom*>(data);
-    br->model_.startSpring();
+    if (br->model_.isZeroK()) {
+        br->model_.requestConnectSpring();
+    }
+    else {
+        br->model_.startSpring();
+    }
     br->startBtn_->deactivate();
 }
 
