@@ -77,6 +77,7 @@ public:
 
     std::string serverCommand(std::string const& str);
 
+    void openBattle(std::string const& title, std::string const& password);
     void requestConnectSpring(); // zk specific
     void startSpring(); // throws on failure
     void startDemo(std::string const& springCmd, std::string const& demoPath);

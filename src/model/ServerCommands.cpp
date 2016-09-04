@@ -29,6 +29,7 @@ SERVER_COMMAND(sub);
 SERVER_COMMAND(unsub);
 SERVER_COMMAND(listsubs);
 SERVER_COMMAND(pm);
+SERVER_COMMAND(battle);
 
 
 Model* ServerCommand::model_ = 0;
@@ -50,7 +51,7 @@ void ServerCommand::init(Model& model)
 
     if (model_->isZeroK())
     {
-
+        sc = new SC_battle(); commmands_[sc->name_] = sc;
     }
     else // uberserver
     {
@@ -399,6 +400,30 @@ std::string SC_pm::process(std::vector<std::string> const& args)
     else
     {
         result = name_ + " requires <username> <message> arguments";
+    }
+
+    return result;
+}
+
+std::string SC_battle::description()
+{
+    return  "/" + name_ + " title [password] - "
+            "Host Zero-K battle";
+}
+
+std::string SC_battle::process(std::vector<std::string> const& args)
+{
+    std::string result;
+
+    if (!args.empty()) {
+        std::string password;
+        if (args.size() > 1) {
+            password = args[1];
+        }
+        model_->openBattle(args[0], password);
+    }
+    else {
+        result = name_ + " requires <title> argument";
     }
 
     return result;

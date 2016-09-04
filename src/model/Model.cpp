@@ -2917,6 +2917,36 @@ void Model::startDemo(std::string const& springCmd, std::string const& demoPath)
     controller_.startThread( boost::bind(&Model::runProcess, this, cmd, false) );
 }
 
+void Model::openBattle(std::string const& title, std::string const& password)
+{
+    if (!isZeroK()) {
+        LOG(ERROR)<< __FUNCTION__<< " not zk";
+        return;
+    }
+
+    if (title.empty()) {
+        LOG(ERROR)<< __FUNCTION__<< " title empty";
+        return;
+    }
+
+    Json::Value jvBattleHeader;
+    jvBattleHeader["Title"] = title;
+    jvBattleHeader["Engine"] = "103.0";
+    jvBattleHeader["Game"] = "zk:stable";
+    if (!password.empty()) {
+        jvBattleHeader["Password"] = password;
+    }
+
+    Json::Value jv;
+    jv["Header"] = jvBattleHeader;
+
+    Json::FastWriter writer;
+    std::ostringstream oss;
+    oss<< "OpenBattle "<< writer.write(jv);
+    //LOG(WARNING)<< oss.str();
+    controller_.send(oss.str());
+}
+
 void Model::requestConnectSpring()
 {
     if (!isZeroK()) {
