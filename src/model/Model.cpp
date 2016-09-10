@@ -1075,7 +1075,8 @@ void Model::handle_TASServer(std::istream & is) // protocolVersion springVersion
     extractWord(is, ex);
     si.serverMode_ = boost::lexical_cast<unsigned short>(ex);
 
-    serverInfoSignal_(si);
+    serverInfo_ = si;
+    serverInfoSignal_(serverInfo_);
 }
 
 void Model::handle_Welcome(std::istream & is) // Engine Game Version
@@ -1092,7 +1093,8 @@ void Model::handle_Welcome(std::istream & is) // Engine Game Version
     si.serverMode_ = 0;
     si.udpPort_ = 0;
 
-    serverInfoSignal_(si);
+    serverInfo_ = si;
+    serverInfoSignal_(serverInfo_);
 }
 
 void Model::handle_LoginResponse(std::istream & is) // ResultCode Reason
@@ -2917,24 +2919,35 @@ void Model::startDemo(std::string const& springCmd, std::string const& demoPath)
     controller_.startThread( boost::bind(&Model::runProcess, this, cmd, false) );
 }
 
-void Model::openBattle(std::string const& title, std::string const& password)
+void Model::openBattle(int type, std::string const& title, std::string const& password)
 {
+    if (!connected_) {
+        LOG(ERROR)<< __FUNCTION__<< " not connected";
+        return;
+    }
+
     if (!isZeroK()) {
         LOG(ERROR)<< __FUNCTION__<< " not zk";
         return;
     }
 
-    if (title.empty()) {
+    std::string const titleStripped = boost::trim_copy(title);
+    if (titleStripped.empty()) {
         LOG(ERROR)<< __FUNCTION__<< " title empty";
         return;
     }
 
+    std::string const passwordStripped = boost::trim_copy(password);
+
     Json::Value jvBattleHeader;
-    jvBattleHeader["Title"] = title;
-    jvBattleHeader["Engine"] = "103.0";
+    if (type >= 0) {
+        jvBattleHeader["Mode"] = type;
+    }
+    jvBattleHeader["Title"] = titleStripped;
+    jvBattleHeader["Engine"] = serverInfo_.springVersion_;
     jvBattleHeader["Game"] = "zk:stable";
-    if (!password.empty()) {
-        jvBattleHeader["Password"] = password;
+    if (!passwordStripped.empty()) {
+        jvBattleHeader["Password"] = passwordStripped;
     }
 
     Json::Value jv;
@@ -2943,7 +2956,6 @@ void Model::openBattle(std::string const& title, std::string const& password)
     Json::FastWriter writer;
     std::ostringstream oss;
     oss<< "OpenBattle "<< writer.write(jv);
-    //LOG(WARNING)<< oss.str();
     controller_.send(oss.str());
 }
 

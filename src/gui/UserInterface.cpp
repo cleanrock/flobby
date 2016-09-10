@@ -22,6 +22,7 @@
 #include "SoundSettingsDialog.h"
 #include "FontSettingsDialog.h"
 #include "DownloadSettingsDialog.h"
+#include "OpenBattleZkDialog.h"
 
 #include "log/Log.h"
 #include "model/Model.h"
@@ -123,6 +124,11 @@ UserInterface::UserInterface(Model & model) :
     menuBar_->box(FL_FLAT_BOX);
     menuBar_->copy(menuitems);
 
+    if (model_.isZeroK()) {
+        int index = menuBar_->find_index((Fl_Callback *)&onQuit);
+        menuBar_->insert(index, "Open &battle...", 0, (Fl_Callback *)&menuOpenBattleZk, this, FL_MENU_INACTIVE);
+    }
+
     tile_ = new Fl_Tile(0, mH, W, cH);
 
     // limit split drag
@@ -160,6 +166,7 @@ UserInterface::UserInterface(Model & model) :
     fontSettingsDialog_ = new FontSettingsDialog();
     downloadSettingsDialog_ = new DownloadSettingsDialog(model_);
     tabs_->setChatSettingsDialog(chatSettingsDialog_); // ugly dependency injection
+    openBattleZkDialog_ = new OpenBattleZkDialog(model_);
 
 
     // model signal handlers
@@ -429,6 +436,9 @@ void UserInterface::connected(bool connected)
 {
     enableMenuItem(UserInterface::menuDisconnect, connected);
     enableMenuItem(UserInterface::menuRegister, !connected);
+    if (model_.isZeroK()) {
+        enableMenuItem(UserInterface::menuOpenBattleZk, connected);
+    }
 
     if (!connected)
     {
@@ -527,6 +537,13 @@ void UserInterface::menuMaps(Fl_Widget *w, void* d)
     {
         ui->mapsWindow_->show();
     }
+}
+
+void UserInterface::menuOpenBattleZk(Fl_Widget *w, void* d)
+{
+    UserInterface* ui = static_cast<UserInterface*>(d);
+
+    ui->openBattleZkDialog_->open();
 }
 
 void UserInterface::menuBattleListFilter(Fl_Widget *w, void* d)

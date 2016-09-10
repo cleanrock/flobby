@@ -29,6 +29,7 @@ class ChatSettingsDialog;
 class SoundSettingsDialog;
 class FontSettingsDialog;
 class DownloadSettingsDialog;
+class OpenBattleZkDialog;
 
 class Fl_Double_Window;
 class Fl_Browser;
@@ -92,6 +93,7 @@ private:
     SoundSettingsDialog * soundSettingsDialog_;
     FontSettingsDialog * fontSettingsDialog_;
     DownloadSettingsDialog * downloadSettingsDialog_;
+    OpenBattleZkDialog * openBattleZkDialog_;
 
     Fl_Tile * tile_; // whole app window client area
     Fl_Tile * tileLeft_; // chat and battle list
@@ -139,6 +141,7 @@ private:
     static void doGenJob(void* d);
     static void closeProgressDialog(void* d);
     static void quitHandler(void* d);
+    static void menuOpenBattleZk(Fl_Widget *w, void* d);
 
     void enableMenuItem(void(*cb)(Fl_Widget*, void*), bool enable);
 

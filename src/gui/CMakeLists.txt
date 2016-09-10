@@ -50,6 +50,7 @@ add_library (gui STATIC
     FontSettingsDialog.cpp
     MapsWindow.cpp
     DownloadSettingsDialog.cpp
+    OpenBattleZkDialog.cpp
 )
 
 add_dependencies(gui FlobbyConfig)

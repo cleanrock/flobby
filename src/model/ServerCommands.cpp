@@ -420,7 +420,7 @@ std::string SC_battle::process(std::vector<std::string> const& args)
         if (args.size() > 1) {
             password = args[1];
         }
-        model_->openBattle(args[0], password);
+        model_->openBattle(-1, args[0], password);
     }
     else {
         result = name_ + " requires <title> argument";

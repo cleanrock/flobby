@@ -77,7 +77,7 @@ public:
 
     std::string serverCommand(std::string const& str);
 
-    void openBattle(std::string const& title, std::string const& password);
+    void openBattle(int type, std::string const& title, std::string const& password);
     void requestConnectSpring(); // zk specific
     void startSpring(); // throws on failure
     void startDemo(std::string const& springCmd, std::string const& demoPath);
@@ -288,6 +288,7 @@ private:
     bool checkFirstMsg_;
     bool loginInProgress_;
     bool loggedIn_; // set to true when we get LOGININFOEND
+    ServerInfo serverInfo_;
     uint64_t timePingSent_;
     int waitingForPong_;
     std::unique_ptr<UnitSync> unitSync_;
