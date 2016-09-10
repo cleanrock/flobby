@@ -74,7 +74,6 @@ Battle::Battle(std::istream & is): // battleId type natType founder IP port maxP
 
 Battle::Battle(Json::Value & jv):
         locked_(false), // only set to true by UPDATEBATTLEINFO
-        running_(false), // set by founder status
         modHash_(0)
 {
     id_ = jv["BattleID"].asInt();
@@ -96,8 +95,7 @@ Battle::Battle(Json::Value & jv):
     engineName_ = "spring";
     engineVersion_ = jv["Engine"].asString();
 
-
-    // TODO use IsRunning, RunningSince ?
+    // TODO use RunningSince ?
 
     // separate engine version and branch
     std::istringstream iss(engineVersion_);
@@ -150,7 +148,8 @@ void Battle::updateBattleUpdate(Json::Value & jv)
     if (jv.isMember("Title")) title_ = jv["Title"].asString();
     if (jv.isMember("Game")) modName_ = jv["Game"].asString();
     if (jv.isMember("SpectatorCount")) spectators_ = jv["SpectatorCount"].asInt();
-    // TODO use IsRunning, RunningSince ?
+    if (jv.isMember("IsRunning")) running_ = jv["IsRunning"].asBool();
+    // TODO use RunningSince ?
 }
 
 void Battle::joined(User const & user)

@@ -287,10 +287,17 @@ void BattleRoom::battleChanged(const Battle & battle)
             if (!me.status().inGame())
             {
                 // start spring if game started and we are synced, except if we are spectator and not ready
-                if ( lastRunning_ == false && ubs.sync() == 1 && ( !ubs.spectator() || (ubs.spectator() && ubs.ready()) ) )
+                if (lastRunning_ == false
+                        && ubs.sync() == 1
+                        && ( !ubs.spectator() || (ubs.spectator() && ubs.ready()) ) )
                 {
-                    model_.startSpring();
-                    startBtn_->deactivate();
+                    if (battle.ip().empty()) {
+                        LOG(WARNING)<< __FUNCTION__<< " no ip";
+                    }
+                    else {
+                        model_.startSpring();
+                        startBtn_->deactivate();
+                    }
                 }
                 else
                 {

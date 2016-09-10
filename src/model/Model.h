@@ -487,4 +487,5 @@ private:
     std::vector<std::string> start_replay_Args_;
     std::string const flobbyDemo_;
     std::set<unsigned int> demoDownloadJobs_;
+    bool requestedConnectSpring_;
 };

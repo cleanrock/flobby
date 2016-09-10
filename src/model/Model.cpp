@@ -50,7 +50,8 @@ Model::Model(IController & controller, bool zerok):
     springId_(0),
     prDownloaderId_(0),
     curlId_(0),
-    flobbyDemo_("flobby_demo")
+    flobbyDemo_("flobby_demo"),
+    requestedConnectSpring_(false)
 {
     controller_.setIControllerEvent(*this);
     ServerCommand::init(*this);
@@ -1152,7 +1153,6 @@ void Model::handle_User(std::istream & is) // User content
         {
             userChangedSignal_(user);
         }
-        updateBattleRunningStatus(user);
     }
     else
     {
@@ -1197,17 +1197,9 @@ void Model::handle_BattleAdded(std::istream & is) // BattleAdded content
     std::shared_ptr<Battle> b(new Battle(jv["Header"]));
     battles_[b->id()] = b;
 
-    // set running status
-    User& founder = user(b->founder());
-    b->running(founder.status().inGame());
-
-    founder.joinedBattle(*b);
-
     if (loggedIn_)
     {
        battleOpenedSignal_(*b);
-       userJoinedBattleSignal_(founder, *b);
-       userChangedSignal_(founder);
     }
 
 }
@@ -2980,6 +2972,7 @@ void Model::requestConnectSpring()
     std::ostringstream oss;
     oss<< "RequestConnectSpring "<< writer.write(jv);
     controller_.send(oss.str());
+    requestedConnectSpring_ = true;
 }
 
 void Model::handle_ConnectSpring(std::istream & is)
@@ -2997,15 +2990,17 @@ void Model::handle_ConnectSpring(std::istream & is)
     b.setIp(jv["Ip"].asString());
     b.setPort(jv["Port"].asString());
 
-    if (jv.isMember("ScriptPassword"))
-    {
+    if (jv.isMember("ScriptPassword")) {
         myScriptPassword_ = jv["ScriptPassword"].asString();
     }
-    else
-    {
+    else {
         LOG(WARNING)<< "no ScriptPassword, falling back to username";
         myScriptPassword_ = userName_;
     }
 
-    startSpring();
+    // only start spring here if it was requested, BattleRoom will handle auto start
+    if (requestedConnectSpring_) {
+        startSpring();
+    }
+    requestedConnectSpring_ = false;
 }
