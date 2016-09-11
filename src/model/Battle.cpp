@@ -84,12 +84,11 @@ Battle::Battle(Json::Value & jv):
 
     founder_ = jv["Founder"].asString();
 
-    maxPlayers_ = jv["MaxPlayers"].asInt();
-
     passworded_ = !jv["Password"].asString().empty();
 
+    maxPlayers_ = 0;
+    spectators_ = 0;
     rank_ = 0;
-
     mapHash_ = 0;
 
     engineName_ = "spring";
@@ -147,6 +146,7 @@ void Battle::updateBattleUpdate(Json::Value & jv)
     if (jv.isMember("Map")) mapName_ = jv["Map"].asString();
     if (jv.isMember("Title")) title_ = jv["Title"].asString();
     if (jv.isMember("Game")) modName_ = jv["Game"].asString();
+    if (jv.isMember("MaxPlayers")) maxPlayers_ = jv["MaxPlayers"].asInt();
     if (jv.isMember("SpectatorCount")) spectators_ = jv["SpectatorCount"].asInt();
     if (jv.isMember("IsRunning")) running_ = jv["IsRunning"].asBool();
     // TODO use RunningSince ?

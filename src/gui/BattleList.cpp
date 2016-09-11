@@ -233,7 +233,7 @@ std::string BattleList::statusString(Battle const & battle)
 
 StringTableRow BattleList::makeRow(Battle const & battle)
 {
-    boost::format players("%2d %2d/%d"); // players (non-specs/maxplayers)
+    boost::format players("%2d %2d/%2d"); // players (non-specs/maxplayers)
     players % battle.playerCount() % (battle.playerCount()-battle.spectators()) % battle.maxPlayers();
 
     return StringTableRow( boost::lexical_cast<std::string>(battle.id()),
