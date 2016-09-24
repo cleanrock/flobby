@@ -394,6 +394,7 @@ private:
     void sendMyInitialBattleStatus(Battle const & battle);
     void sendMyBattleStatus();
     int calcSync(Battle const & battle);
+    void updateSync();
 
     void meInGame(bool inGame);
 

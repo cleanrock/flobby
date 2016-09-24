@@ -278,7 +278,7 @@ int Model::runProcess(std::string const& cmd, bool logToFile)
 
 void Model::processDone(std::pair<unsigned int, int> idRetPair)
 {
-    LOG(DEBUG) << "processDone:" << idRetPair.first << ", " << idRetPair.second;
+    LOG(DEBUG)<< "processDone, id:"<< idRetPair.first << " ret:" << idRetPair.second;
     if (idRetPair.first == springId_)
     {
         springExitSignal_();
@@ -890,19 +890,22 @@ void Model::refresh()
     unitSync_->GetPrimaryModCount();
     initMapIndex();
 
-    // check if sync changed
+    updateSync();
+}
+
+void Model::updateSync()
+{
     if (joinedBattleId_ != -1)
     {
         int const sync = calcSync(getBattle(joinedBattleId_));
-        LOG(DEBUG) << "refresh sync:" << sync;
         User & u = me();
         if (sync != u.battleStatus().sync())
         {
+            LOG(DEBUG) << "sync changed:" << sync;
             u.battleStatus_.sync(sync);
             sendMyBattleStatus();
         }
     }
-
 }
 
 void Model::sendMyInitialBattleStatus(Battle const & battle)
@@ -1317,15 +1320,8 @@ void Model::handle_UPDATEBATTLEINFO(std::istream & is) // battleId spectatorCoun
     b.updateBattleInfo(is);
 
     // update self sync
-    if (b.id() == joinedBattleId_)
-    {
-        int const sync = calcSync(b);
-        User & u = me();
-        if (sync != u.battleStatus().sync())
-        {
-            u.battleStatus_.sync(sync);
-            sendMyBattleStatus();
-        }
+    if (b.id() == joinedBattleId_) {
+        updateSync();
     }
 
     if (loggedIn_) // only inform ui after login sequence is complete
@@ -1343,15 +1339,8 @@ void Model::handle_BattleUpdate(std::istream & is)
     b.updateBattleUpdate(jv["Header"]);
 
     // update self sync
-    if (b.id() == joinedBattleId_)
-    {
-        int const sync = calcSync(b);
-        User & u = me();
-        if (sync != u.battleStatus().sync())
-        {
-            u.battleStatus_.sync(sync);
-            sendMyBattleStatus();
-        }
+    if (b.id() == joinedBattleId_) {
+        updateSync();
     }
 
     if (loggedIn_) // only inform ui after login sequence is complete

@@ -92,22 +92,6 @@ Battle::Battle(Json::Value & jv):
     mapHash_ = 0;
 
     engineName_ = "spring";
-    engineVersion_ = jv["Engine"].asString();
-
-    // TODO use RunningSince ?
-
-    // separate engine version and branch
-    std::istringstream iss(engineVersion_);
-    iss >> engineVersion_;
-    iss >> engineBranch_;
-
-    engineVersionLong_ = engineVersion_;
-    if (!engineBranch_.empty())
-    {
-        engineVersionLong_ += " (";
-        engineVersionLong_ += engineBranch_;
-        engineVersionLong_ += ")";
-    }
 
     updateBattleUpdate(jv);
 }
@@ -150,6 +134,23 @@ void Battle::updateBattleUpdate(Json::Value & jv)
     if (jv.isMember("SpectatorCount")) spectators_ = jv["SpectatorCount"].asInt();
     if (jv.isMember("IsRunning")) running_ = jv["IsRunning"].asBool();
     // TODO use RunningSince ?
+
+    if (jv.isMember("Engine")) {
+        engineVersion_ = jv["Engine"].asString();
+
+        // separate engine version and branch
+        std::istringstream iss(engineVersion_);
+        iss >> engineVersion_;
+        iss >> engineBranch_;
+
+        engineVersionLong_ = engineVersion_;
+        if (!engineBranch_.empty())
+        {
+            engineVersionLong_ += " (";
+            engineVersionLong_ += engineBranch_;
+            engineVersionLong_ += ")";
+        }
+    }
 }
 
 void Battle::joined(User const & user)

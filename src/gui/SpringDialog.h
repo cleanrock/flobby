@@ -27,7 +27,7 @@ public:
 
     void show();
     bool setPaths(); // returns true on success
-    void setProfile(std::string const& engineVersion);
+    bool setProfile(std::string const& engineVersion); // returns true on success
     std::string getCurrentSpringCmd();
     std::string getSpringCmd(std::string const& engineVersion);
 

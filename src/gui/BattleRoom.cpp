@@ -33,7 +33,7 @@
 static char const * PrefBattleRoomSplitV = "BattleRoomSplitV";
 
 static char const* DL_GAME = "Download\nGame";
-static char const* DL_ENGINE = "Download\nEngine";
+static char const* DL_ENGINE = "Select\nEngine";
 
 BattleRoom::BattleRoom(int x, int y, int w, int h, Model & model, Cache & cache, ITabs & iTabs, SpringDialog& springDialog):
     Fl_Tile(x,y,w,h),
@@ -216,14 +216,8 @@ void BattleRoom::setMapImage(Battle const & battle)
     currentMapImage_ = battle.mapName();
 }
 
-void BattleRoom::joined(Battle const & battle)
+void BattleRoom::updateDownloadButtons(Battle const & battle)
 {
-    battleId_ = battle.id();
-    founder_ = battle.founder();
-
-    playerList_->clear();
-    top_->activate();
-
     // prio download of engine if unitsync is not loaded (we need unitsync to detect game properly)
     if ( !model_.gameExist(battle.modName()) && !model_.getUnitSyncPath().empty())
     {
@@ -240,7 +234,23 @@ void BattleRoom::joined(Battle const & battle)
         sideNames_ = model_.getModSideNames(battle.modName());
     }
 
+    if (currentMapImage_ != battle.mapName())
+    {
+        setMapImage(battle);
+    }
+}
+
+void BattleRoom::joined(Battle const & battle)
+{
+    battleId_ = battle.id();
+    founder_ = battle.founder();
+
+    playerList_->clear();
+    top_->activate();
+
+    // call setMapImage before updateDownloadButtons to make sure download of map changes map image
     setMapImage(battle);
+    updateDownloadButtons(battle);
 
     lastRunning_ = battle.running();
     if (battle.running())
@@ -270,14 +280,19 @@ void BattleRoom::joined(Battle const & battle)
     setHeaderText(battle);
 }
 
+void BattleRoom::springProfile(std::string const& springProfile)
+{
+    springProfile_ = springProfile;
+    if (battleId_ != -1) {
+        updateDownloadButtons(model_.getBattle(battleId_));
+    }
+}
+
 void BattleRoom::battleChanged(const Battle & battle)
 {
     if (battle.id() == battleId_)
     {
-        if (currentMapImage_ != battle.mapName())
-        {
-            setMapImage(battle);
-        }
+        updateDownloadButtons(battle);
         setHeaderText(battle);
 
         if (battle.running())
@@ -902,6 +917,13 @@ void BattleRoom::handleOnDownloadGame()
     }
     else if (btnText == DL_ENGINE)
     {
+        downloadName = model_.getBattle(battleId_).engineVersion();
+
+        // try to change to existing engine
+        if (springDialog_.setProfile(downloadName)) {
+            return;
+        }
+
         downloadType = Model::DT_ENGINE;
         // Make it possible to download development engines from other branches than develop.
         // Non-develop branch engines contain branch name in springname (see http://api.springfiles.com/).

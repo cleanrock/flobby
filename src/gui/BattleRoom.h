@@ -37,7 +37,7 @@ public:
     virtual ~BattleRoom();
 
     void initTiles();
-    void springProfile(std::string const& springProfile) { springProfile_ = springProfile; }
+    void springProfile(std::string const& springProfile);
 
     void joined(Battle const & battle); // call when user joins a battle
     void userLeft(User const & user, Battle const & battle);
@@ -117,6 +117,7 @@ private:
     void handleOnDownloadGame();
     void hideDownloadGameButton();
     void showDownloadGameButton(Model::DownloadType downloadType);
+    void updateDownloadButtons(Battle const & battle);
 
     void playerClicked(int rowIndex, int button);
     void playerDoubleClicked(int rowIndex, int button);

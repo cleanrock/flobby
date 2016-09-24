@@ -454,7 +454,7 @@ void SpringDialog::onBrowseUnitSync()
     }
 }
 
-void SpringDialog::setProfile(std::string const& engineVersion)
+bool SpringDialog::setProfile(std::string const& engineVersion)
 {
     if (prefs_.groupExists(engineVersion.c_str()))
     {
@@ -462,8 +462,10 @@ void SpringDialog::setProfile(std::string const& engineVersion)
         if (setPaths())
         {
             hide();
+            return true;
         }
     }
+    return false;
 }
 
 std::string SpringDialog::buildSpringCmd(Fl_Preferences& profile)
