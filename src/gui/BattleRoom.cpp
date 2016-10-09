@@ -696,8 +696,9 @@ void BattleRoom::menuUser(User const& user)
 {
     PopupMenu menu;
 
-    menu.add(user.info());
-    menu.add("Open chat", 1);
+    std::string const userInfo = user.info();
+    menu.add(userInfo, 1);
+    menu.add("Open chat", 2);
 
     if (user == model_.me())
     {
@@ -717,7 +718,7 @@ void BattleRoom::menuUser(User const& user)
 
     std::string const zkAccountID = user.zkAccountID();
     if (!zkAccountID.empty()) {
-        menu.add("Open user web page", 2);
+        menu.add("Open user web page", 3);
     }
 
     if (menu.size() > 0)
@@ -726,10 +727,13 @@ void BattleRoom::menuUser(User const& user)
         switch (id)
         {
         case 1:
+            Fl::copy(userInfo.c_str(), userInfo.size(), 1 /* clipboard */);
+            break;
+        case 2:
             iTabs_.openPrivateChat(user.name());
             break;
 
-        case 2: {
+        case 3: {
             std::string const link("http://zero-k.info/Users/Detail/" + zkAccountID);
             flOpenUri(link);
             break;

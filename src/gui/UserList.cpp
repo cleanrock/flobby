@@ -8,6 +8,7 @@
 #include "model/Model.h"
 #include "log/Log.h"
 
+#include <FL/Fl.H>
 #include "FL/fl_ask.H"
 #include <boost/bind.hpp>
 
@@ -89,8 +90,9 @@ void UserList::userClicked(int rowIndex, int button)
             return;
         }
 
-        menu.add(user->info());
-        menu.add("Open chat", 1);
+        std::string const userInfo = user->info();
+        menu.add(userInfo, 1);
+        menu.add("Open chat", 2);
 
         int const battleId = user->joinedBattle();
 
@@ -100,7 +102,7 @@ void UserList::userClicked(int rowIndex, int button)
             {
                 Battle const& battle = model_.getBattle(battleId);
                 std::string joinText = "Join " + battle.title();
-                menu.add(joinText, 2);
+                menu.add(joinText, 3);
             }
             catch (std::invalid_argument const& e)
             {
@@ -110,7 +112,7 @@ void UserList::userClicked(int rowIndex, int button)
 
         std::string const zkAccountID = user->zkAccountID();
         if (!zkAccountID.empty()) {
-            menu.add("Open user web page", 3);
+            menu.add("Open user web page", 4);
         }
 
         if (menu.size() > 0)
@@ -119,6 +121,9 @@ void UserList::userClicked(int rowIndex, int button)
             switch (id)
             {
             case 1:
+                Fl::copy(userInfo.c_str(), userInfo.size(), 1 /* clipboard */);
+                break;
+            case 2:
                 try
                 {
                     model_.getUser(userName); // to make sure user still exist
@@ -130,7 +135,7 @@ void UserList::userClicked(int rowIndex, int button)
                 }
                 break;
 
-            case 2:
+            case 3:
                 try
                 {
                     Battle const& battle = model_.getBattle(battleId);
@@ -153,7 +158,7 @@ void UserList::userClicked(int rowIndex, int button)
                 }
                 break;
 
-            case 3: {
+            case 4: {
                 std::string const link("http://zero-k.info/Users/Detail/" + zkAccountID);
                 flOpenUri(link);
                 break;
