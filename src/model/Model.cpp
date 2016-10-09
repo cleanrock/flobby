@@ -135,6 +135,11 @@ Model::Model(IController & controller, bool zerok):
     ADD_ZK_MSG_HANDLER(SetModOptions)
     ADD_ZK_MSG_HANDLER(SiteToLobbyCommand)
     ADD_ZK_MSG_HANDLER(ConnectSpring)
+    ADD_ZK_MSG_HANDLER(FriendList)
+    ADD_ZK_MSG_HANDLER(IgnoreList)
+    ADD_ZK_MSG_HANDLER(MatchMakerSetup)
+    ADD_ZK_MSG_HANDLER(MatchMakerStatus)
+    ADD_ZK_MSG_HANDLER(BattleDebriefing)
 }
 
 Model::~Model()
@@ -228,7 +233,7 @@ void Model::attemptLogin()
         login["PasswordHash"] = password_;
         login["UserID"] = userId;
         login["LobbyVersion"] = "flobby " FLOBBY_VERSION;
-        login["ClientType"] = 2;
+        login["ClientType"] = 3; // ZKL(1)|Linux(2), see enum ClientTypes in ZKS code
 
         Json::FastWriter writer;
         oss << "Login " << writer.write(login);

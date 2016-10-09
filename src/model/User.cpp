@@ -32,28 +32,16 @@ User::User(Json::Value & jv):
 {
     name_ = jv["Name"].asString();
     country_ = jv["Country"].asString();
-    int const clientType = jv["ClientType"].asInt();
-    switch (clientType)
-    {
-    case 1:
-        zkClientType_ = "ZKL";
-        break;
-    case 2:
-        zkClientType_ = "Linux";
-        break;
-    case 3:
-        zkClientType_ = "ZKL-Linux";
-        break;
-    case 4:
-        zkClientType_ = "SpringieManaged";
-        break;
-    case 8:
-        zkClientType_ = "Springie";
-        break;
-    default:
-        zkClientType_ = "Unknown";
-        break;
+    zkClientType_ = jv["LobbyVersion"].asString();
+    if (zkClientType_.empty()) {
+        LOG(WARNING)<< "empty LobbyVersion for user "<< name_;
+        zkClientType_ = "empty";
     }
+    // append Linux if bit 1 is set, see enum ClientTypes in ZKS code
+    if (jv["ClientType"].asInt() & 0x2) {
+        zkClientType_ += " Linux";
+    }
+
     if (jv.isMember("AccountID")) zkAccountID_ = jv["AccountID"].asString();
 
     status_.bot(jv["IsBot"].asBool());

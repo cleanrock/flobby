@@ -482,6 +482,11 @@ private:
     void handle_SetModOptions(std::istream & is);
     void handle_SiteToLobbyCommand(std::istream & is);
     void handle_ConnectSpring(std::istream & is);
+    void handle_FriendList(std::istream & is) {} // TODO
+    void handle_IgnoreList(std::istream & is) {} // TODO
+    void handle_MatchMakerSetup(std::istream & is) {} // TODO
+    void handle_MatchMakerStatus(std::istream & is) {} // TODO
+    void handle_BattleDebriefing(std::istream & is) {} // TODO
 
     // ZeroK specific methods and attributes
     void handleZerokAction(std::string const& action, std::string const& arg);
