@@ -118,7 +118,6 @@ Model::Model(IController & controller, bool zerok):
     ADD_ZK_MSG_HANDLER(LoginResponse)
     ADD_ZK_MSG_HANDLER(User)
     ADD_ZK_MSG_HANDLER(UserDisconnected)
-    ADD_ZK_MSG_HANDLER(Ping)
     ADD_ZK_MSG_HANDLER(BattleAdded)
     ADD_ZK_MSG_HANDLER(BattleRemoved)
     ADD_ZK_MSG_HANDLER(BattleUpdate)
@@ -2273,13 +2272,6 @@ void Model::handle_PONG(std::istream & is)
     waitingForPong_ = 0;
 }
 
-void Model::handle_Ping(std::istream & is)
-{
-    using namespace LobbyProtocol;
-
-    waitingForPong_ = 0;
-}
-
 void Model::handle_HOSTPORT(std::istream & is)
 {
     using namespace LobbyProtocol;
@@ -2719,6 +2711,10 @@ unsigned int Model::prDownloadExternal(std::string const& name, DownloadType typ
 
 void Model::checkPing()
 {
+    if (zerok_) {
+        return;
+    }
+
     uint64_t const timeNow = controller_.timeNow();
 
     if (timeNow > timePingSent_ + 30000)
@@ -2732,14 +2728,7 @@ void Model::checkPing()
         }
         else
         {
-            if (zerok_)
-            {
-                controller_.send("Ping {}");
-            }
-            else
-            {
-                controller_.send("PING");
-            }
+            controller_.send("PING");
             timePingSent_ = timeNow;
             ++waitingForPong_;
         }

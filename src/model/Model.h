@@ -462,7 +462,6 @@ private:
     void handle_Welcome(std::istream & is);
     void handle_RegisterResponse(std::istream & is);
     void handle_LoginResponse(std::istream & is);
-    void handle_Ping(std::istream & is);
     void handle_User(std::istream & is);
     void handle_UserDisconnected(std::istream & is);
     void handle_BattleAdded(std::istream & is);
