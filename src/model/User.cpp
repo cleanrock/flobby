@@ -58,6 +58,7 @@ void User::updateUser(Json::Value& jv)
 {
     if (jv.isMember("IsInGame")) status_.inGame(jv["IsInGame"].asBool());
     if (jv.isMember("IsAway")) status_.away(jv["IsAway"].asBool());
+    if (jv.isMember("BattleID")) joinedBattle_ = jv["BattleID"].asInt();
 }
 
 void User::updateUserBattleStatus(Json::Value& jv)
