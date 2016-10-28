@@ -122,6 +122,7 @@ Model::Model(IController & controller, bool zerok):
     ADD_ZK_MSG_HANDLER(BattleRemoved)
     ADD_ZK_MSG_HANDLER(BattleUpdate)
     ADD_ZK_MSG_HANDLER(JoinedBattle)
+    ADD_ZK_MSG_HANDLER(JoinBattleSuccess)
     ADD_ZK_MSG_HANDLER(LeftBattle)
     ADD_ZK_MSG_HANDLER(JoinChannelResponse)
     ADD_ZK_MSG_HANDLER(ChannelUserAdded)
@@ -1403,6 +1404,33 @@ void Model::handle_JoinedBattle(std::istream & is)
         sendMyInitialBattleStatus(b);
         battleJoinedSignal_(b);
     }
+}
+
+void Model::handle_JoinBattleSuccess(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+
+    Battle & b = getBattle(jv["BattleID"].asString());
+
+    assert(loggedIn_);
+
+    Json::Value players = jv["Players"];
+
+    for (Json::Value & userBattleStatus : players)
+    {
+        User & u = user(userBattleStatus["Name"].asString());
+        b.joined(u);
+        u.joinedBattle(b);
+        u.updateUserBattleStatus(userBattleStatus);
+
+        userJoinedBattleSignal_(u, b);
+        userChangedSignal_(u);
+    }
+
+    joinedBattleId_ = b.id();
+    sendMyInitialBattleStatus(b);
+    battleJoinedSignal_(b);
 }
 
 void Model::handle_LEFTBATTLE(std::istream & is) // battleId username
