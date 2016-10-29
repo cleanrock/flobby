@@ -1159,7 +1159,6 @@ void Model::handle_User(std::istream & is) // User content
         auto const pairChangeId = user.updateUser(jv);
         if (loggedIn_)
         {
-            userChangedSignal_(user);
             if (pairChangeId.first) {
                 if (user.joinedBattle() != -1) {
                     Battle& b = battle(user.joinedBattle());
@@ -1176,6 +1175,7 @@ void Model::handle_User(std::istream & is) // User content
                     }
                 }
             }
+            userChangedSignal_(user);
         }
     }
     else
