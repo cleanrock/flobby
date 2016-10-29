@@ -1427,6 +1427,7 @@ void Model::handle_JoinedBattle(std::istream & is)
     }
 }
 
+// BattleID, Players=[UpdateUserBattleStatus, ...], Bots=[UpdateBotStatus, ...], Options=Dictionary<string, string>
 void Model::handle_JoinBattleSuccess(std::istream & is)
 {
     Json::Value jv;
@@ -1434,13 +1435,12 @@ void Model::handle_JoinBattleSuccess(std::istream & is)
 
     Battle & b = getBattle(jv["BattleID"].asString());
 
-    assert(loggedIn_);
+    joinedBattleId_ = b.id();
 
     Json::Value players = jv["Players"];
-
-    for (Json::Value & userBattleStatus : players)
+    for (Json::Value& userBattleStatus : players)
     {
-        User & u = user(userBattleStatus["Name"].asString());
+        User& u = user(userBattleStatus["Name"].asString());
         // probably don't need the joined stuff here but keeping until i know for sure
         b.joined(u);
         u.joinedBattle(b);
@@ -1450,13 +1450,18 @@ void Model::handle_JoinBattleSuccess(std::istream & is)
         userChangedSignal_(u);
     }
 
-    joinedBattleId_ = b.id();
     // join as spectator
     auto bs = me().battleStatus();
     bs.spectator(true);
     me().battleStatus(bs);
     sendMyInitialBattleStatus(b);
     battleJoinedSignal_(b);
+
+    Json::Value bots = jv["Bots"];
+    for (Json::Value& updateBotStatus : bots)
+    {
+        handleUpdateBotStatus(updateBotStatus);
+    }
 }
 
 void Model::handle_LEFTBATTLE(std::istream & is) // battleId username
@@ -1674,11 +1679,16 @@ void Model::handle_ADDBOT(std::istream & is) // battleId name owner battleStatus
 
 void Model::handle_UpdateBotStatus(std::istream & is)
 {
+    Json::Value jv;
+    is >> jv;
+
+    handleUpdateBotStatus(jv);
+}
+
+void Model::handleUpdateBotStatus(Json::Value& jv)
+{
     if (-1 != joinedBattleId_)
     {
-        Json::Value jv;
-        is >> jv;
-
         std::string const& botName = jv["Name"].asString();
 
         Bots::iterator it = bots_.find(botName);
