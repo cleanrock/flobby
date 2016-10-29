@@ -20,7 +20,7 @@ public:
     User(Json::Value& jv); // User content
     virtual ~User();
 
-    void updateUser(Json::Value& jv); // User content
+    std::pair<bool,int> updateUser(Json::Value& jv);
     void updateUserBattleStatus(Json::Value& jv); // UpdateUserBattleStatus content
 
     std::string const & name() const;

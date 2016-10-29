@@ -1156,10 +1156,26 @@ void Model::handle_User(std::istream & is) // User content
     {
         // existing user, update
         User& user = *it->second;
-        user.updateUser(jv);
+        auto const pairChangeId = user.updateUser(jv);
         if (loggedIn_)
         {
             userChangedSignal_(user);
+            if (pairChangeId.first) {
+                if (user.joinedBattle() != -1) {
+                    Battle& b = battle(user.joinedBattle());
+                    b.joined(user);
+                    userJoinedBattleSignal_(user, b);
+                }
+                else {
+                    Battle& b = battle(pairChangeId.second);
+                    b.left(user);
+                    userLeftBattleSignal_(user, b);
+                    if (user == me() && b.id () == joinedBattleId_) {
+                        joinedBattleId_ = -1;
+                        bots_.clear();
+                    }
+                }
+            }
         }
     }
     else
@@ -1177,6 +1193,11 @@ void Model::handle_User(std::istream & is) // User content
         else if (loggedIn_)
         {
             userJoinedSignal_(*u);
+            if (u->joinedBattle() != -1) {
+                Battle& b = battle(u->joinedBattle());
+                b.joined(*u);
+                userJoinedBattleSignal_(*u, b);
+            }
         }
         else
         {
@@ -1420,6 +1441,7 @@ void Model::handle_JoinBattleSuccess(std::istream & is)
     for (Json::Value & userBattleStatus : players)
     {
         User & u = user(userBattleStatus["Name"].asString());
+        // probably don't need the joined stuff here but keeping until i know for sure
         b.joined(u);
         u.joinedBattle(b);
         u.updateUserBattleStatus(userBattleStatus);
@@ -1429,6 +1451,10 @@ void Model::handle_JoinBattleSuccess(std::istream & is)
     }
 
     joinedBattleId_ = b.id();
+    // join as spectator
+    auto bs = me().battleStatus();
+    bs.spectator(true);
+    me().battleStatus(bs);
     sendMyInitialBattleStatus(b);
     battleJoinedSignal_(b);
 }

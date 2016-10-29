@@ -54,11 +54,18 @@ User::~User()
 {
 }
 
-void User::updateUser(Json::Value& jv)
+std::pair<bool,int> User::updateUser(Json::Value& jv)  // User content
 {
+    int const battleIdPre = joinedBattle_;
     if (jv.isMember("IsInGame")) status_.inGame(jv["IsInGame"].asBool());
     if (jv.isMember("IsAway")) status_.away(jv["IsAway"].asBool());
     if (jv.isMember("BattleID")) joinedBattle_ = jv["BattleID"].asInt();
+    if (jv.isMember("IsInBattleRoom")) {
+        if (jv["IsInBattleRoom"].asBool() == false) {
+            joinedBattle_ = -1;
+        }
+    }
+    return std::make_pair(battleIdPre != joinedBattle_, battleIdPre);
 }
 
 void User::updateUserBattleStatus(Json::Value& jv)
