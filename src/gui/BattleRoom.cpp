@@ -648,19 +648,19 @@ void BattleRoom::playerClicked(int rowIndex, int button)
         StringTableRow const & row = playerList_->getRow(static_cast<std::size_t>(rowIndex));
 
         // try block will handle players, catch block will handle bots
-        try
-        {
+        try {
             User const & user = model_.getUser(row.id_);
             menuUser(user);
         }
-        catch (std::invalid_argument const & e)
-        {
+        catch (std::invalid_argument const & e) {
             // bot, row.id_ is "botName:ownerName"
-            std::vector<std::string> res;
-            boost::algorithm::split(res, row.id_, boost::is_any_of(":"));
-            assert(res.size() == 2);
-
-            menuBot(res[0], res[1]);
+            try {
+                auto const pairBotOwner = splitAtLast(':', row.id_);
+                menuBot(pairBotOwner.first, pairBotOwner.second);
+            }
+            catch (std::invalid_argument const & e) {
+                LOG(WARNING)<< "colon not found in '"<< row.id_<< "'";
+            }
         }
     }
 }
@@ -671,22 +671,21 @@ void BattleRoom::playerDoubleClicked(int rowIndex, int button)
     {
         StringTableRow const & row = playerList_->getRow(static_cast<std::size_t>(rowIndex));
 
-        try
-        {
+        try {
             User const & user = model_.getUser(row.id_);
-            // player if we get here, i.e. getUser doesnt throw
+            // player if we get here, i.e. getUser doesn't throw
             iTabs_.openPrivateChat(user.name());
         }
-        catch (std::invalid_argument const & e)
-        {
-            // bot, remove bot
-            std::vector<std::string> res;
-            boost::algorithm::split(res, row.id_, boost::is_any_of(":"));
-            assert(res.size() == 2);
-
-            if (res[1] == model_.me().name())
-            {
-                model_.removeBot(res[0]);
+        catch (std::invalid_argument const & e) {
+            // bot, remove bot, row.id_ is "botName:ownerName"
+            try {
+                auto const pairBotOwner = splitAtLast(':', row.id_);
+                if (pairBotOwner.second == model_.me().name()) {
+                    model_.removeBot(pairBotOwner.first);
+                }
+            }
+            catch (std::invalid_argument const & e) {
+                LOG(WARNING)<< "colon not found in '"<< row.id_<< "'";
             }
         }
     }

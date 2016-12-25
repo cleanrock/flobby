@@ -773,3 +773,37 @@ BOOST_AUTO_TEST_CASE(test_getLastWord)
         BOOST_CHECK(pairWordPos.second == 5);
     }
 }
+
+BOOST_AUTO_TEST_CASE(test_splitAtLast)
+{
+    // empty string
+    {
+        BOOST_CHECK_THROW(splitAtLast(':', ""), std::invalid_argument);
+    }
+
+    // not found
+    {
+        BOOST_CHECK_THROW(splitAtLast(':', "asd,dsa"), std::invalid_argument);
+    }
+
+    // simple
+    {
+        auto pair = splitAtLast(':', "before:after");
+        BOOST_CHECK(pair.first == "before");
+        BOOST_CHECK(pair.second == "after");
+    }
+
+    // at beginning
+    {
+        auto pair = splitAtLast(':', ":after");
+        BOOST_CHECK(pair.first == "");
+        BOOST_CHECK(pair.second == "after");
+    }
+
+    // at end
+    {
+        auto pair = splitAtLast(':', "before:");
+        BOOST_CHECK(pair.first == "before");
+        BOOST_CHECK(pair.second == "");
+    }
+}

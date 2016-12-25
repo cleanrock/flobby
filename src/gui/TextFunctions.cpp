@@ -147,3 +147,12 @@ bool flOpenUri(std::string const& uri)
     }
     return result;
 }
+
+std::pair<std::string, std::string> splitAtLast(char ch, std::string const& str)
+{
+    auto pos = str.find_last_of(ch);
+    if (pos == std::string::npos) {
+        throw std::invalid_argument("char not found:" + ch);
+    }
+    return std::make_pair(str.substr(0, pos), str.substr(pos+1));
+}

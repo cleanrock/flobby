@@ -18,6 +18,8 @@ bool containsI(std::string const& text, std::string const& needle);
 
 std::string findMatch(std::vector<std::string> const& strings, std::string const& needle, std::string const& previousMatch = "");
 
+std::pair<std::string, std::string> splitAtLast(char ch, std::string const& str);
+
 // returns current local 24h time string, e.g. "17:59"
 std::string getHourMinuteNow();
 
