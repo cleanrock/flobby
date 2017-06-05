@@ -13,6 +13,7 @@ if(NOT CMAKE_BUILD_TYPE)
       FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
 
 # TODO enable below if/when linking to pr-d static
 #include_directories (
@@ -30,7 +31,12 @@ set(PRD_STATICLIB ON CACHE BOOL "build static lib")
 set(PRD_LINK_STATIC ON CACHE BOOL "link to static lib")
 set(PRD_DEVELOP_FILES OFF CACHE BOOL "install develop files")
 set(PRD_DO_INSTALL ON CACHE BOOL "install any pr-downloader files")
-set(PRD_ARCHIVE_SUPPORT ON CACHE BOOL "archive support interferes with 91.0 unitsync when linking static")
+set(PRD_ARCHIVE_SUPPORT ON CACHE BOOL "enable archive support")
+set(PRD_TESTS OFF CACHE BOOL "Enable prd unit tests")
+set(PRD_JSONCPP_INTERNAL OFF CACHE BOOL "use bundled JsonCpp")
+
+
+
 mark_as_advanced(FORCE
     PRD_CLEAR_COMPILER_FLAGS
     PRD_CONSOLETOOL
@@ -43,6 +49,9 @@ mark_as_advanced(FORCE
     PRD_LIBDIR
     PRD_BINDIR
     PRD_INCLUDE_DIR
+    PRD_ENABLE_LSL
+    PRD_JSONCPP_INTERNAL
+    PRD_TESTS
 )
 
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/pr-downloader/CMakeLists.txt")
