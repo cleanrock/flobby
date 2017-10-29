@@ -13,7 +13,9 @@
 #include "model/Model.h"
 #include "log/Log.h"
 
+#include <FL/Fl_Box.H>
 #include <FL/fl_ask.H>
+#include <FL/Fl.H>
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 #include <cassert>

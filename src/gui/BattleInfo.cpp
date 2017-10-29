@@ -12,6 +12,7 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_Shared_Image.H>
+#include <FL/Fl.H>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
