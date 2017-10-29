@@ -56,7 +56,7 @@ add_library (gui STATIC
 add_dependencies(gui FlobbyConfig)
 
 target_link_libraries (gui
-    ${FLTK_LIBRARIES}
+    fltk fltk_images
     ${GraphicsMagick_LIBRARIES}
     ${X11_Xpm_LIB}
     ${X11_Xscreensaver_LIB}

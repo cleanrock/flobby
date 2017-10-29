@@ -15,12 +15,21 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
 
+# fltk static library
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/fltk/CMakeLists.txt")
+    MESSAGE(FATAL_ERROR "fltk/CMakeLists.txt doesn't exist, run \ngit submodule update --init")
+else()
+    # add include path for FL/abi-version.h
+    include_directories (${CMAKE_BINARY_DIR}/fltk)
+    add_subdirectory (fltk EXCLUDE_FROM_ALL)
+endif()
+
+add_subdirectory (src)
+
 # TODO enable below if/when linking to pr-d static
 #include_directories (
 #    ${PROJECT_SOURCE_DIR}/pr-downloader/src
 #)
-
-add_subdirectory (src)
 
 if (WITH_PRD)
 

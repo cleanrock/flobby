@@ -5,7 +5,7 @@ flobby is developed and tested on archlinux, use AUR package [flobby-git](https:
 
 Dependencies worth noting
 -------------------------
-* FLTK 1.3
+* FLTK 1.4 dependencies (FLTK is a submodule and linked to statically)
 * jsoncpp
 * libxpm
 * libxss

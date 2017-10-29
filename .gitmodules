@@ -1,3 +1,6 @@
 [submodule "pr-downloader"]
 	path = pr-downloader
 	url = https://github.com/spring/pr-downloader.git
+[submodule "fltk"]
+	path = fltk
+	url = https://github.com/cleanrock/test-only.git

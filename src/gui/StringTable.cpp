@@ -5,6 +5,7 @@
 #include "Prefs.h"
 
 #include <FL/fl_draw.H>
+#include <FL/Fl.H>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
