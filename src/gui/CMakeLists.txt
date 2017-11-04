@@ -3,7 +3,7 @@ add_definitions( -DMAGICKCORE_HDRI_ENABLE=0 )
 
 find_package(PkgConfig REQUIRED)
 
-pkg_check_modules(GraphicsMagick REQUIRED GraphicsMagick++)
+pkg_check_modules(GraphicsMagick REQUIRED GraphicsMagick++>=1.3.21)
 
 find_package(X11 COMPONENTS X11_Xpm_LIB X11_Xscreensaver_LIB REQUIRED)
 
