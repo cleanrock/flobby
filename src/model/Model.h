@@ -487,6 +487,10 @@ private:
     void handle_MatchMakerSetup(std::istream & is) {} // TODO
     void handle_MatchMakerStatus(std::istream & is) {} // TODO
     void handle_BattleDebriefing(std::istream & is) {} // TODO
+    void handle_NewsList(std::istream & is) {} // TODO
+    void handle_ForumList(std::istream & is) {} // TODO
+    void handle_LadderList(std::istream & is) {} // TODO
+    void handle_UserProfile(std::istream & is) {} // TODO
 
     // ZeroK specific methods and attributes
     void handleZerokAction(std::string const& action, std::string const& arg);

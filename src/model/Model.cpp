@@ -140,6 +140,10 @@ Model::Model(IController & controller, bool zerok):
     ADD_ZK_MSG_HANDLER(MatchMakerSetup)
     ADD_ZK_MSG_HANDLER(MatchMakerStatus)
     ADD_ZK_MSG_HANDLER(BattleDebriefing)
+    ADD_ZK_MSG_HANDLER(NewsList)
+    ADD_ZK_MSG_HANDLER(ForumList)
+    ADD_ZK_MSG_HANDLER(LadderList)
+    ADD_ZK_MSG_HANDLER(UserProfile)
 }
 
 Model::~Model()
