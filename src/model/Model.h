@@ -495,6 +495,7 @@ private:
     // ZeroK specific methods and attributes
     void handleZerokAction(std::string const& action, std::string const& arg);
     void handleUpdateBotStatus(Json::Value& jv);
+    void handleZkOptions(Json::Value const& jv);
     std::vector<std::string> start_replay_Args_;
     std::string const flobbyDemo_;
     std::set<unsigned int> demoDownloadJobs_;

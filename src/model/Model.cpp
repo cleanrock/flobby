@@ -1466,6 +1466,8 @@ void Model::handle_JoinBattleSuccess(std::istream & is)
     {
         handleUpdateBotStatus(updateBotStatus);
     }
+
+    handleZkOptions(jv["Options"]);
 }
 
 void Model::handle_LEFTBATTLE(std::istream & is) // battleId username
@@ -1589,20 +1591,24 @@ void Model::handle_REMOVESCRIPTTAGS(std::istream & is) // key [key ...]
     }
 }
 
-void Model::handle_SetModOptions(std::istream & is)
+void Model::handleZkOptions(Json::Value const& jv)
 {
     // zero-k seem to always send all options in this message, start by removing all
     removeScriptTagSignal_("*");
 
-    Json::Value jv;
-    is >> jv;
-
-    Json::Value const& jvOptions = jv["Options"];
-    for (Json::ValueConstIterator it = jvOptions.begin(); it != jvOptions.end(); ++it)
+    for (Json::ValueConstIterator it = jv.begin(); it != jv.end(); ++it)
     {
         setScriptTagSignal_(it.key().asString(), (*it).asString());
     }
 
+}
+
+void Model::handle_SetModOptions(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+
+    handleZkOptions(jv["Options"]);
 }
 
 void Model::handle_CLIENTBATTLESTATUS(std::istream & is) // userName battleStatus color
