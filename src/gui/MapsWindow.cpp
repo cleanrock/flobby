@@ -208,7 +208,7 @@ int MapsWindow::MapArea::handle(int event)
         return 1;
     }
 
-    Fl_Widget::handle(event);
+    return Fl_Widget::handle(event);
 }
 
 int MapsWindow::MapArea::mousePosToMapIndex(int x, int y)
