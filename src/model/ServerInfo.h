@@ -11,6 +11,10 @@ struct ServerInfo
     unsigned short udpPort_;
     unsigned short serverMode_;
 
+    // zk specific
+    std::string game_;
+    int userCount_ = 0;
+
     inline void print(std::ostream & os) const;
 };
 
@@ -18,6 +22,12 @@ inline void ServerInfo::print(std::ostream & os) const
 {
     os << "protocolVersion:" << protocolVersion_;
     os << " springVersion:" << springVersion_;
+    if (!game_.empty()) {
+        os << " Game:" << game_;
+    }
+    if (userCount_ > 0) {
+        os << " UserCount:" << userCount_;
+    }
     os << " udpPort:" << udpPort_;
     os << " serverMode:" << serverMode_;
 }

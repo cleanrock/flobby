@@ -144,6 +144,7 @@ Model::Model(IController & controller, bool zerok):
     ADD_ZK_MSG_HANDLER(ForumList)
     ADD_ZK_MSG_HANDLER(LadderList)
     ADD_ZK_MSG_HANDLER(UserProfile)
+    ADD_ZK_MSG_HANDLER(DefaultGameChanged)
 }
 
 Model::~Model()
@@ -1102,6 +1103,8 @@ void Model::handle_Welcome(std::istream & is) // Engine Game Version
     ServerInfo si;
 
     si.springVersion_ = welcome["Engine"].asString();
+    si.game_ = welcome["Game"].asString();
+    si.userCount_ = welcome["UserCount"].asInt();
     si.protocolVersion_ = welcome["Version"].asString();
     si.serverMode_ = 0;
     si.udpPort_ = 0;
@@ -2994,7 +2997,7 @@ void Model::openBattle(int type, std::string const& title, std::string const& pa
     }
     jvBattleHeader["Title"] = titleStripped;
     jvBattleHeader["Engine"] = serverInfo_.springVersion_;
-    jvBattleHeader["Game"] = "zk:stable";
+    jvBattleHeader["Game"] = serverInfo_.game_;
     if (!passwordStripped.empty()) {
         jvBattleHeader["Password"] = passwordStripped;
     }
@@ -3061,3 +3064,15 @@ void Model::handle_ConnectSpring(std::istream & is)
     }
     requestedConnectSpring_ = false;
 }
+
+void Model::handle_DefaultGameChanged(std::istream & is) // Game
+{
+    using namespace LobbyProtocol;
+
+    Json::Value jv;
+    is >> jv;
+
+    serverInfo_.game_ = jv["Game"].asString();
+    serverMsgSignal_("Default Game changed: " + serverInfo_.game_, 0);
+}
+

@@ -482,6 +482,7 @@ private:
     void handle_SetModOptions(std::istream & is);
     void handle_SiteToLobbyCommand(std::istream & is);
     void handle_ConnectSpring(std::istream & is);
+    void handle_DefaultGameChanged(std::istream & is);
     void handle_FriendList(std::istream & is) {} // TODO
     void handle_IgnoreList(std::istream & is) {} // TODO
     void handle_MatchMakerSetup(std::istream & is) {} // TODO
