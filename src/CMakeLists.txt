@@ -1,6 +1,6 @@
 add_definitions(${CMAKE_CXX_FLAGS} "-std=c++0x")
 
-find_package(Boost REQUIRED COMPONENTS system filesystem regex chrono signals thread)
+find_package(Boost REQUIRED COMPONENTS system filesystem regex chrono thread)
 
 ADD_CUSTOM_TARGET(FlobbyConfig
     ${CMAKE_COMMAND} -D FLOBBY_ROOT=${CMAKE_SOURCE_DIR}
