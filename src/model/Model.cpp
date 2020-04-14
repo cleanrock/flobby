@@ -121,6 +121,8 @@ Model::Model(IController & controller, bool zerok):
     ADD_ZK_MSG_HANDLER(BattleAdded)
     ADD_ZK_MSG_HANDLER(BattleRemoved)
     ADD_ZK_MSG_HANDLER(BattleUpdate)
+    ADD_ZK_MSG_HANDLER(BattlePoll)
+    ADD_ZK_MSG_HANDLER(BattlePollOutcome)
     ADD_ZK_MSG_HANDLER(JoinedBattle)
     ADD_ZK_MSG_HANDLER(JoinBattleSuccess)
     ADD_ZK_MSG_HANDLER(LeftBattle)
@@ -1409,6 +1411,29 @@ void Model::handle_JOINEDBATTLE(std::istream & is) // battleId username [scriptP
         }
 
     }
+}
+
+void Model::handle_BattlePoll(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+
+    const std::string msg = (jv["YesNoVote"].asBool() ? "Poll: " : "")
+        + jv["Topic"].asString();
+
+    battleChatMsgSignal_("Nightwatch", msg);
+}
+
+void Model::handle_BattlePollOutcome(std::istream & is)
+{
+    Json::Value jv;
+    is >> jv;
+
+    const std::string msg = (jv["YesNoVote"].asBool() ? "Poll: " : "")
+        + jv["Topic"].asString()
+        + " [END:" + (jv["Success"].asBool() ? "SUCCESS" : "FAILED") + "]";
+
+    battleChatMsgSignal_("Nightwatch", msg);
 }
 
 void Model::handle_JoinedBattle(std::istream & is)

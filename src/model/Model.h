@@ -467,6 +467,8 @@ private:
     void handle_BattleAdded(std::istream & is);
     void handle_BattleRemoved(std::istream & is);
     void handle_BattleUpdate(std::istream & is);
+    void handle_BattlePoll(std::istream & is);
+    void handle_BattlePollOutcome(std::istream & is);
     void handle_JoinedBattle(std::istream & is);
     void handle_JoinBattleSuccess(std::istream & is);
     void handle_LeftBattle(std::istream & is);
