@@ -17,11 +17,9 @@ libjsoncpp-dev libjsoncpp1 \
 libgraphicsmagick++1-dev \
 libcurl4-gnutls-dev \
 libminizip-dev \
-clang-format \
 libxpm-dev \
 libxcb-screensaver0-dev \
 libxss-dev \
-libqt5opengl5-dev \
 checkinstall
 
 
@@ -35,4 +33,4 @@ make -j 12
 make install
 
 
-checkinstall --pakdir="/debpackages/" --pkgname="flobby-u19-" -y
+checkinstall --pakdir="/debpackages" --pkgname="flobby-${DISTRO}-${DISTRO_VERSION}-" -y

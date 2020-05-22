@@ -1,0 +1,13 @@
+version: '3'
+services:
+  flobbybuilder:
+    build: .
+    container_name: flobbybuilder
+    hostname: foobar
+    restart: always
+    #image: "${DISTRO:-debian}:latest"
+    #image: "debian:latest"
+    volumes:
+      - .:/debpackages
+volumes:
+  debpackages: {}
