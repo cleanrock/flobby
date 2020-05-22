@@ -14,6 +14,14 @@ Dependencies worth noting
 * boost
 * C++11 (gcc 4.6 should be enough)
 
+Ubuntu Instructions
+------------------
+* see script: flobby_installer.sh
+* essential build packages: apt-get update
+
+```
+sudo apt-get install -y apt-utils git cmake build-essential pkg-config libboost-system1.67.0 libboost1.67-dev libboost-filesystem-dev libboost-chrono1.67-dev libboost-regex-dev libboost-thread1.67-dev libjsoncpp-dev libjsoncpp1 libgraphicsmagick++1-dev libcurl4-gnutls-dev libminizip-dev clang-format libxpm-dev libxcb-screensaver0-dev libxss-dev libqt5opengl5-dev
+```
 
 Build and run
 -------------

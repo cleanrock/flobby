@@ -1,0 +1,12 @@
+version: '3'
+services:
+  ubuntu-19:
+    build: .
+    container_name: ubuntu-19
+    hostname: u19
+    restart: always
+    image: ubuntu:19.10
+    volumes:
+      - .:/debpackages
+volumes:
+  debpackages: {}
