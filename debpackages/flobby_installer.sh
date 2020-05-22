@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 create_debpkg="${1:-"False"}"
+source .env
 
 apt-get update
 apt-get install -y apt-utils \
@@ -31,6 +32,5 @@ git submodule update --init
 cmake .
 make -j 12
 make install
-
 
 checkinstall --pakdir="/debpackages" --pkgname="flobby-${DISTRO}-${DISTRO_VERSION}-" -y
