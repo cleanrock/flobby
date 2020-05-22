@@ -27,6 +27,15 @@ make -j 4 ( depends on your CPUspeed, use -j 12 for very fast compiling )
 sudo make install
 ```
 
+* to build on docker use:
+
+```
+cd ubuntu
+docker-compuse up --build
+# grep some coffee...
+# finished build should plop up after a while in $(pwd) e.g.: flobby-u19.deb_20200521-1_amd64.deb
+```
+
 Build and run
 -------------
     git clone --recursive https://github.com/cleanrock/flobby.git
