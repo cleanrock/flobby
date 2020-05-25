@@ -1,14 +1,2 @@
-CMakeFiles/
-cmake_install.cmake
-CMakeCache.txt
-Makefile
-callgrind.out.*
-.settings/
-.cproject
-.project
-*.a
-*.log
-src/flobby
-src/test/unittest
-src/test/script.txt
-src/FlobbyConfig.h
+*.swp
+**.deb

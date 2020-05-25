@@ -14,6 +14,27 @@ Dependencies worth noting
 * boost
 * C++11 (gcc 4.6 should be enough)
 
+Ubuntu Instructions
+------------------
+* see script: ubuntu/flobby_installer.sh
+* essential build packages:
+
+```
+sudo apt-get update
+sudo apt-get install -y apt-utils git cmake build-essential pkg-config libboost-system1.67.0 libboost1.67-dev libboost-filesystem-dev libboost-chrono1.67-dev libboost-regex-dev libboost-thread1.67-dev libjsoncpp-dev libjsoncpp1 libgraphicsmagick++1-dev libcurl4-gnutls-dev libminizip-dev clang-format libxpm-dev libxcb-screensaver0-dev libxss-dev libqt5opengl5-dev
+cmake .
+make -j 4 ( depends on your CPUspeed, use -j 12 for very fast compiling )
+sudo make install
+```
+
+* to build on docker use:
+
+```
+cd ubuntu
+docker-compuse up --build
+# grep some coffee...
+# finished build should plop up after a while in $(pwd) e.g.: flobby-u19.deb_20200521-1_amd64.deb
+```
 
 Build and run
 -------------
